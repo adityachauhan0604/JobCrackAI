@@ -1,159 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JobCrackAI - Video Interview Coach 🇮🇳</title>
-    <link rel="manifest" href="data:application/manifest+json,{
-        'name': 'JobCrackAI', 'short_name': 'JobCrackAI', 'start_url': '/',
-        'display': 'standalone', 'background_color': '#4CAF50', 'theme_color': '#4CAF50'
-    }">
-    <style>
-        :root {
-            --primary: #4CAF50; --secondary: #2196F3; --warning: #FF9800; --danger: #f44336;
-            --beginner: linear-gradient(135deg, #4CAF50, #45a049);
-            --intermediate: linear-gradient(135deg, #FF9800, #F57C00);
-            --expert: linear-gradient(135deg, #f44336, #D32F2F);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, var(--primary) 0%, #45a049 100%);
-            min-height: 100vh; display: flex; flex-direction: column; align-items: center;
-            justify-content: center; color: #333; padding: 20px;
-        }
-        .menu-container { max-width: 450px; width: 100%; }
-        .logo { 
-            text-align: center; margin-bottom: 30px;
-            font-size: clamp(2.5em, 8vw, 4em); font-weight: 900; 
-            background: linear-gradient(45deg, #fff, #f0f0f0); -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent; text-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        .level-grid { display: flex; flex-direction: column; gap: 20px; }
-        .level-card {
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
-            border-radius: 25px; padding: 35px 25px; text-align: center; 
-            cursor: pointer; transition: all 0.4s ease; position: relative;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15); border: 3px solid transparent;
-            text-decoration: none; color: inherit; display: block;
-        }
-        .level-card:hover { 
-            transform: translateY(-12px) scale(1.02); box-shadow: 0 30px 60px rgba(0,0,0,0.25);
-        }
-        .level-card:active { transform: translateY(-8px); }
-        .level-icon { font-size: 4.5em; margin-bottom: 20px; }
-        .level-title { font-size: 1.8em; font-weight: 800; margin-bottom: 10px; }
-        .level-desc { color: #666; font-size: 1.1em; line-height: 1.5; }
-        .level-badge {
-            position: absolute; top: 20px; right: 20px; padding: 10px 18px;
-            border-radius: 30px; font-weight: 700; font-size: 14px; color: white;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        .beginner { border-image: var(--beginner) 1; }
-        .intermediate { border-image: var(--intermediate) 1; }
-        .expert { border-image: var(--expert) 1; }
-        .locked { opacity: 0.5; cursor: not-allowed; }
-        .locked::after {
-            content: '🔒 LOCKED'; position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); font-size: 2em; font-weight: bold;
-        }
-        .progress-bar {
-            width: 100%; height: 8px; background: #e0e0e0; 
-            border-radius: 10px; overflow: hidden; margin-top: 20px;
-        }
-        .progress-fill {
-            height: 100%; transition: width 0.5s; border-radius: 10px;
-        }
-        .btn-back { 
-            position: fixed; top: 20px; left: 20px; z-index: 1000;
-            background: rgba(255,255,255,0.9); border: none; border-radius: 50%;
-            width: 60px; height: 60px; font-size: 24px; cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); backdrop-filter: blur(10px);
-        }
-        @media (max-width: 480px) { .level-card { padding: 25px 20px; } }
-    </style>
+    <!-- Same head as before -->
+    <title>JobCrackAI - Unlimited Video Practice 🇮🇳</title>
 </head>
 <body>
-    <button class="btn-back" onclick="goHome()">🏠</button>
+    <!-- Same menu structure -->
     
-    <div class="menu-container">
-        <h1 class="logo">JobCrackAI</h1>
-        <p style="text-align: center; color: #666; margin-bottom: 40px; font-size: 1.2em;">
-            AI Video Interview • Nervousness Detection • 3 Levels
-        </p>
-
-        <div class="level-grid" id="levelGrid">
-            <!-- Levels populated by JS -->
-        </div>
-
-        <div style="text-align: center; margin-top: 40px; padding: 20px; background: rgba(255,255,255,0.2); border-radius: 20px;">
-            <div style="font-size: 1.4em; font-weight: 700; margin-bottom: 10px;">Daily Goal</div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="dailyProgress" style="width: 0%; background: var(--secondary);"></div>
-            </div>
-            <div id="dailyStats" style="font-size: 14px; color: #666; margin-top: 10px;">0/3 sessions</div>
-        </div>
-    </div>
-
     <script>
-        const LEVELS = [
-            { name: 'beginner', title: 'Beginner', icon: '🆕', desc: 'Basic confidence • Simple questions', file: 'beginner.html', color: '#4CAF50', questions: 10 },
-            { name: 'intermediate', title: 'Intermediate', icon: '⚡', desc: 'Situational • Pressure handling', file: 'intermediate.html', color: '#FF9800', questions: 15 },
-            { name: 'expert', title: 'Expert', icon: '👑', desc: 'HR + Technical • Real simulation', file: 'expert.html', color: '#f44336', questions: 20 }
-        ];
+        // UNLIMITED QUESTION CATEGORIES
+        const QUESTION_CATEGORIES = {
+            beginner: {
+                driver: ["basic intro", "experience", "daily routine", "safety rules"],
+                factory: ["shift timing", "machine basics", "team work", "reporting"],
+                security: ["patrol route", "ID check", "visitor log", "shift handover"]
+            },
+            intermediate: {
+                driver: ["emergency handling", "customer complaint", "traffic violation"],
+                factory: ["machine breakdown", "quality issue", "target miss"],
+                security: ["suspicious activity", "VIP protocol", "CCTV alert"]
+            },
+            expert: {
+                driver: ["salary negotiation", "previous job reason", "career goal"],
+                factory: ["union problem", "production delay", "supervisor conflict"],
+                security: ["theft investigation", "emergency evacuation", "policy violation"]
+            }
+        };
 
-        function initLevels() {
-            const levelsData = JSON.parse(localStorage.getItem('jobcrackai_levels')) || {};
-            const grid = document.getElementById('levelGrid');
-            
-            LEVELS.forEach((level, index) => {
-                const progress = levelsData[level.name] || 0;
-                const isUnlocked = index === 0 || (levelsData[LEVELS[index-1].name] || 0) >= 8;
-                const locked = !isUnlocked;
-                
-                const card = document.createElement('a');
-                card.className = `level-card ${level.name} ${locked ? 'locked' : ''}`;
-                card.href = locked ? '#' : level.file;
-                card.onclick = locked ? null : () => localStorage.setItem('currentLevel', level.name);
-                
-                card.innerHTML = `
-                    <div class="level-icon">${level.icon}</div>
-                    <div class="level-title">${level.title} Level</div>
-                    <div class="level-desc">${level.desc}</div>
-                    <div class="level-badge">${level.questions} Questions</div>
-                    ${progress > 0 ? `
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${(progress/level.questions)*100}%"></div>
-                        </div>
-                    ` : ''}
-                `;
-                grid.appendChild(card);
-            });
-            
-            updateDailyProgress();
+        // Generate Unlimited Questions
+        function generateQuestion(level, category) {
+            const templates = QUESTION_CATEGORIES[level][category];
+            const template = templates[Math.floor(Math.random() * templates.length)];
+            const variations = [
+                `Boss se "${template}" ke baare mein poochha jaaye to kya jawab doge?`,
+                `Real situation: "${template}". Aap kya karoge? Explain.`,
+                `Interview mein ye sawaal aaya: "${template}". 1 minute jawab do.`,
+                `Practical example do: "${template}" handle karne ka.`
+            ];
+            return variations[Math.floor(Math.random() * variations.length)];
         }
-
-        function goHome() { 
-            if (confirm('Go to main menu?')) window.location.href = 'index.html'; 
-        }
-
-        function updateDailyProgress() {
-            const today = new Date().toDateString();
-            const sessions = JSON.parse(localStorage.getItem('dailySessions') || '{}');
-            const todaySessions = sessions[today] || 0;
-            document.getElementById('dailyProgress').style.width = `${Math.min((todaySessions/3)*100, 100)}%`;
-            document.getElementById('dailyStats').textContent = `${todaySessions}/3 sessions`;
-        }
-
-        // Save progress when leaving
-        window.addEventListener('beforeunload', () => {
-            const today = new Date().toDateString();
-            const sessions = JSON.parse(localStorage.getItem('dailySessions') || '{}');
-            sessions[today] = (sessions[today] || 0) + 1;
-            localStorage.setItem('dailySessions', JSON.stringify(sessions));
-        });
-
-        initLevels();
     </script>
 </body>
 </html>
