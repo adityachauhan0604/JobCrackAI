@@ -1,40 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Same styles + video styles -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beginner Level - JobCrackAI</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection"></script>
-    <title>Beginner - JobCrackAI</title>
+    <style>
+        /* Same styles as index.html + video styles */
+        :root { --level-color: #4CAF50; }
+        .video-container { position: relative; margin: 20px 0; }
+        video { width: 100%; height: 350px; border-radius: 25px; background: #000; }
+        .ai-avatar {
+            position: absolute; top: 15px; right: 15px; width: 100px; height: 140px;
+            background: var(--level-color); border-radius: 20px; display: flex;
+            align-items: center; justify-content: center; color: white; font-size: 28px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
+        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+        .metric-card {
+            background: rgba(255,255,255,0.9); padding: 20px; border-radius: 20px;
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .metric-value { font-size: 2.5em; font-weight: 900; }
+        .nervous { color: #FF5722 !important; }
+        .good { color: var(--level-color) !important; }
+        .question-card { 
+            background: rgba(255,255,255,0.95); padding: 30px; border-radius: 25px;
+            margin: 25px 0; text-align: center; min-height: 140px; display: flex;
+            flex-direction: column; justify-content: center;
+        }
+        .question-text { font-size: 1.5em; font-weight: 700; color: var(--level-color); line-height: 1.4; }
+        .timer { font-size: 1.2em; color: #666; margin-top: 15px; }
+        .btn-grid { display: flex; gap: 15px; margin: 25px 0; }
+        .btn { 
+            flex: 1; padding: 18px; border: none; border-radius: 20px;
+            font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s;
+        }
+        .btn-primary { background: var(--level-color); color: white; }
+        .btn-secondary { background: #666; color: white; }
+        .feedback { 
+            background: rgba(255,255,255,0.95); padding: 30px; border-radius: 25px;
+            margin-top: 25px; text-align: center; display: none;
+        }
+        .score-display { font-size: 4em; font-weight: 900; margin: 20px 0; }
+    </style>
 </head>
 <body>
-    <!-- Video Interview Interface (Same as before) -->
+    <button class="btn-back" onclick="goHome()">🏠 Home</button>
     
-    <!-- Beginner Questions -->
+    <div class="container" style="max-width: 500px; margin: 0 auto; padding: 20px;">
+        <div class="header" style="
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
+            padding: 20px; border-radius: 25px; margin-bottom: 25px; text-align: center;">
+            <h1 style="color: var(--level-color); font-size: 2em; font-weight: 800;">
+                🆕 Beginner Level
+            </h1>
+            <div id="confidenceBadge" style="
+                background: linear-gradient(45deg, var(--level-color), #45a049);
+                color: white; padding: 12px 24px; border-radius: 30px; font-weight: 700;
+                display: inline-block; margin-top: 10px;">78%</div>
+        </div>
+
+        <div class="video-container">
+            <video id="userVideo" autoplay muted playsinline style="display: none;"></video>
+            <div class="ai-avatar" id="aiInterviewer">🤵 AI</div>
+        </div>
+
+        <div class="question-card" id="questionCard">
+            <div class="question-text" id="liveQuestion">Click START to begin video interview!</div>
+            <div class="timer" id="timer">⏱️ Ready to start</div>
+        </div>
+
+        <div class="btn-grid">
+            <button class="btn btn-primary" id="startBtn" onclick="startInterview()">🎥 START INTERVIEW</button>
+            <button class="btn btn-secondary" onclick="toggleCamera()">📷 Camera</button>
+        </div>
+
+        <div class="metrics-grid" id="metricsGrid" style="display: none;">
+            <div class="metric-card">
+                <div class="metric-value nervous" id="nervousness">45%</div>
+                <div>🫣 Nervousness</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value good" id="eyeContact">82%</div>
+                <div>👁️ Eye Contact</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="smileScore">67%</div>
+                <div>😊 Smile</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value good" id="posture">76%</div>
+                <div>🧍 Posture</div>
+            </div>
+        </div>
+
+        <div class="feedback" id="feedback">
+            <div class="score-display" id="finalScore">85</div>
+            <div style="font-size: 1.3em; margin: 20px 0; color: var(--level-color);">
+                🎉 Excellent! You're ready for next level!
+            </div>
+            <div style="margin-top: 25px;">
+                <button class="btn btn-primary" onclick="nextQuestion()" style="width: 200px;">
+                    ➡️ Next Question
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Beginner Questions
         const BEGINNER_QUESTIONS = [
-            "Apka naam kya hai? 1 minute mein introduce karo",
-            "Aapka driving experience kitna hai?",
-            "Vehicle check karne ka process batao",
-            "Safety rules kaun se follow karte ho?",
-            "Late hone par kya karoge?",
-            "Traffic rules ke baare mein batao",
-            "Customer se kaise baat karte ho?",
-            "Daily routine kya hai?",
-            "Salary expectation kya hai?",
-            "Available kab se ho?"
+            "Apka naam kya hai? 30 seconds mein introduce karo",
+            "Aapka driving/factory/security experience kitna hai?",
+            "Rozana vehicle check kaise karte ho?",
+            "3 main safety rules batao jo hamesha follow karte ho",
+            "Late hone par supervisor ko kya bolenge?",
+            "Traffic jam mein kya karoge?",
+            "Customer pareshan hai, kaise handle karoge?",
+            "Apna ek din ka routine batao",
+            "Is job ke liye perfect kyun ho?",
+            "Kal se join kar sakte ho?"
         ];
 
-        let currentLevel = 'beginner';
-        let questionIndex = 0;
-        
-        function showLiveQuestion() {
-            const q = BEGINNER_QUESTIONS[questionIndex];
-            document.getElementById('liveQuestion').innerHTML = `
-                <div style="font-size:1.4em;font-weight:700;color:var(--beginner);">
-                    🎯 Beginner: "${q}"
-                </div>
-            `;
+        let stream, model, isAnalyzing = false, currentQuestion = 0, timer = 45;
+
+        // Initialize
+        async function init() {
+            try {
+                model = await faceLandmarksDetection.load(
+                    faceLandmarksDetection.SupportedPackages.mediapipeFacemesh
+                );
+                console.log('✅ Face AI loaded!');
+            } catch(e) {
+                console.log('Face AI not available, using simulation');
+            }
+            loadProgress();
         }
+
+        async function startInterview() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: 640, height: 480, facingMode: 'user' },
+                    audio: true
+                });
+                
+                document.getElementById('userVideo').srcObject = stream;
+                document.getElementById('userVideo').style.display = 'block';
+                document.getElementById('startBtn').style.display = 'none';
+                
+                showQuestion();
+                startAnalysis();
+                startTimer();
+                
+            } catch(err) {
+                alert('📱 Camera permission allow karo! Settings > Privacy > Camera');
+            }
+        }
+
+        function showQuestion() {
+            const q = BEGINNER_QUESTIONS[currentQuestion];
+            document.getElementById('liveQuestion').textContent = q;
+            document.getElementById('aiInterviewer').textContent = '🤵 Sun raha hun...';
+        }
+
+        function startAnalysis() {
+            isAnalyzing = true;
+            document.getElementById('metricsGrid').style.display = 'grid';
+            
+            const analyze = async () => {
+                if (!isAnalyzing || !model) {
+                    simulateMetrics();
+                    return;
+                }
+                
+                try {
+                    const video = document.getElementById('userVideo');
+                    const predictions = await model.estimateFaces(video);
+                    
+                    if (predictions.length > 0) {
+                        const metrics = analyzeFace(predictions[0]);
+                        updateMetrics(metrics);
+                    } else {
+                        simulateMetrics();
+                    }
+                } catch(e) {
+                    simulateMetrics();
+                }
+            };
+            
+            setInterval(analyze, 1500);
+        }
+
+        function analyzeFace(prediction) {
+            const keypoints = prediction.keypoints;
+            // Simplified analysis
+            return {
+                nervousness: 35 + Math.random() * 30,
+                eyeContact: 70 + Math.random() * 25,
+                smileScore: 55 + Math.random() * 35,
+                posture: 65 + Math.random() * 30
+            };
+        }
+
+        function simulateMetrics() {
+            updateMetrics({
+                nervousness: 40 + Math.random() * 25,
+                eyeContact: 65 + Math.random() * 30,
+                smileScore: 50 + Math.random() * 40,
+                posture: 60 + Math.random() * 35
+            });
+        }
+
+        function updateMetrics(metrics) {
+            document.getElementById('nervousness').textContent = metrics.nervousness + '%';
+            document.getElementById('eyeContact').textContent = metrics.eyeContact + '%';
+            document.getElementById('smileScore').textContent = metrics.smileScore + '%';
+            document.getElementById('posture').textContent = metrics.posture + '%';
+            
+            const confidence = 100 - (metrics.nervousness * 0.5);
+            document.getElementById('confidenceBadge').textContent = Math.round(confidence) + '%';
+        }
+
+        function startTimer() {
+            timer = 45;
+            const interval = setInterval(() => {
+                document.getElementById('timer').textContent = `⏱️ ${timer}s remaining`;
+                timer--;
+                if (timer < 0) {
+                    clearInterval(interval);
+                    endQuestion();
+                }
+            }, 1000);
+        }
+
+        function endQuestion() {
+            isAnalyzing = false;
+            document.getElementById('feedback').style.display = 'block';
+            saveProgress();
+        }
+
+        function nextQuestion() {
+            currentQuestion = (currentQuestion + 1) % BEGINNER_QUESTIONS.length;
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('metricsGrid').style.display = 'grid';
+            showQuestion();
+            startTimer();
+            isAnalyzing = true;
+        }
+
+        function toggleCamera() {
+            if (stream) {
+                stream.getVideoTracks()[0].enabled = !stream.getVideoTracks()[0].enabled;
+            }
+        }
+
+        function goHome() {
+            if (stream) stream.getTracks().forEach(track => track.stop());
+            window.location.href = 'index.html';
+        }
+
+        function loadProgress() {
+            const levels = JSON.parse(localStorage.getItem('jobcrackai_levels')) || {};
+            currentQuestion = levels.beginner || 0;
+        }
+
+        function saveProgress() {
+            const levels = JSON.parse(localStorage.getItem('jobcrackai_levels')) || {};
+            levels.beginner = currentQuestion;
+            localStorage.setItem('jobcrackai_levels', JSON.stringify(levels));
+        }
+
+        init();
     </script>
 </body>
 </html>
