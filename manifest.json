@@ -1,0 +1,15 @@
+{
+  "name": "JobCrackAI",
+  "short_name": "JobCrackAI", 
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#4CAF50",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSIjNENBRjUwIi8+CjxwYXRoIGQ9Ik0xMjAgOTBDMTIwIDExMi4xIDExMi4xIDEyMCAxMDAgMTIwQzg3LjkgMTIwIDc2LjEgMTEyLjEgNjQgMTAwQzY0IDg3LjkgNzEuOSA3NiA4NCA3NkM5Ni4xIDc2IDEwNCA4Ny45IDEwNCAxMDBDMTA0IDExMi4xIDExMi4xIDEyMCAxMjAgMTBDMTI4LjEgMTIwIDEzNiA5MTAuMSAxMzYgMTAwUzEyOC4xIDEyMCAxMjAgMTB6IiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
