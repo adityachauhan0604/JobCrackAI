@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Same styles + video styles -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection"></script>
+    <title>Beginner - JobCrackAI</title>
+</head>
+<body>
+    <!-- Video Interview Interface (Same as before) -->
+    
+    <!-- Beginner Questions -->
+    <script>
+        const BEGINNER_QUESTIONS = [
+            "Apka naam kya hai? 1 minute mein introduce karo",
+            "Aapka driving experience kitna hai?",
+            "Vehicle check karne ka process batao",
+            "Safety rules kaun se follow karte ho?",
+            "Late hone par kya karoge?",
+            "Traffic rules ke baare mein batao",
+            "Customer se kaise baat karte ho?",
+            "Daily routine kya hai?",
+            "Salary expectation kya hai?",
+            "Available kab se ho?"
+        ];
+
+        let currentLevel = 'beginner';
+        let questionIndex = 0;
+        
+        function showLiveQuestion() {
+            const q = BEGINNER_QUESTIONS[questionIndex];
+            document.getElementById('liveQuestion').innerHTML = `
+                <div style="font-size:1.4em;font-weight:700;color:var(--beginner);">
+                    🎯 Beginner: "${q}"
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
