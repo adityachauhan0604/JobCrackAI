@@ -859,7 +859,18 @@ footer{
 
     <!-- Pay Button -->
     <button class="btn-pay" id="mainPayBtn" onclick="handlePayment()">✅ Maine Pay Kar Diya – Activate Karo</button>
-    <p style="text-align:center;font-size:0.72rem;color:var(--muted);margin-top:8px">Ya Instagram pe DM karo: <a href="https://instagram.com/jobcrackai" target="_blank" style="color:#e1306c;text-decoration:none;font-weight:600">@jobcrackai</a></p>
+
+    <!-- Activation code box (shown after screenshot upload) -->
+    <div id="activateCodeBox" style="display:none;margin-top:12px;background:rgba(34,211,165,0.07);border:1px solid rgba(34,211,165,0.25);border-radius:10px;padding:14px;text-align:center">
+      <p style="font-size:0.82rem;color:var(--text);margin-bottom:8px;font-weight:600">📲 Activation Code Daalo</p>
+      <p style="font-size:0.74rem;color:var(--muted);margin-bottom:10px">Screenshot bhejne ke baad Aditya (<a href="https://instagram.com/jobcrackai" target="_blank" style="color:#e1306c;font-weight:600">@jobcrackai</a>) se code lo</p>
+      <div style="display:flex;gap:8px">
+        <input id="activateCodeInput" type="text" placeholder="Code daalo (e.g. JCAI99)" style="flex:1;padding:9px 12px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:0.9rem;font-family:monospace;text-transform:uppercase">
+        <button onclick="activateWithCode()" style="background:linear-gradient(135deg,var(--accent),#059669);border:none;color:white;padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.85rem">✅ Activate</button>
+      </div>
+    </div>
+
+    <p style="text-align:center;font-size:0.72rem;color:var(--muted);margin-top:10px">Support: <a href="https://instagram.com/jobcrackai" target="_blank" style="color:#e1306c;text-decoration:none;font-weight:600">@jobcrackai</a> Instagram</p>
   </div>
 </div>
 
@@ -1337,17 +1348,33 @@ function handlePayment() {
     return;
   }
 
-  // Screenshot uploaded — activate premium + send via Instagram/Telegram
-  const btn = document.getElementById('mainPayBtn');
-  btn.textContent = '⏳ Activating...';
-  btn.disabled = true;
+  // Screenshot uploaded — show code entry box
+  document.getElementById('ssUploadBox').style.border = '2px solid var(--accent)';
+  document.getElementById('mainPayBtn').style.display = 'none';
+  document.getElementById('activateCodeBox').style.display = 'block';
+  showToast('📲 Screenshot mil gaya! Aditya se activation code lo.');
+  // Open Instagram DM
+  window.open('https://www.instagram.com/jobcrackai', '_blank');
+}
 
-  setTimeout(() => {
-    activatePremium(plan);
-    btn.disabled = false;
-    // Open Instagram DM to notify
-    window.open('https://instagram.com/jobcrackai', '_blank');
-  }, 1200);
+function activateWithCode() {
+  const code = document.getElementById('activateCodeInput').value.trim().toUpperCase();
+  // Valid codes — add more from your end
+  const VALID_CODES = {
+    'JCAI99':   'jobseeker',
+    'JCAI499':  'lifetime',
+    'JCAIGULF': 'global',
+    'JCAIVIP':  'lifetime',
+    'ADMIN2025':'lifetime',
+  };
+  if (VALID_CODES[code]) {
+    activatePremium(VALID_CODES[code]);
+    showToast('🎉 Premium activated! Unlimited interviews!');
+  } else {
+    showToast('❌ Galat code. Aditya se sahi code lo.');
+    document.getElementById('activateCodeInput').style.border = '1px solid var(--danger)';
+    setTimeout(() => { document.getElementById('activateCodeInput').style.border = ''; }, 2000);
+  }
 }
 
 function confirmPay() { handlePayment(); }
@@ -1571,56 +1598,37 @@ Evaluate this answer and respond according to your instructions.`;
       return;
     }
     const fullPrompt = systemPrompt + '\n\n' + userMsg;
-    // ── Streaming call for instant feedback ──
-    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:streamGenerateContent?alt=sse&key=' + GEMINI_KEY, {
+
+    // ── Simple Gemini API call ──
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + GEMINI_KEY, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: fullPrompt }] }],
-        generationConfig: { maxOutputTokens: 500, temperature: 0.7 }
+        contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
+        generationConfig: { maxOutputTokens: 400, temperature: 0.7 }
       })
     });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    document.getElementById('aiFeedbackLoader').style.display = 'none';
-    document.getElementById('aiFeedbackPanel').style.display = 'block';
-    document.getElementById('aiFeedbackText').textContent = '';
-
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let rawText = '';
-    let streamDone = false;
-    while (!streamDone) {
-      const { done, value } = await reader.read();
-      if (done) { streamDone = true; break; }
-      const chunk = decoder.decode(value, { stream: true });
-      const lines = chunk.split('\n');
-      for (const line of lines) {
-        if (!line.startsWith('data: ')) continue;
-        const jsonStr = line.slice(6).trim();
-        if (jsonStr === '[DONE]') { streamDone = true; break; }
-        try {
-          const parsed = JSON.parse(jsonStr);
-          const piece = parsed.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          if (piece) {
-            rawText += piece;
-            // Show partial feedback immediately (just FEEDBACK part)
-            const partialFB = rawText.match(/FEEDBACK:\s*([\s\S]*?)(?:ACTION:|$)/);
-            if (partialFB) document.getElementById('aiFeedbackText').textContent = partialFB[1].trim();
-            else document.getElementById('aiFeedbackText').textContent = rawText;
-          }
-        } catch(_) {}
-      }
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData?.error?.message || 'HTTP ' + res.status);
     }
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
 
-    // Parse final
+    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (!rawText) throw new Error('AI ne khaali response diya');
+
+    // Parse structured response
     const feedbackMatch = rawText.match(/FEEDBACK:\s*([\s\S]*?)(?:ACTION:|$)/);
-    const actionMatch = rawText.match(/ACTION:\s*(\w+)/);
-    const nextQMatch = rawText.match(/NEXT_Q:\s*([\s\S]*?)$/);
+    const actionMatch   = rawText.match(/ACTION:\s*(NEXT_QUESTION|RETRY)/);
+    const nextQMatch    = rawText.match(/NEXT_Q:\s*([\s\S]*?)$/);
 
-    const feedbackText = feedbackMatch ? feedbackMatch[1].trim() : rawText;
-    const action = actionMatch ? actionMatch[1].trim() : 'NEXT_QUESTION';
-    const nextQ = nextQMatch ? nextQMatch[1].trim() : '';
+    const feedbackText = feedbackMatch ? feedbackMatch[1].trim() : rawText.trim();
+    const action       = actionMatch   ? actionMatch[1].trim()   : 'NEXT_QUESTION';
+    const nextQ        = nextQMatch    ? nextQMatch[1].trim()    : '';
 
+    document.getElementById('aiFeedbackLoader').style.display = 'none';
+    document.getElementById('aiFeedbackPanel').style.display  = 'block';
     document.getElementById('aiFeedbackText').textContent = feedbackText;
     document.getElementById('aiStatus').textContent = 'AI Interviewer is speaking...';
 
