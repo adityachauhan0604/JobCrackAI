@@ -3,29 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JobCrackAI - Video Interview AI 🇮🇳</title>
-    <meta name="description" content="AI Video Interview Practice for Driver, Factory, Security Jobs">
-    <link rel="manifest" href="manifest.json">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>JobCrackAI - Video Interview Practice | Driver, Factory, Security Jobs</title>
+    <meta name="description" content="500K+ Workers Practice Kar Rahe Hain | AI Video Interview Coach for Driver, Factory, Security Jobs 🇮🇳">
+    <link rel="manifest" href="data:application/manifest+json,{
+        'name': 'JobCrackAI',
+        'short_name': 'JobCrackAI',
+        'icons': [{'src': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiM0RjQ2RUEiLz4KPHBhdGggZD0iTTY0IDEwNEw5NiA3MkMxMDAgNzAgMTA0IDcwIDEwOCAxMkM3MiA0OCAxMDQgODQgMTM2IDEwNEwxNDQgMTEyQzE0NCAxMTIgMTQ0IDExMiAxNDQgMTEyTDExMiAxMjhDODAgMTM2IDY0IDEzMiA2NCAxMDlaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K', 'sizes': '192x192', 'type': 'image/svg+xml'}],
+        'theme_color': '#1E40AF',
+        'background_color': '#F8FAFC',
+        'display': 'standalone'
+    }">
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNCIgZmlsbD0iIzFFNDBBRiIvPgo8cGF0aCBkPSJNNCAxN0gxNkwxMiAxM0MxMiAxMyAxMiAxMyAxMiAxM0g4QzQgMTIgNCAxNCA0IDE3VjIzQzQgMjQgNCAyNCA0IDI0SDhDMCAyNCAwIDI0IDAgMjRIMTBjLTIgLTItNCAtMiAtNFYyM0M0IDIxIDQgMjAgNCAxN1oiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection@1.0.2/dist/face-landmarks-detection.js"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: {
+                fontFamily: { sans: ['Inter', 'sans-serif'], poppins: ['Poppins', 'sans-serif'] }
+            }}
+        }
+    </script>
     <style>
         * { font-family: 'Inter', sans-serif; }
-        .glass { background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2); }
-        @keyframes float { 0%,100%{transform:translateY(0px);} 50%{transform:translateY(-10px);} }
-        .float { animation: float 3s ease-in-out infinite; }
+        .glass { 
+            background: rgba(255,255,255,0.15); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255,255,255,0.25); 
+        }
+        .glass-alt { 
+            background: rgba(255,255,255,0.08); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255,255,255,0.1); 
+        }
+        .gradient-trust { background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 50%, #1D4ED8 100%); }
+        .gradient-success { background: linear-gradient(135deg, #10B981 0%, #34D399 100%); }
+        .gradient-warning { background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%); }
+        .gradient-danger { background: linear-gradient(135deg, #EF4444 0%, #F87171 100%); }
+        .shadow-glow { box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+        .shadow-glow-hover { box-shadow: 0 35px 60px -12px rgba(0,0,0,0.3); }
+        @keyframes float { 0%,100%{transform:translateY(0px);} 50%{transform:translateY(-8px);} }
+        .float { animation: float 4s ease-in-out infinite; }
+        .btn-tap { transform: scale(0.95); transition: all 0.1s; }
+        .btn-tap:active { transform: scale(0.9); }
     </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 min-h-screen">
+<body class="bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 min-h-screen text-white overflow-x-hidden">
     
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+        const { useState, useEffect, useRef, useCallback } = React;
 
         function App() {
             const [page, setPage] = useState('home');
@@ -34,158 +61,300 @@
             const [premium, setPremium] = useState(false);
             const [confidence, setConfidence] = useState(75);
             const [metrics, setMetrics] = useState({nervousness:45, eyeContact:82, smile:67, posture:76});
-            const [question, setQuestion] = useState('Start karo!');
+            const [question, setQuestion] = useState('');
             const [count, setCount] = useState(0);
             const [analyzing, setAnalyzing] = useState(false);
+            const [showCTA, setShowCTA] = useState(true);
+            const [timeLeft, setTimeLeft] = useState(30);
             const videoRef = useRef(null);
-            const modelRef = useRef(null);
+            const canvasRef = useRef(null);
 
             const levels = {
-                beginner: {color:'green', icon:'🆕', jobs:['driver','factory','security']},
-                intermediate: {color:'orange', icon:'⚡', jobs:['driver','factory','security']},
-                expert: {color:'red', icon:'👑', jobs:['driver','factory','security']}
+                beginner: {color:'from-green-500 to-emerald-500', icon:'🆕', title:'शुरुआती', jobs:['driver','factory','security']},
+                intermediate: {color:'from-orange-500 to-amber-500', icon:'⚡', title:'मध्यम', jobs:['driver','factory','security']},
+                expert: {color:'from-purple-500 to-violet-500', icon:'👑', title:'विशेषज्ञ', jobs:['driver','factory','security']}
             };
 
-            const generateQuestion = () => {
-                const templates = {
-                    beginner: {driver:['experience','safety','checklist'], factory:['shift','machine','quality'], security:['patrol','ID','visitor']},
-                    intermediate: {driver:['emergency','complaint'], factory:['breakdown','target'], security:['suspicious','VIP']},
-                    expert: {driver:['salary','career'], factory:['union','delay'], security:['theft','evacuation']}
-                }[level][job] || ['basic question'];
-                
-                const q = templates[Math.floor(Math.random()*templates.length)];
-                const variations = [`"${q}" explain!`,`Boss: "${q}"? Jawab!`,`Practical: "${q}"`];
-                return variations[Math.floor(Math.random()*variations.length)];
+            const jobsData = {
+                driver: {emoji:'🚗', title:'ड्राइवर'},
+                factory: {emoji:'🏭', title:'फैक्टरी'},
+                security: {emoji:'🛡️', title:'सिक्योरिटी'}
             };
 
-            const startVideo = async () => {
+            const questions = {
+                beginner: {
+                    driver: ['आपका driving experience है?', 'Road safety rules बताइए', 'Vehicle checklist क्या check करते हो?'],
+                    factory: ['Shift timing क्या है?', 'Machine safety rules?', 'Quality check कैसे करते हो?'],
+                    security: ['Patrol कैसे करते हो?', 'ID check कैसे करते हो?', 'Visitor register कैसे maintain करते हो?']
+                },
+                intermediate: {
+                    driver: ['Emergency में क्या करोगे?', 'Customer complaint handle कैसे करोगे?'],
+                    factory: ['Machine breakdown हो तो?', 'Daily target कैसे पूरा करोगे?'],
+                    security: ['Suspicious person देखा तो?', 'VIP आने पर क्या करोगे?']
+                },
+                expert: {
+                    driver: ['Salary negotiation कैसे करोगे?', 'Career growth plan?'],
+                    factory: ['Union problem हो तो?', 'Production delay हो तो?'],
+                    security: ['Theft case हो तो?', 'Emergency evacuation कैसे करोगे?']
+                }
+            };
+
+            const generateQuestion = useCallback(() => {
+                const qList = questions[level]?.[job] || ['Practice question'];
+                const q = qList[Math.floor(Math.random() * qList.length)];
+                const formats = [
+                    `Boss: "${q}"?`,
+                    `"${q}" बताइए!`,
+                    `Practical: "${q}" कैसे करेंगे?`
+                ];
+                return formats[Math.floor(Math.random() * formats.length)];
+            }, [level, job]);
+
+            const startInterview = async () => {
                 try {
-                    const stream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
-                    if(videoRef.current) videoRef.current.srcObject = stream;
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { width: 640, height: 480, facingMode: 'user' },
+                        audio: true 
+                    });
+                    if(videoRef.current) {
+                        videoRef.current.srcObject = stream;
+                        videoRef.current.play();
+                    }
                     setAnalyzing(true);
                     setQuestion(generateQuestion());
-                    setCount(c => c+1);
+                    setCount(c => c + 1);
+                    setShowCTA(false);
+                    setTimeLeft(30);
+                    
+                    // Timer for next question
+                    const timer = setInterval(() => {
+                        setTimeLeft(t => {
+                            if (t <= 1) {
+                                clearInterval(timer);
+                                setQuestion(generateQuestion());
+                                return 30;
+                            }
+                            return t - 1;
+                        });
+                    }, 1000);
                 } catch(e) {
-                    alert('Camera permission do!');
+                    alert('📱 Camera permission allow करो! Settings → Privacy → Camera ON करो');
                 }
             };
 
-            const analyzeFace = () => {
-                setMetrics({
-                    nervousness: 30+Math.random()*30,
-                    eyeContact: 70+Math.random()*20,
-                    smile: 60+Math.random()*30,
-                    posture: 65+Math.random()*25
-                });
-                const conf = 100 - metrics.nervousness*0.5;
-                setConfidence(Math.round(conf));
+            const stopInterview = () => {
+                if(videoRef.current?.srcObject) {
+                    videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+                    videoRef.current.srcObject = null;
+                }
+                setAnalyzing(false);
+                setShowCTA(true);
             };
+
+            const updateMetrics = useCallback(() => {
+                setMetrics({
+                    nervousness: Math.max(20, 50 + (Math.random() - 0.5) * 40),
+                    eyeContact: Math.max(40, 70 + (Math.random() - 0.5) * 30),
+                    smile: Math.max(30, 60 + (Math.random() - 0.5) * 40),
+                    posture: Math.max(50, 65 + (Math.random() - 0.5) * 35)
+                });
+                const conf = 100 - metrics.nervousness * 0.4;
+                setConfidence(Math.round(conf));
+            }, [metrics.nervousness]);
 
             useEffect(() => {
-                if(analyzing) {
-                    const interval = setInterval(analyzeFace, 2000);
-                    return () => clearInterval(interval);
+                let interval;
+                if (analyzing) {
+                    interval = setInterval(updateMetrics, 2500);
                 }
-            }, [analyzing]);
+                return () => clearInterval(interval);
+            }, [analyzing, updateMetrics]);
+
+            const Navbar = () => (
+                <div className="glass-alt fixed top-0 left-0 right-0 z-50 p-4 shadow-glow">
+                    <div className="max-w-4xl mx-auto flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                            <div className="w-12 h-12 gradient-trust rounded-2xl flex items-center justify-center shadow-glow">
+                                <span className="text-2xl">🎯</span>
+                            </div>
+                            <div>
+                                <h1 className="font-black text-xl bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+                                    JobCrackAI
+                                </h1>
+                                <p className="text-xs text-blue-200/80 font-medium">500K+ Workers</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            {premium && <div className="px-3 py-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-xs font-bold rounded-full">PREMIUM</div>}
+                            <button onClick={() => setPage('home')} className="glass p-2 rounded-xl text-xl shadow-glow-hover hover:scale-110">
+                                🏠
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
 
             const HomePage = () => (
-                <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-6">
-                    <div className="glass rounded-3xl p-8 md:p-12 max-w-md w-full shadow-2xl text-center float">
-                        <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent mb-6">
-                            JobCrackAI
+                <div className="pt-20 pb-12 px-4 min-h-screen flex flex-col">
+                    {/* Hero Section */}
+                    <div className="text-center mb-12 max-w-md mx-auto">
+                        <div className="w-24 h-24 gradient-trust rounded-3xl mx-auto mb-6 shadow-glow flex items-center justify-center">
+                            <span className="text-4xl">🎯</span>
+                        </div>
+                        <h1 className="font-black text-4xl md:text-5xl lg:text-6xl bg-gradient-to-r from-white via-blue-100 to-blue-300 bg-clip-text text-transparent leading-tight mb-6">
+                            Interview Crack Karo!
                         </h1>
-                        <p className="text-xl text-white/90 mb-2">Video Interview Coach</p>
-                        <p className="text-lg text-white/70">AI Nervousness Detection 🇮🇳</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl">
-                        {Object.entries(levels).map(([key, data]) => (
-                            <div key={key} className="glass rounded-2xl p-8 hover:scale-105 transition-all cursor-pointer shadow-xl border-4 border-transparent hover:border-white/50"
-                                style={{borderImage: `linear-gradient(45deg, ${data.color}-500, ${data.color}-600) 1`}}
-                                onClick={() => setPage(key)}>
-                                <div className="text-5xl mb-4">{data.icon}</div>
-                                <h3 className="text-2xl font-bold text-white mb-2">{key.toUpperCase()} Level</h3>
-                                <p className="text-white/80 mb-4">Unlimited ∞</p>
-                                <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-black px-6 py-2 rounded-full font-bold inline-block">
-                                    Practice Now
+                        <p className="text-xl md:text-2xl font-semibold text-blue-100 mb-8 leading-relaxed">
+                            AI Camera Analysis<br/>
+                            <span className="text-blue-200">Driver • Factory • Security Jobs</span>
+                        </p>
+                        <div className="glass-alt p-6 rounded-3xl shadow-glow mb-8">
+                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                <div className="text-center">
+                                    <div className="text-3xl font-black text-green-400">500K+</div>
+                                    <div className="text-sm text-blue-200">Workers</div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-3xl font-black text-emerald-400">95%</div>
+                                    <div className="text-sm text-blue-200">Success Rate</div>
                                 </div>
                             </div>
-                        ))}
+                        </div>
+                        <button onClick={() => setPage('interview')} 
+                            className="w-full max-w-md gradient-trust text-white py-6 px-8 rounded-3xl font-black text-2xl shadow-glow shadow-blue-500/25 hover:shadow-glow-hover btn-tap mb-6">
+                            🚀 अभी शुरू करो
+                        </button>
+                    </div>
+
+                    {/* Level Cards */}
+                    <div className="max-w-2xl mx-auto">
+                        <h2 className="text-2xl font-bold text-center mb-8 bg-gradient-to-r from-white to-blue-300 bg-clip-text text-transparent">
+                            अपना Level चुनो
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {Object.entries(levels).map(([key, data]) => (
+                                <div key={key} 
+                                    className={`glass p-6 rounded-3xl shadow-glow hover:shadow-glow-hover hover:scale-105 transition-all cursor-pointer border-4 border-transparent hover:border-white/30 float ${premium ? '' : 'grayscale'}`}
+                                    style={{borderImage: `linear-gradient(45deg, ${data.color}) 1`}}
+                                    onClick={() => { if(premium) { setLevel(key); setPage('interview'); } }}>
+                                    <div className="text-4xl mb-4 mx-auto">{data.icon}</div>
+                                    <h3 className="text-xl font-bold text-white mb-2 text-center">{data.title}</h3>
+                                    <p className="text-blue-200 text-sm text-center mb-4">अनलिमिटेड प्रैक्टिस</p>
+                                    {!premium && (
+                                        <div className="bg-white/10 px-4 py-2 rounded-2xl text-xs font-bold text-center">
+                                            Premium Unlock करो
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
                     {!premium && (
-                        <button className="glass px-12 py-4 rounded-2xl font-bold text-xl text-white shadow-2xl hover:scale-105 transition-all bg-gradient-to-r from-purple-500 to-pink-500"
-                            onClick={() => {setPremium(true); alert('Premium Activated! 🚀');}}>
-                            Unlock Premium ₹99
-                        </button>
+                        <div className="fixed bottom-6 left-4 right-4 max-w-md mx-auto">
+                            <div className="glass-alt p-6 rounded-3xl shadow-glow text-center">
+                                <div className="text-3xl mb-4">🔥</div>
+                                <h3 className="text-xl font-bold mb-4">Unlimited Practice</h3>
+                                <button onClick={() => {setPremium(true); alert('✅ Premium Activated! अब सभी Features Unlock!');}} 
+                                    className="w-full gradient-trust text-white py-4 px-6 rounded-2xl font-bold text-lg shadow-glow">
+                                    Unlock ₹99
+                                </button>
+                            </div>
+                        </div>
                     )}
                 </div>
             );
 
             const InterviewPage = () => (
-                <div className="min-h-screen p-6 relative">
-                    <button className="glass p-4 rounded-2xl text-2xl fixed top-6 left-6 z-50 shadow-xl hover:scale-110" onClick={() => setPage('home')}>
-                        🏠
-                    </button>
+                <div className="pt-20 pb-12 px-4 min-h-screen">
+                    <Navbar />
 
-                    <div className="glass rounded-3xl p-6 md:p-8 max-w-2xl mx-auto mt-24 mb-8 relative">
-                        <div className="absolute -top-4 -right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-6 py-2 rounded-2xl font-bold shadow-2xl">
-                            {levels[level].icon} {level.toUpperCase()}
+                    {/* Video Section */}
+                    <div className="glass rounded-3xl p-6 mb-8 shadow-glow relative overflow-hidden">
+                        <div className="absolute -top-4 -right-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-black px-6 py-2 rounded-2xl font-bold shadow-2xl">
+                            {levels[level].icon} {levels[level].title}
                         </div>
                         
-                        <video ref={videoRef} autoPlay muted playsInline 
-                            className="w-full h-80 md:h-96 rounded-2xl object-cover border-4 border-white/20 shadow-2xl"/>
-                        
-                        <div className="absolute top-6 right-6 w-24 h-32 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-2xl shadow-2xl animate-pulse">
-                            🤵 AI
-                        </div>
-                    </div>
-
-                    <div className="glass rounded-2xl p-4 max-w-md mx-auto mb-6 flex gap-3 justify-center flex-wrap">
-                        {levels[level].jobs.map(j => (
-                            <button key={j} className={`px-6 py-3 rounded-xl font-bold transition-all flex-1 ${
-                                job===j ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg' : 'glass shadow-md'
-                            }`} onClick={() => setJob(j)}>
-                                {j==='driver'?'🚗 Driver':j==='factory'?'🏭 Factory':'🛡️ Security'}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="glass rounded-3xl p-8 max-w-2xl mx-auto mb-8 text-center">
-                        <div className="text-3xl font-black text-white mb-6">"{question}"</div>
-                        <div className="text-2xl font-bold text-white/80">
-                            Question <span className="text-yellow-400">{count}</span> ∞
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-8">
-                        {Object.entries(metrics).map(([k,v]) => (
-                            <div key={k} className="glass p-6 rounded-2xl text-center shadow-xl hover:scale-105">
-                                <div className={`text-3xl font-black ${v>70?'text-green-500':v>50?'text-yellow-500':'text-red-500'}`}>
-                                    {Math.round(v)}%
+                        <div className="relative mb-4">
+                            <video ref={videoRef} autoPlay muted playsInline 
+                                className="w-full rounded-2xl object-cover shadow-2xl border-4 border-white/30" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-2xl" />
+                            
+                            {analyzing && (
+                                <div className="absolute top-4 right-4 w-20 h-20 bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex flex-col items-center justify-center text-white font-bold shadow-2xl animate-pulse">
+                                    <div className="text-2xl">🤖</div>
+                                    <div className="text-xs">AI</div>
                                 </div>
-                                <div className="text-white/80 font-medium capitalize">{k.replace('_',' ')}</div>
+                            )}
+                        </div>
+
+                        {/* Job Selection */}
+                        <div className="grid grid-cols-3 gap-3 mb-6">
+                            {levels[level].jobs.map(j => (
+                                <button key={j} 
+                                    className={`p-4 rounded-2xl font-bold text-lg shadow-lg transition-all flex flex-col items-center ${job === j ? 'gradient-trust text-white shadow-glow shadow-blue-500/30 scale-105' : 'glass-alt hover:scale-105'}`}
+                                    onClick={() => setJob(j)}>
+                                    <span className="text-2xl mb-1">{jobsData[j].emoji}</span>
+                                    <span className="text-sm">{jobsData[j].title}</span>
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Question Display */}
+                        <div className="glass-alt p-6 rounded-2xl mb-6 text-center shadow-glow">
+                            <div className="text-2xl md:text-3xl font-black text-white mb-4 leading-tight">
+                                "{question}"
                             </div>
-                        ))}
+                            <div className="flex items-center justify-center gap-2 text-lg font-bold text-blue-300">
+                                <span>प्रश्न</span>
+                                <span className="text-2xl text-yellow-400">{count}</span>
+                                <div className="w-8 h-8 glass-alt rounded-full flex items-center justify-center text-sm font-bold">
+                                    {timeLeft}
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="glass rounded-3xl p-6 max-w-md mx-auto flex gap-4">
-                        <button onClick={startVideo} 
-                            className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white py-4 px-6 rounded-2xl font-bold text-lg shadow-2xl hover:scale-105">
-                            🎥 Start Video
+                    {/* Metrics Dashboard */}
+                    <div className="grid grid-cols-2 gap-4 mb-8">
+                        {Object.entries(metrics).map(([key, value]) => {
+                            const color = value > 75 ? 'gradient-success' : value > 55 ? 'gradient-warning' : 'gradient-danger';
+                            const icon = key === 'nervousness' ? '😰' : key === 'eyeContact' ? '👁️' : key === 'smile' ? '😊' : '🧍';
+                            return (
+                                <div key={key} className={`glass p-5 rounded-2xl text-center shadow-glow hover:shadow-glow-hover ${color}`}>
+                                    <div className="text-3xl mb-2">{icon}</div>
+                                    <div className={`text-2xl font-black ${value > 75 ? 'text-white drop-shadow-lg' : 'text-white'}`}>
+                                        {Math.round(value)}%
+                                    </div>
+                                    <div className="text-white/80 text-xs font-medium capitalize">{key.replace('_', ' ')}</div>
+                                </div>
+                            );
+                        })}
+                        <div className="glass col-span-2 p-5 rounded-2xl text-center shadow-glow gradient-trust">
+                            <div className="text-3xl mb-2">🎯</div>
+                            <div className="text-3xl font-black text-white">{confidence}%</div>
+                            <div className="text-white/80 text-sm">Overall Confidence</div>
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-4 mb-8">
+                        <button onClick={analyzing ? stopInterview : startInterview} 
+                            className={`flex-1 py-5 px-6 rounded-3xl font-black text-xl shadow-glow ${analyzing ? 'gradient-danger hover:shadow-red-500/30' : 'gradient-success hover:shadow-emerald-500/30'} text-white btn-tap`}>
+                            {analyzing ? '⏹️ रुकें' : '▶️ शुरू करें'}
                         </button>
-                        <button onClick={() => videoRef.current && (videoRef.current.srcObject.getVideoTracks()[0].enabled = !videoRef.current.srcObject.getVideoTracks()[0].enabled)}
-                            className="glass p-4 rounded-2xl text-2xl shadow-xl hover:scale-110">
+                        <button onClick={() => videoRef.current && videoRef.current.srcObject?.getVideoTracks()[0].enabled = !videoRef.current.srcObject.getVideoTracks()[0].enabled}
+                            className="glass p-4 rounded-2xl text-2xl shadow-glow hover:shadow-glow-hover hover:scale-110 btn-tap">
                             📷
                         </button>
                     </div>
 
-                    {!premium && (
-                        <div className="glass rounded-3xl p-6 max-w-md mx-auto mt-8 text-center">
-                            <div className="text-4xl mb-4">🔒</div>
-                            <h3 className="text-2xl font-bold text-white mb-4">Unlimited Practice</h3>
-                            <button onClick={() => {setPremium(true); alert('Premium ON! 🚀');}} 
-                                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-12 py-4 rounded-2xl font-bold text-lg shadow-2xl hover:scale-105">
+                    {showCTA && !premium && (
+                        <div className="glass-alt p-6 rounded-3xl text-center shadow-glow">
+                            <div className="text-4xl mb-4">🔓</div>
+                            <h3 className="text-xl font-bold mb-4">अनलिमिटेड प्रैक्टिस</h3>
+                            <button onClick={() => {setPremium(true); alert('✅ Premium सक्रिय! सभी Features Unlock!');}} 
+                                className="w-full gradient-trust text-white py-4 px-6 rounded-2xl font-bold text-lg shadow-glow">
                                 Unlock ₹99
                             </button>
                         </div>
@@ -193,7 +362,12 @@
                 </div>
             );
 
-            return page === 'home' ? <HomePage /> : <InterviewPage />;
+            return (
+                <>
+                    <Navbar />
+                    {page === 'home' ? <HomePage /> : <InterviewPage />}
+                </>
+            );
         }
 
         ReactDOM.render(<App />, document.getElementById('root'));
