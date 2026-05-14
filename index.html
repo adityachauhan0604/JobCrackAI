@@ -3,507 +3,1356 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JobCrackAI - Global AI Interview | Live Video + Payments</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>JobCrackAI – Global AI Interview Coach</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- 🔥 PRODUCTION READY - FULLSTACK -->
-    <script src="https://js.stripe.com/v3/"></script>
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-    <script src="https://cdn.skypack.dev/@mediapipe/camera_utils"></script>
-    <script src="https://cdn.skypack.dev/@mediapipe/face_mesh"></script>
-    <script src="https://cdn.skypack.dev/@mediapipe/drawing_utils"></script>
+    <style>
+        :root {
+            --bg: #070b14;
+            --surface: #0f1623;
+            --surface2: #161f30;
+            --border: rgba(255,255,255,0.07);
+            --accent: #00e5a0;
+            --accent2: #3b82f6;
+            --accent3: #a855f7;
+            --text: #e8f0fe;
+            --muted: #7890b0;
+            --danger: #ef4444;
+            --gold: #f59e0b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated mesh background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0,229,160,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(59,130,246,0.07) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 40% at 60% 30%, rgba(168,85,247,0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ─── HEADER ─── */
+        header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(7,11,20,0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .logo {
+            display: flex; align-items: center; gap: 12px;
+            font-family: 'Syne', sans-serif;
+            font-size: 1.4rem; font-weight: 800;
+        }
+        .logo-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--accent), #00b8d9);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+        /* Language selector in header */
+        .lang-selector {
+            display: flex; align-items: center; gap: 6px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            position: relative;
+        }
+        .lang-dropdown {
+            position: absolute; top: 110%; right: 0;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; min-width: 180px;
+            z-index: 200; display: none;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        }
+        .lang-dropdown.open { display: block; }
+        .lang-option {
+            padding: 10px 16px; cursor: pointer;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 0.9rem; transition: background 0.2s;
+        }
+        .lang-option:hover { background: var(--surface2); }
+        .lang-option:first-child { border-radius: 12px 12px 0 0; }
+        .lang-option:last-child { border-radius: 0 0 12px 12px; }
+
+        .credits-badge {
+            background: rgba(0,229,160,0.12);
+            border: 1px solid rgba(0,229,160,0.3);
+            color: var(--accent);
+            padding: 6px 14px; border-radius: 10px;
+            font-size: 0.82rem; font-weight: 600;
+        }
+
+        .btn-upgrade {
+            background: linear-gradient(135deg, var(--accent), #00b8d9);
+            color: #070b14; padding: 8px 18px; border-radius: 10px;
+            font-weight: 700; font-size: 0.88rem;
+            border: none; cursor: pointer; transition: opacity 0.2s;
+        }
+        .btn-upgrade:hover { opacity: 0.85; }
+
+        /* ─── MAIN LAYOUT ─── */
+        main { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 32px 20px 60px; }
+
+        /* ─── HERO ─── */
+        .hero { text-align: center; margin-bottom: 40px; }
+        .hero-tag {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(0,229,160,0.1); border: 1px solid rgba(0,229,160,0.25);
+            color: var(--accent); padding: 6px 16px; border-radius: 999px;
+            font-size: 0.82rem; font-weight: 600; margin-bottom: 18px;
+        }
+        .hero-tag .dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 800; line-height: 1.1;
+            margin-bottom: 14px;
+        }
+        h1 span { color: var(--accent); }
+
+        .hero-sub { color: var(--muted); font-size: 1.05rem; max-width: 520px; margin: 0 auto 28px; }
+
+        .stats-row {
+            display: flex; justify-content: center; gap: 28px; flex-wrap: wrap;
+            margin-bottom: 36px;
+        }
+        .stat { text-align: center; }
+        .stat-num { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--accent); }
+        .stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+        /* ─── SETUP PANEL ─── */
+        .setup-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 28px;
+            margin-bottom: 28px;
+        }
+
+        .setup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+
+        .setup-group label {
+            display: block; font-size: 0.78rem; font-weight: 600;
+            color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em;
+            margin-bottom: 10px;
+        }
+
+        .pill-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .pill {
+            padding: 7px 15px; border-radius: 999px;
+            border: 1.5px solid var(--border);
+            background: var(--surface2);
+            font-size: 0.85rem; cursor: pointer;
+            transition: all 0.2s; user-select: none;
+        }
+        .pill:hover { border-color: var(--accent); color: var(--accent); }
+        .pill.active {
+            background: rgba(0,229,160,0.15);
+            border-color: var(--accent); color: var(--accent); font-weight: 600;
+        }
+        .pill.active-blue {
+            background: rgba(59,130,246,0.15);
+            border-color: var(--accent2); color: var(--accent2); font-weight: 600;
+        }
+        .pill.active-purple {
+            background: rgba(168,85,247,0.15);
+            border-color: var(--accent3); color: var(--accent3); font-weight: 600;
+        }
+
+        /* Country selector */
+        .country-select {
+            width: 100%;
+            background: var(--surface2);
+            border: 1.5px solid var(--border);
+            color: var(--text);
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .country-select:focus { border-color: var(--accent); }
+        .country-select option { background: var(--surface); }
+
+        /* ─── START BUTTON ─── */
+        .btn-start {
+            display: block; width: 100%;
+            background: linear-gradient(135deg, var(--accent) 0%, #00b8d9 100%);
+            color: #070b14;
+            padding: 18px;
+            border-radius: 16px;
+            font-family: 'Syne', sans-serif;
+            font-size: 1.2rem; font-weight: 800;
+            border: none; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 0 40px rgba(0,229,160,0.25);
+            margin-bottom: 28px;
+        }
+        .btn-start:hover { transform: translateY(-2px); box-shadow: 0 0 60px rgba(0,229,160,0.4); }
+
+        /* ─── INTERVIEW AREA ─── */
+        .interview-area { display: none; }
+
+        .interview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        @media(max-width:768px){ .interview-grid { grid-template-columns: 1fr; } }
+
+        .video-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 20px; overflow: hidden; position: relative;
+        }
+        .video-card video {
+            width: 100%; aspect-ratio: 4/3; object-fit: cover;
+            display: block; background: #0a0f1a;
+        }
+        .video-label {
+            position: absolute; top: 12px; left: 12px;
+            background: rgba(7,11,20,0.8); backdrop-filter: blur(8px);
+            padding: 5px 12px; border-radius: 8px;
+            font-size: 0.78rem; font-weight: 600;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .live-dot { width: 7px; height: 7px; background: var(--danger); border-radius: 50%; animation: pulse 1s infinite; }
+
+        /* AI Avatar placeholder */
+        .ai-avatar-placeholder {
+            width: 100%; aspect-ratio: 4/3;
+            background: linear-gradient(135deg, #0f1a2e, #1a1040);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 16px;
+        }
+        .ai-avatar-circle {
+            width: 90px; height: 90px;
+            background: linear-gradient(135deg, var(--accent), #00b8d9);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: 0 0 40px rgba(0,229,160,0.4);
+        }
+        .ai-speaking {
+            display: flex; gap: 5px; align-items: flex-end; height: 30px;
+        }
+        .ai-speaking span {
+            width: 4px; background: var(--accent); border-radius: 999px;
+            animation: soundbar 0.6s ease-in-out infinite alternate;
+        }
+        .ai-speaking span:nth-child(2){ animation-delay: 0.1s; }
+        .ai-speaking span:nth-child(3){ animation-delay: 0.2s; }
+        .ai-speaking span:nth-child(4){ animation-delay: 0.3s; }
+        .ai-speaking span:nth-child(5){ animation-delay: 0.15s; }
+        @keyframes soundbar { from{height:6px} to{height:28px} }
+
+        /* ─── METRICS ─── */
+        .metrics-grid {
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 12px;
+            margin-bottom: 20px;
+        }
+        @media(max-width:600px){ .metrics-grid { grid-template-columns: repeat(2,1fr); } }
+
+        .metric-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 16px 12px; text-align: center;
+        }
+        .metric-val {
+            font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .metric-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+        .m-green { color: var(--accent); }
+        .m-blue { color: var(--accent2); }
+        .m-purple { color: var(--accent3); }
+        .m-gold { color: var(--gold); }
+
+        /* ─── QUESTION CARD ─── */
+        .question-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 20px; padding: 24px;
+            margin-bottom: 20px;
+        }
+        .q-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .q-num { font-size: 0.82rem; color: var(--muted); font-weight: 600; }
+        .q-badges { display: flex; gap: 8px; }
+        .q-badge {
+            padding: 4px 10px; border-radius: 6px;
+            font-size: 0.75rem; font-weight: 600;
+        }
+        .badge-green { background: rgba(0,229,160,0.12); color: var(--accent); }
+        .badge-blue { background: rgba(59,130,246,0.12); color: var(--accent2); }
+        .badge-purple { background: rgba(168,85,247,0.12); color: var(--accent3); }
+
+        #currentQuestion {
+            font-size: 1.15rem; font-weight: 500; line-height: 1.6;
+            min-height: 80px; color: var(--text);
+        }
+
+        .q-tip {
+            margin-top: 14px; padding: 12px 16px;
+            background: rgba(59,130,246,0.07); border-left: 3px solid var(--accent2);
+            border-radius: 0 8px 8px 0; font-size: 0.85rem; color: var(--muted);
+            display: none;
+        }
+
+        /* ─── CALL CONTROLS ─── */
+        .controls {
+            display: flex; align-items: center; justify-content: center; gap: 14px;
+            margin-bottom: 28px; flex-wrap: wrap;
+        }
+        .ctrl-btn {
+            width: 52px; height: 52px; border-radius: 14px;
+            border: 1.5px solid var(--border);
+            background: var(--surface2);
+            color: var(--text);
+            font-size: 1.1rem; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .ctrl-btn.danger { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); color: var(--danger); }
+        .ctrl-btn.danger:hover { background: var(--danger); color: white; }
+        .ctrl-btn.primary { background: rgba(0,229,160,0.15); border-color: rgba(0,229,160,0.4); color: var(--accent); }
+
+        .btn-next {
+            background: linear-gradient(135deg, var(--accent2), var(--accent3));
+            color: white; padding: 14px 28px; border-radius: 12px;
+            font-weight: 700; font-size: 0.95rem;
+            border: none; cursor: pointer; transition: opacity 0.2s;
+        }
+        .btn-next:hover { opacity: 0.85; }
+
+        /* ─── FEEDBACK PANEL ─── */
+        .feedback-panel {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 20px; padding: 24px; display: none;
+            margin-bottom: 20px;
+        }
+        .feedback-panel h3 { font-family: 'Syne', sans-serif; font-size: 1.1rem; margin-bottom: 16px; }
+        .score-bar-row { margin-bottom: 12px; }
+        .score-bar-label { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 5px; }
+        .score-bar-track { height: 6px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+        .score-bar-fill { height: 100%; border-radius: 999px; transition: width 1s ease; }
+
+        /* ─── COUNTRY TIPS SECTION ─── */
+        .country-tip-card {
+            background: var(--surface); border: 1px solid rgba(245,158,11,0.2);
+            border-radius: 16px; padding: 18px 20px; margin-bottom: 20px;
+            display: none;
+        }
+        .country-tip-card h4 { color: var(--gold); font-size: 0.9rem; margin-bottom: 8px; }
+        .country-tip-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+        /* ─── PROGRESS / SESSION CARD ─── */
+        .session-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; text-align: center;
+        }
+        .sess-num { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--accent); }
+        .sess-label { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+        /* ─── PAYMENT MODAL ─── */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 500;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(6px);
+            display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 28px; max-width: 440px; width: 100%;
+            padding: 36px 28px; position: relative;
+        }
+        .modal-close {
+            position: absolute; top: 16px; right: 16px;
+            background: var(--surface2); border: 1px solid var(--border);
+            color: var(--muted); width: 34px; height: 34px; border-radius: 9px;
+            cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;
+        }
+        .plan-card {
+            border: 2px solid var(--border); border-radius: 16px; padding: 20px;
+            margin-bottom: 14px; cursor: pointer; transition: all 0.2s;
+        }
+        .plan-card:hover, .plan-card.selected { border-color: var(--accent); background: rgba(0,229,160,0.06); }
+        .plan-price { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--accent); }
+        .plan-name { font-weight: 600; margin-bottom: 6px; }
+        .plan-features { font-size: 0.82rem; color: var(--muted); line-height: 1.7; }
+        .plan-badge {
+            float: right; background: var(--gold); color: #070b14;
+            font-size: 0.72rem; font-weight: 700; padding: 3px 9px; border-radius: 999px;
+        }
+
+        .payment-methods { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .pay-method {
+            flex: 1; min-width: 80px; padding: 12px; border-radius: 12px;
+            border: 1.5px solid var(--border); background: var(--surface2);
+            text-align: center; cursor: pointer; font-size: 0.82rem; transition: all 0.2s;
+        }
+        .pay-method:hover, .pay-method.selected { border-color: var(--accent); color: var(--accent); }
+        .pay-icon { font-size: 1.3rem; margin-bottom: 4px; }
+
+        .upi-section { display: none; text-align: center; }
+        .upi-id {
+            font-family: monospace; font-size: 1rem;
+            background: var(--surface2); padding: 10px 18px; border-radius: 10px;
+            margin: 12px 0; display: inline-block; color: var(--accent);
+        }
+        .btn-copy {
+            background: var(--surface2); border: 1px solid var(--border);
+            color: var(--text); padding: 8px 16px; border-radius: 8px;
+            cursor: pointer; font-size: 0.82rem; transition: all 0.2s;
+        }
+        .btn-copy:hover { border-color: var(--accent); color: var(--accent); }
+
+        .btn-pay {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent), #00b8d9);
+            color: #070b14; padding: 15px;
+            border-radius: 14px; font-family: 'Syne', sans-serif;
+            font-size: 1rem; font-weight: 800;
+            border: none; cursor: pointer; margin-top: 6px;
+        }
+
+        /* ─── HOW IT WORKS ─── */
+        .how-section { margin-top: 60px; }
+        .how-section h2 { font-family: 'Syne', sans-serif; font-size: 1.8rem; margin-bottom: 28px; text-align: center; }
+        .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .step-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 18px; padding: 24px;
+        }
+        .step-num {
+            width: 36px; height: 36px; border-radius: 10px;
+            background: rgba(0,229,160,0.12); color: var(--accent);
+            font-family: 'Syne', sans-serif; font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 14px; font-size: 1rem;
+        }
+        .step-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+        .step-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+        /* ─── TOAST ─── */
+        .toast {
+            position: fixed; bottom: 28px; right: 24px; z-index: 999;
+            background: var(--surface); border: 1px solid var(--accent);
+            color: var(--accent); padding: 12px 20px; border-radius: 12px;
+            font-size: 0.88rem; font-weight: 600;
+            transform: translateY(60px); opacity: 0;
+            transition: all 0.35s; pointer-events: none;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        /* Timer ring */
+        .timer-ring { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 0.85rem; }
+        .timer-val { font-family: 'Syne', sans-serif; font-size: 1rem; color: var(--gold); font-weight: 700; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 999px; }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900 min-h-screen text-white">
+<body>
 
-    <!-- 🔥 REAL-TIME STATUS -->
-    <div id="connectionStatus" class="fixed top-20 right-4 z-50 glass px-4 py-2 rounded-xl text-sm hidden">
-        <span id="statusText">Connecting...</span>
-        <div class="w-full bg-green-500 rounded-full h-2 mt-2" id="connectionBar"></div>
+<!-- HEADER -->
+<header>
+    <div class="logo">
+        <div class="logo-icon">🎯</div>
+        JobCrackAI
+    </div>
+    <div class="header-right">
+        <!-- Language Selector -->
+        <div class="lang-selector" onclick="toggleLangDropdown()">
+            <span id="selectedLangFlag">🇮🇳</span>
+            <span id="selectedLangName">Hindi</span>
+            <i class="fas fa-chevron-down" style="font-size:0.7rem;color:var(--muted)"></i>
+            <div class="lang-dropdown" id="langDropdown">
+                <div class="lang-option" onclick="setLang('hi','🇮🇳','Hindi')">🇮🇳 Hindi</div>
+                <div class="lang-option" onclick="setLang('en','🇺🇸','English')">🇺🇸 English</div>
+                <div class="lang-option" onclick="setLang('ar','🇦🇪','Arabic')">🇦🇪 Arabic</div>
+                <div class="lang-option" onclick="setLang('tl','🇵🇭','Filipino')">🇵🇭 Filipino</div>
+                <div class="lang-option" onclick="setLang('es','🇪🇸','Español')">🇪🇸 Español</div>
+                <div class="lang-option" onclick="setLang('bn','🇧🇩','Bengali')">🇧🇩 Bengali</div>
+                <div class="lang-option" onclick="setLang('ne','🇳🇵','Nepali')">🇳🇵 Nepali</div>
+            </div>
+        </div>
+        <span class="credits-badge" id="creditsBadge">⚡ 5 Free Left</span>
+        <button class="btn-upgrade" onclick="openPayment()">💎 Go Premium</button>
+    </div>
+</header>
+
+<!-- MAIN -->
+<main>
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-tag">
+            <div class="dot"></div>
+            Live AI Interview Coach — 50+ Countries
+        </div>
+        <h1>Crack Any Interview<br>with <span>AI Video Coach</span></h1>
+        <p class="hero-sub">Real-time posture, eye contact & speech analysis. Practice in your language, for your country.</p>
+        <div class="stats-row">
+            <div class="stat"><div class="stat-num">500K+</div><div class="stat-label">Jobs Covered</div></div>
+            <div class="stat"><div class="stat-num">50+</div><div class="stat-label">Countries</div></div>
+            <div class="stat"><div class="stat-num">7</div><div class="stat-label">Languages</div></div>
+            <div class="stat"><div class="stat-num">&lt;200ms</div><div class="stat-label">Latency</div></div>
+        </div>
     </div>
 
-    <!-- 🔥 HEADER -->
-    <header class="glass sticky top-0 z-50 border-b border-white/10">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-2xl">
-                    <i class="fas fa-video text-xl"></i>
+    <!-- SETUP PANEL -->
+    <div class="setup-panel" id="setupPanel">
+        <div class="setup-grid">
+
+            <!-- Level -->
+            <div class="setup-group">
+                <label>📊 Level</label>
+                <div class="pill-group" id="levelGroup">
+                    <div class="pill active" data-val="beginner" onclick="selectPill(this,'levelGroup')">🆕 Beginner</div>
+                    <div class="pill" data-val="intermediate" onclick="selectPill(this,'levelGroup')">⚡ Intermediate</div>
+                    <div class="pill" data-val="expert" onclick="selectPill(this,'levelGroup')">👑 Expert</div>
                 </div>
-                <h1 class="text-2xl font-black bg-gradient-to-r from-white to-blue-300 bg-clip-text">JobCrackAI</h1>
             </div>
-            <div class="flex items-center space-x-4">
-                <span id="userCredits" class="px-3 py-1 bg-blue-500/30 rounded-xl text-sm font-semibold">5 Free Interviews</span>
-                <button onclick="showPayments()" class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-6 py-2 rounded-xl font-semibold shadow-xl">
-                    <i class="fas fa-credit-card mr-2"></i>Upgrade
-                </button>
+
+            <!-- Country -->
+            <div class="setup-group">
+                <label>🌍 Country / Region</label>
+                <select class="country-select" id="countrySelect" onchange="onCountryChange()">
+                    <option value="in">🇮🇳 India</option>
+                    <option value="ae">🇦🇪 UAE / Gulf</option>
+                    <option value="sa">🇸🇦 Saudi Arabia</option>
+                    <option value="ph">🇵🇭 Philippines</option>
+                    <option value="bd">🇧🇩 Bangladesh</option>
+                    <option value="np">🇳🇵 Nepal</option>
+                    <option value="uk">🇬🇧 United Kingdom</option>
+                    <option value="ca">🇨🇦 Canada</option>
+                    <option value="au">🇦🇺 Australia</option>
+                    <option value="sg">🇸🇬 Singapore</option>
+                    <option value="us">🇺🇸 USA</option>
+                    <option value="my">🇲🇾 Malaysia</option>
+                </select>
+            </div>
+
+            <!-- Job Role -->
+            <div class="setup-group">
+                <label>💼 Job Role</label>
+                <div class="pill-group" id="jobGroup">
+                    <div class="pill active" data-val="driver" onclick="selectPill(this,'jobGroup')">🚗 Driver</div>
+                    <div class="pill" data-val="factory" onclick="selectPill(this,'jobGroup')">🏭 Factory</div>
+                    <div class="pill" data-val="security" onclick="selectPill(this,'jobGroup')">🛡️ Security</div>
+                    <div class="pill" data-val="delivery" onclick="selectPill(this,'jobGroup')">🚚 Delivery</div>
+                    <div class="pill" data-val="welder" onclick="selectPill(this,'jobGroup')">🔧 Welder</div>
+                    <div class="pill" data-val="nurse" onclick="selectPill(this,'jobGroup')">🏥 Nurse/Care</div>
+                    <div class="pill" data-val="hospitality" onclick="selectPill(this,'jobGroup')">🍽️ Hospitality</div>
+                    <div class="pill" data-val="construction" onclick="selectPill(this,'jobGroup')">🏗️ Construction</div>
+                    <div class="pill" data-val="domestic" onclick="selectPill(this,'jobGroup')">🏠 Domestic</div>
+                </div>
+            </div>
+
+            <!-- Mode -->
+            <div class="setup-group">
+                <label>🎬 Practice Mode</label>
+                <div class="pill-group" id="modeGroup">
+                    <div class="pill active" data-val="video" onclick="selectPill(this,'modeGroup')">📹 Video Call</div>
+                    <div class="pill" data-val="written" onclick="selectPill(this,'modeGroup')">✍️ Written</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Country Tip -->
+    <div class="country-tip-card" id="countryTip">
+        <h4 id="countryTipTitle">🇦🇪 Gulf Interview Style</h4>
+        <p id="countryTipText">Gulf employers expect formal greetings, respect for hierarchy, and clear answers. Dress conservatively, maintain eye contact, and always mention safety awareness.</p>
+    </div>
+
+    <!-- START BUTTON -->
+    <button class="btn-start" id="startBtn" onclick="startInterview()">
+        <i class="fas fa-video"></i> &nbsp; START AI INTERVIEW
+    </button>
+
+    <!-- SESSION STATS -->
+    <div class="session-card" id="sessionCard" style="display:none">
+        <div><div class="sess-num" id="sessQuestions">0</div><div class="sess-label">Questions Done</div></div>
+        <div><div class="sess-num" id="sessScore">-</div><div class="sess-label">Avg Score</div></div>
+        <div><div class="sess-num" id="sessTime">0:00</div><div class="sess-label">Session Time</div></div>
+    </div>
+
+    <!-- INTERVIEW AREA (hidden until start) -->
+    <div class="interview-area" id="interviewArea">
+
+        <!-- VIDEO GRID -->
+        <div class="interview-grid">
+            <!-- User video -->
+            <div class="video-card">
+                <video id="localVideo" autoplay muted playsinline></video>
+                <canvas id="analysisCanvas" style="position:absolute;inset:0;pointer-events:none;width:100%;height:100%"></canvas>
+                <div class="video-label">
+                    <div class="live-dot"></div> YOU
+                </div>
+            </div>
+            <!-- AI video -->
+            <div class="video-card">
+                <div class="ai-avatar-placeholder" id="aiPlaceholder">
+                    <div class="ai-avatar-circle" id="aiAvatarEmoji">🤵</div>
+                    <div class="ai-speaking" id="aiSpeaking" style="display:none">
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                    <div style="font-size:0.85rem;color:var(--muted)" id="aiStatusText">Waiting...</div>
+                </div>
+                <div class="video-label" style="background:rgba(0,229,160,0.15);color:var(--accent)">
+                    🤖 AI INTERVIEWER
+                </div>
             </div>
         </div>
-    </header>
 
-    <!-- 🔥 MAIN INTERVIEW DASHBOARD -->
-    <div class="max-w-6xl mx-auto px-4 py-12">
-        <!-- 🔥 VIDEO CALL INTERFACE -->
-        <div class="grid lg:grid-cols-2 gap-8 mb-12">
-            <!-- USER VIDEO + ANALYSIS -->
-            <div class="space-y-6">
-                <div class="relative glass p-6 rounded-3xl overflow-hidden">
-                    <video id="localVideo" autoplay muted playsinline class="w-full h-80 lg:h-[400px] rounded-2xl object-cover shadow-2xl"></video>
-                    <canvas id="analysisCanvas" class="absolute inset-0 rounded-2xl pointer-events-none" width="640" height="480"></canvas>
-                    
-                    <!-- LIVE STATUS -->
-                    <div class="absolute top-4 left-4 bg-red-500/90 backdrop-blur-sm text-white px-4 py-2 rounded-2xl text-sm font-bold flex items-center space-x-2">
-                        <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                        <span id="callStatus">🔴 LIVE CALL</span>
-                    </div>
-                    
-                    <!-- CREDITS COUNTER -->
-                    <div class="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm text-white px-4 py-2 rounded-2xl text-sm">
-                        Interviews left: <span id="creditsLeft">5</span>
-                    </div>
-                </div>
-                
-                <!-- 🔥 LIVE METRICS (Real-time) -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="glass p-6 rounded-2xl text-center metric-active">
-                        <div id="eyeMetric" class="text-3xl font-black text-emerald-400 mb-2">92%</div>
-                        <div class="text-xs text-blue-300 uppercase tracking-wide font-semibold">Eye Contact</div>
-                    </div>
-                    <div class="glass p-6 rounded-2xl text-center metric-active">
-                        <div id="postureMetric" class="text-3xl font-black text-blue-400 mb-2">87%</div>
-                        <div class="text-xs text-blue-300 uppercase tracking-wide font-semibold">Posture</div>
-                    </div>
-                    <div class="glass p-6 rounded-2xl text-center metric-active">
-                        <div id="confidenceMetric" class="text-3xl font-black text-purple-400 mb-2">89%</div>
-                        <div class="text-xs text-blue-300 uppercase tracking-wide font-semibold">Confidence</div>
-                    </div>
-                    <div class="glass p-6 rounded-2xl text-center metric-active">
-                        <div id="speechMetric" class="text-3xl font-black text-orange-400 mb-2">84%</div>
-                        <div class="text-xs text-blue-300 uppercase tracking-wide font-semibold">Speech Clarity</div>
-                    </div>
-                </div>
+        <!-- METRICS -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-val m-green" id="eyeMetric">--</div>
+                <div class="metric-label">👁️ Eye Contact</div>
             </div>
-
-            <!-- 🔥 AI INTERVIEWER VIDEO -->
-            <div class="space-y-6">
-                <!-- REMOTE AI VIDEO -->
-                <div class="relative glass p-6 rounded-3xl overflow-hidden">
-                    <video id="remoteVideo" class="w-full h-80 lg:h-[400px] rounded-2xl object-cover shadow-2xl bg-gradient-to-br from-purple-900 to-pink-900"></video>
-                    
-                    <!-- AI SPEAKING INDICATOR -->
-                    <div id="aiSpeakingIndicator" class="absolute inset-0 bg-black/40 flex items-center justify-center rounded-2xl hidden">
-                        <div class="text-4xl animate-pulse">🗣️</div>
-                    </div>
-                    
-                    <!-- CALL CONTROLS -->
-                    <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-4">
-                        <button onclick="toggleMute()" class="w-14 h-14 bg-gray-800/50 hover:bg-gray-700 rounded-2xl flex items-center justify-center text-xl transition-all">
-                            <i class="fas fa-microphone" id="micIcon"></i>
-                        </button>
-                        <button onclick="endCall()" class="w-16 h-16 bg-red-500 hover:bg-red-600 rounded-2xl flex items-center justify-center text-2xl shadow-2xl transition-all">
-                            <i class="fas fa-phone-slash"></i>
-                        </button>
-                        <button onclick="nextQuestion()" class="w-14 h-14 bg-emerald-500 hover:bg-emerald-600 rounded-2xl flex items-center justify-center text-xl transition-all">
-                            <i class="fas fa-forward"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- CURRENT QUESTION -->
-                <div class="glass p-8 rounded-3xl">
-                    <div class="flex items-center justify-between mb-6">
-                        <span class="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text">Q<span id="questionNum">1</span>/∞</span>
-                        <div class="flex items-center gap-4 text-sm">
-                            <span class="px-3 py-1 bg-blue-500/30 rounded-xl">🇮🇳 Hindi</span>
-                            <span class="px-3 py-1 bg-purple-500/30 rounded-xl">Intermediate</span>
-                        </div>
-                    </div>
-                    <div id="currentQuestion" class="text-xl font-semibold text-white leading-relaxed min-h-[100px] mb-8">
-                        Click START to begin your live AI interview...
-                    </div>
-                </div>
+            <div class="metric-card">
+                <div class="metric-val m-blue" id="postureMetric">--</div>
+                <div class="metric-label">🧍 Posture</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-val m-purple" id="confidenceMetric">--</div>
+                <div class="metric-label">💪 Confidence</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-val m-gold" id="speechMetric">--</div>
+                <div class="metric-label">🎤 Speech</div>
             </div>
         </div>
 
-        <!-- 🔥 START BUTTON (Hidden after start) -->
-        <div id="startSection" class="text-center max-w-2xl mx-auto">
-            <button onclick="startVideoCall()" 
-                class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white py-8 px-16 rounded-3xl font-black text-2xl shadow-3xl hover:shadow-4xl transform hover:scale-105 transition-all w-full lg:w-auto mx-auto block">
-                <i class="fas fa-video mr-4 text-3xl"></i>
-                🎥 START LIVE AI VIDEO CALL
+        <!-- QUESTION CARD -->
+        <div class="question-card">
+            <div class="q-header">
+                <div style="display:flex;align-items:center;gap:12px">
+                    <span class="q-num">Q <span id="questionNum">1</span></span>
+                    <div class="timer-ring">
+                        <i class="fas fa-clock"></i>
+                        <span class="timer-val" id="timerVal">45s</span>
+                    </div>
+                </div>
+                <div class="q-badges">
+                    <span class="q-badge badge-green" id="langBadge">🇮🇳 Hindi</span>
+                    <span class="q-badge badge-blue" id="levelBadge">Beginner</span>
+                    <span class="q-badge badge-purple" id="jobBadge">Driver</span>
+                </div>
+            </div>
+            <div id="currentQuestion">Click START to begin your AI interview...</div>
+            <div class="q-tip" id="qTip">💡 Tip: Structure your answer with a clear beginning, middle and end.</div>
+        </div>
+
+        <!-- FEEDBACK -->
+        <div class="feedback-panel" id="feedbackPanel">
+            <h3>📊 Answer Analysis</h3>
+            <div id="feedbackBars"></div>
+            <div id="feedbackText" style="font-size:0.88rem;color:var(--muted);margin-top:14px;line-height:1.7"></div>
+        </div>
+
+        <!-- CONTROLS -->
+        <div class="controls">
+            <button class="ctrl-btn" onclick="toggleMute()" id="muteBtn" title="Mute">
+                <i class="fas fa-microphone" id="micIcon"></i>
             </button>
-            <p class="text-blue-300 mt-6 text-lg">Real-time AI interviewer • Live analysis • Zero latency</p>
+            <button class="ctrl-btn primary" onclick="showTip()" title="Tip">
+                <i class="fas fa-lightbulb"></i>
+            </button>
+            <button class="btn-next" onclick="nextQuestion()">
+                Next Question <i class="fas fa-arrow-right"></i>
+            </button>
+            <button class="ctrl-btn danger" onclick="endInterview()" title="End">
+                <i class="fas fa-phone-slash"></i>
+            </button>
+        </div>
+
+    </div><!-- /interview-area -->
+
+    <!-- HOW IT WORKS -->
+    <div class="how-section" id="howSection">
+        <h2>How JobCrackAI Works</h2>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-num">1</div>
+                <h3>Choose Your Setup</h3>
+                <p>Select your country, language, job role and experience level. We tailor questions to your market.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">2</div>
+                <h3>Live AI Interview</h3>
+                <p>AI interviewer asks real questions in your language. Speak your answers naturally.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">3</div>
+                <h3>Real-time Analysis</h3>
+                <p>Track eye contact, posture, confidence and speech clarity live as you answer.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">4</div>
+                <h3>Instant Feedback</h3>
+                <p>Get scored on every answer with tips to improve. Practice until you're ready.</p>
+            </div>
         </div>
     </div>
 
-    <!-- 🔥 STRIPE PAYMENT MODAL -->
-    <div id="paymentModal" class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-6">
-        <div class="glass max-w-md w-full p-8 rounded-3xl shadow-2xl">
-            <div class="text-center mb-8">
-                <div class="w-20 h-20 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-3xl mx-auto mb-4 flex items-center justify-center shadow-2xl">
-                    <i class="fas fa-unlock text-2xl"></i>
-                </div>
-                <h2 class="text-3xl font-bold mb-2">Unlock Unlimited</h2>
-                <p class="text-blue-300">Get 100+ interviews & premium analysis</p>
-            </div>
-            
-            <!-- 🔥 STRIPE PAYMENT FORM -->
-            <div id="paymentForm">
-                <div class="space-y-4 mb-8">
-                    <div>
-                        <label class="block text-sm font-semibold text-blue-300 mb-2">Card Details</label>
-                        <div id="card-element" class="p-4 border-2 border-white/20 rounded-2xl bg-white/5"></div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <input id="card-name" placeholder="Full Name" class="w-full p-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-blue-300 focus:border-emerald-400 outline-none">
-                        <input id="card-email" type="email" placeholder="Email" class="w-full p-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-blue-300 focus:border-emerald-400 outline-none">
-                    </div>
-                    <div class="text-3xl font-black text-emerald-400 text-center py-4 bg-emerald-500/20 rounded-2xl">
-                        $4.99 / Lifetime
-                    </div>
-                </div>
-                <button id="submitPayment" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white py-4 px-8 rounded-2xl font-bold shadow-2xl hover:shadow-3xl transition-all">
-                    <i class="fas fa-lock mr-2"></i>Pay $4.99 Securely
-                </button>
-            </div>
-            
-            <div id="paymentSuccess" class="hidden text-center">
-                <div class="w-24 h-24 bg-emerald-500 rounded-3xl mx-auto mb-6 flex items-center justify-center text-3xl">
-                    <i class="fas fa-check"></i>
-                </div>
-                <h3 class="text-2xl font-bold mb-4">Payment Successful!</h3>
-                <p class="text-blue-300 mb-8">Unlimited interviews unlocked</p>
-                <button onclick="closePayments()" class="w-full bg-emerald-500 text-white py-4 px-8 rounded-2xl font-bold">Start Interview</button>
-            </div>
-            
-            <button onclick="closePayments()" class="w-full mt-6 text-blue-300 underline text-sm">Skip for now</button>
+</main>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-overlay" id="paymentModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closePayment()">✕</button>
+        <div style="text-align:center;margin-bottom:24px">
+            <div style="font-size:2.5rem;margin-bottom:10px">💎</div>
+            <h2 style="font-family:'Syne',sans-serif;font-size:1.5rem;margin-bottom:6px">Unlock Premium</h2>
+            <p style="color:var(--muted);font-size:0.88rem">Unlimited interviews • All languages • All countries</p>
         </div>
+
+        <!-- Plans -->
+        <div class="plan-card selected" id="plan-lifetime" onclick="selectPlan('lifetime')">
+            <div class="plan-badge">BEST</div>
+            <div class="plan-name">Lifetime Access</div>
+            <div class="plan-price" id="planPrice">₹99</div>
+            <div class="plan-features">✓ Unlimited interviews<br>✓ All 7 languages<br>✓ All 50+ countries<br>✓ CV builder (coming soon)</div>
+        </div>
+
+        <!-- Payment Method -->
+        <p style="font-size:0.78rem;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em">Pay via</p>
+        <div class="payment-methods">
+            <div class="pay-method selected" id="pm-upi" onclick="selectPayMethod('upi')">
+                <div class="pay-icon">📱</div>UPI
+            </div>
+            <div class="pay-method" id="pm-card" onclick="selectPayMethod('card')">
+                <div class="pay-icon">💳</div>Card
+            </div>
+            <div class="pay-method" id="pm-paypal" onclick="selectPayMethod('paypal')">
+                <div class="pay-icon">🅿️</div>PayPal
+            </div>
+        </div>
+
+        <!-- UPI Section -->
+        <div class="upi-section" id="upiSection" style="display:block">
+            <p style="color:var(--muted);font-size:0.85rem;margin-bottom:6px">Send payment to:</p>
+            <div class="upi-id" id="upiIdText">adityachauhan0604@oksbi</div><br>
+            <button class="btn-copy" onclick="copyUPI()">📋 Copy UPI ID</button>
+            <p style="color:var(--muted);font-size:0.78rem;margin-top:10px">After paying, WhatsApp screenshot to get activated</p>
+        </div>
+
+        <!-- Card Section -->
+        <div id="cardSection" style="display:none">
+            <p style="color:var(--muted);font-size:0.85rem;margin-bottom:10px">Card payments via Stripe (add your Stripe key to activate)</p>
+            <div id="card-element" style="padding:14px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface2);color:var(--muted);font-size:0.85rem">
+                🔒 Add your Stripe publishable key in the script section
+            </div>
+        </div>
+
+        <!-- PayPal Section -->
+        <div id="paypalSection" style="display:none">
+            <p style="color:var(--muted);font-size:0.85rem;margin-bottom:10px">PayPal — add your PayPal.me link below</p>
+            <a href="https://paypal.me/YOURLINK" target="_blank"
+               style="display:block;text-align:center;padding:12px;background:rgba(0,112,243,0.15);border:1px solid rgba(0,112,243,0.3);border-radius:12px;color:#60a5fa;text-decoration:none;font-weight:600">
+               Pay via PayPal.me →
+            </a>
+        </div>
+
+        <button class="btn-pay" onclick="confirmPayment()">✅ I've Paid – Activate Now</button>
     </div>
+</div>
 
-    <script>
-        // 🔥 STRIPE - REAL PAYMENTS
-        const stripe = Stripe('pk_test_51ABC123...'); // YOUR STRIPE KEY
-        const elements = stripe.elements();
-        const cardElement = elements.create('card', {
-            style: {
-                base: {
-                    color: '#ffffff',
-                    fontFamily: '"Inter", sans-serif',
-                    fontSize: '16px',
-                    '::placeholder': { color: '#9ca3af' }
-                }
-            }
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────
+const state = {
+    lang: 'hi', langName: 'Hindi', langFlag: '🇮🇳',
+    level: 'beginner',
+    job: 'driver',
+    country: 'in',
+    mode: 'video',
+    credits: parseInt(localStorage.getItem('jcai_credits') || '5'),
+    isPremium: localStorage.getItem('jcai_premium') === '1',
+    questionNum: 0,
+    totalScore: 0,
+    sessionStart: null,
+    timerInterval: null,
+    qTimerInterval: null,
+    qTimeLeft: 45,
+    isRunning: false,
+    isMuted: false,
+    localStream: null,
+    audioContext: null,
+    analyserNode: null,
+    metricsInterval: null
+};
+
+// ─── QUESTIONS DB (Multi-language, Multi-country, Multi-job) ──
+const QUESTIONS = {
+    driver: {
+        beginner: {
+            hi: ["Apna naam aur driving experience batao", "Vehicle daily check kaise karte ho?", "3 main traffic rules kya hain?", "Night driving mein kya precautions lete ho?", "Customer ke saath kaise behave karte ho?", "Road emergency mein kya karte ho?"],
+            en: ["Introduce yourself and your driving experience", "How do you do a daily vehicle check?", "What are 3 main traffic rules you follow?", "What precautions do you take for night driving?", "How do you handle difficult passengers?", "What do you do in a road emergency?"],
+            ar: ["عرّف نفسك وخبرتك في القيادة", "كيف تقوم بفحص المركبة اليومي؟", "ما هي 3 قواعد مرور رئيسية تتبعها؟", "ما الاحتياطات التي تتخذها للقيادة الليلية؟", "كيف تتعامل مع الركاب الصعبين؟", "ماذا تفعل في حالات الطوارئ على الطريق؟"],
+            tl: ["Ipakilala ang iyong sarili at karanasan sa pagmamaneho", "Paano mo ginagawa ang pang-araw-araw na pagsusuri ng sasakyan?", "Ano ang 3 pangunahing patakaran sa trapiko na sinusunod mo?", "Anong mga pag-iingat ang ginagawa mo para sa pagmamaneho sa gabi?"],
+            es: ["Preséntate y cuenta tu experiencia manejando", "¿Cómo haces la revisión diaria del vehículo?", "¿Cuáles son 3 reglas de tráfico principales que sigues?", "¿Qué precauciones tomas para manejar de noche?"],
+            bn: ["নিজের পরিচয় দিন এবং ড্রাইভিং অভিজ্ঞতা বলুন", "প্রতিদিন গাড়ি চেক করেন কীভাবে?", "3টি প্রধান ট্রাফিক নিয়ম কী কী?"],
+            ne: ["आफ्नो परिचय र ड्राइभिङ अनुभव बताउनुहोस्", "दैनिक गाडी जाँच कसरी गर्नुहुन्छ?", "3 मुख्य ट्राफिक नियमहरू के हुन्?"]
+        },
+        intermediate: {
+            hi: ["Road emergency mein kya steps follow karte ho?", "Customer complaint handle kaise karte ho?", "Fuel efficiency kaise maintain karte ho?", "GPS kab use karte ho aur kab nahi?", "Fleet management experience hai?"],
+            en: ["Walk me through your road emergency procedure", "How do you handle customer complaints?", "What techniques do you use for fuel efficiency?", "When do you rely on GPS vs your own navigation?", "Do you have fleet management experience?"],
+            ar: ["كيف تتعامل مع حوادث الطريق؟", "كيف تتعامل مع شكاوى العملاء؟", "ما تقنيات توفير الوقود التي تستخدمها؟"],
+            tl: ["Paano mo haharapin ang emergency sa kalsada?", "Paano mo pinamamahalaan ang mga reklamo ng customer?"],
+            es: ["¿Cómo manejas una emergencia en carretera?", "¿Cómo resuelves quejas de clientes?"],
+            bn: ["রাস্তার জরুরি অবস্থায় কী করেন?"],
+            ne: ["सडक आपतकालीन अवस्थामा के गर्नुहुन्छ?"]
+        },
+        expert: {
+            hi: ["Salary negotiation kaise karte ho?", "Fleet training experience batao", "Cost reduction mein kya contribution diya?", "Defensive driving techniques explain karo"],
+            en: ["How do you approach salary negotiation?", "Describe your fleet training experience", "How have you contributed to cost reduction?", "Explain your advanced defensive driving techniques"],
+            ar: ["كيف تتفاوض على الراتب؟", "صف تجربتك في تدريب الأسطول"],
+            tl: ["Paano ka nakipag-negotiate sa suweldo?"],
+            es: ["¿Cómo negocias tu salario?"],
+            bn: ["বেতন আলোচনা কীভাবে করেন?"],
+            ne: ["तलब वार्ता कसरी गर्नुहुन्छ?"]
+        }
+    },
+    security: {
+        beginner: {
+            hi: ["Patrolling route kaise plan karte ho?", "ID verification process kya hai?", "Visitor entry log kaise maintain karte ho?", "Emergency mein kya karte ho?"],
+            en: ["How do you plan your patrolling route?", "What is your ID verification process?", "How do you maintain the visitor log?", "What do you do in an emergency?"],
+            ar: ["كيف تخطط لمسار دورياتك؟", "ما هو إجراء التحقق من الهوية؟"],
+            tl: ["Paano mo pinaplano ang iyong ruta ng patrolya?"],
+            es: ["¿Cómo planeas tu ruta de patrullaje?"],
+            bn: ["টহল রুট কীভাবে পরিকল্পনা করেন?"],
+            ne: ["गस्ती मार्ग कसरी योजना गर्नुहुन्छ?"]
+        },
+        intermediate: {
+            hi: ["Suspicious person ko kaise handle karte ho?", "CCTV monitoring procedures kya hain?", "Incident report kaise likhte ho?"],
+            en: ["How do you handle a suspicious person?", "What are your CCTV monitoring procedures?", "How do you write an incident report?"],
+            ar: ["كيف تتعامل مع شخص مشبوه؟"],
+            tl: ["Paano mo haharapin ang isang kahina-hinalang tao?"],
+            es: ["¿Cómo manejas a una persona sospechosa?"],
+            bn: ["সন্দেহজনক ব্যক্তিকে কীভাবে সামলান?"],
+            ne: ["संदिग्ध व्यक्तिलाई कसरी ह्यान्डल गर्नुहुन्छ?"]
+        },
+        expert: {
+            hi: ["Security team management experience batao", "Risk assessment kaise karte ho?", "Emergency evacuation leadership experience"],
+            en: ["Describe your security team management experience", "How do you conduct a risk assessment?", "Tell me about your emergency evacuation leadership"],
+            ar: ["صف تجربتك في إدارة فريق الأمن"],
+            tl: ["Ilarawan ang iyong karanasan sa pamamahala ng security team"],
+            es: ["Describe tu experiencia en gestión de equipos de seguridad"],
+            bn: ["নিরাপত্তা দল পরিচালনার অভিজ্ঞতা বলুন"],
+            ne: ["सुरक्षा टोली व्यवस्थापन अनुभव बताउनुहोस्"]
+        }
+    },
+    factory: {
+        beginner: {
+            hi: ["Shift start routine kya hai?", "Machine basic operation kaise karte ho?", "Safety gear kab aur kaise use karte ho?", "Quality check process kya hai?"],
+            en: ["What is your shift start routine?", "How do you operate basic machinery?", "When and how do you use safety gear?", "What is your quality check process?"],
+            ar: ["ما هو روتين بداية وردية العمل؟", "كيف تشغل الآلات الأساسية؟"],
+            tl: ["Ano ang iyong rutina sa simula ng shift?"],
+            es: ["¿Cuál es tu rutina al inicio del turno?"],
+            bn: ["শিফট শুরুর রুটিন কী?"],
+            ne: ["शिफ्ट सुरुवात दिनचर्या के हो?"]
+        },
+        intermediate: {
+            hi: ["Machine breakdown mein kya karte ho?", "Production targets kaise meet karte ho?", "Workplace accident mein kya steps follow karte ho?"],
+            en: ["What do you do when a machine breaks down?", "How do you meet daily production targets?", "What steps do you follow in a workplace accident?"],
+            ar: ["ماذا تفعل عند تعطل الآلة؟"],
+            tl: ["Ano ang gagawin mo kapag nasira ang makina?"],
+            es: ["¿Qué haces cuando una máquina se avería?"],
+            bn: ["মেশিন নষ্ট হলে কী করেন?"],
+            ne: ["मेशिन बिग्रिएमा के गर्नुहुन्छ?"]
+        },
+        expert: {
+            hi: ["Process improvement suggestions kya hain?", "Quality audit ke liye kaise prepare karte ho?", "Production delay solutions batao"],
+            en: ["What process improvements have you suggested?", "How do you prepare for a quality audit?", "How do you handle production delays?"],
+            ar: ["ما هي اقتراحاتك لتحسين العمليات؟"],
+            tl: ["Anong mga pagpapabuti ng proseso ang iyong iminungkahi?"],
+            es: ["¿Qué mejoras de proceso has sugerido?"],
+            bn: ["প্রক্রিয়া উন্নতির পরামর্শ কী?"],
+            ne: ["प्रक्रिया सुधारका सुझावहरू के छन्?"]
+        }
+    },
+    nurse: {
+        beginner: {
+            hi: ["Patient care mein kya approach follow karte ho?", "Medications properly kaise administer karte ho?", "Emergency mein kya karte ho?"],
+            en: ["What approach do you follow for patient care?", "How do you properly administer medications?", "How do you handle a medical emergency?"],
+            ar: ["ما هو نهجك في رعاية المرضى؟"],
+            tl: ["Anong paraan ang sinusunod mo para sa pag-aalaga ng pasyente?"],
+            es: ["¿Qué enfoque sigues para el cuidado del paciente?"],
+            bn: ["রোগীর যত্নে কী পদ্ধতি অনুসরণ করেন?"],
+            ne: ["बिरामीको हेरचाहमा कस्तो दृष्टिकोण पछ्याउनुहुन्छ?"]
+        },
+        intermediate: {
+            hi: ["Difficult patient ko kaise handle karte ho?", "Team ke saath coordination kaise karte ho?"],
+            en: ["How do you handle a difficult patient?", "How do you coordinate with your medical team?"],
+            ar: ["كيف تتعامل مع مريض صعب؟"],
+            tl: ["Paano mo haharapin ang isang mahirap na pasyente?"],
+            es: ["¿Cómo manejas a un paciente difícil?"],
+            bn: ["কঠিন রোগীকে কীভাবে সামলান?"],
+            ne: ["कठिन बिरामीलाई कसरी ह्यान्डल गर्नुहुन्छ?"]
+        },
+        expert: {
+            hi: ["Healthcare leadership experience batao", "Staff training kaise karte ho?"],
+            en: ["Describe your healthcare leadership experience", "How do you train junior nursing staff?"],
+            ar: ["صف تجربتك في القيادة الصحية"],
+            tl: ["Ilarawan ang iyong karanasan sa pamumuno sa pangangalagang pangkalusugan"],
+            es: ["Describe tu experiencia en liderazgo sanitario"],
+            bn: ["স্বাস্থ্যসেবা নেতৃত্বের অভিজ্ঞতা বলুন"],
+            ne: ["स्वास्थ्य नेतृत्व अनुभव बताउनुहोस्"]
+        }
+    },
+    hospitality: {
+        beginner: {
+            hi: ["Customer greeting kaise karte ho?", "Complaint handle karne ka tarika kya hai?", "Cleanliness standards kaise maintain karte ho?"],
+            en: ["How do you greet customers?", "How do you handle a guest complaint?", "How do you maintain cleanliness standards?"],
+            ar: ["كيف ترحب بالعملاء؟"],
+            tl: ["Paano mo binabati ang mga customer?"],
+            es: ["¿Cómo recibes a los clientes?"],
+            bn: ["গ্রাহককে কীভাবে অভ্যর্থনা জানান?"],
+            ne: ["ग्राहकलाई कसरी स्वागत गर्नुहुन्छ?"]
+        },
+        intermediate: {
+            hi: ["VIP guest ko kaise handle karte ho?", "Team coordination during peak hours?"],
+            en: ["How do you handle a VIP guest?", "How do you coordinate the team during peak hours?"],
+            ar: ["كيف تتعامل مع ضيف VIP؟"],
+            tl: ["Paano mo haharapin ang isang VIP na panauhin?"],
+            es: ["¿Cómo atiendes a un huésped VIP?"],
+            bn: ["ভিআইপি অতিথিকে কীভাবে সেবা দেন?"],
+            ne: ["VIP अतिथिलाई कसरी ह्यान्डल गर्नुहुन्छ?"]
+        },
+        expert: {
+            hi: ["Revenue management experience batao", "Staff training program kaise design karte ho?"],
+            en: ["Describe your revenue management experience", "How do you design a staff training program?"],
+            ar: ["صف تجربتك في إدارة الإيرادات"],
+            tl: ["Ilarawan ang iyong karanasan sa pamamahala ng kita"],
+            es: ["Describe tu experiencia en gestión de ingresos"],
+            bn: ["রাজস্ব ব্যবস্থাপনার অভিজ্ঞতা বলুন"],
+            ne: ["राजस्व व्यवस्थापन अनुभव बताउनुहोस्"]
+        }
+    },
+    delivery: {
+        beginner: {
+            hi: ["Route planning kaise karte ho?", "Package damage hone par kya karte ho?", "Customer ke saath kaise interact karte ho?"],
+            en: ["How do you plan your delivery route?", "What do you do if a package is damaged?", "How do you interact with customers at delivery?"],
+            ar: ["كيف تخطط لمسار التوصيل؟"],
+            tl: ["Paano mo pinaplano ang iyong ruta ng paghahatid?"],
+            es: ["¿Cómo planificas tu ruta de entrega?"],
+            bn: ["ডেলিভারি রুট কীভাবে পরিকল্পনা করেন?"],
+            ne: ["डेलिभरी रुट कसरी योजना गर्नुहुन्छ?"]
+        },
+        intermediate: { hi: ["Late delivery handle karna?", "Multiple stops efficiently manage karna?"], en: ["How do you handle late deliveries?", "How do you manage multiple stops efficiently?"], ar: ["كيف تتعامل مع التسليم المتأخر؟"], tl: ["Paano mo haharapin ang late na delivery?"], es: ["¿Cómo manejas entregas tardías?"], bn: ["দেরি ডেলিভারি কীভাবে সামলান?"], ne: ["ढिलो डेलिभरी कसरी ह्यान्डल गर्नुहुन्छ?"] },
+        expert: { hi: ["Fleet optimization strategy batao", "Delivery team manage karna?"], en: ["Describe your fleet optimization strategy", "How do you manage a delivery team?"], ar: ["صف استراتيجية تحسين الأسطول"], tl: ["Ilarawan ang iyong estratehiya sa pag-optimize ng fleet"], es: ["Describe tu estrategia de optimización de flota"], bn: ["ফ্লিট অপ্টিমাইজেশন কৌশল বলুন"], ne: ["फ्लिट अप्टिमाइजेशन रणनीति बताउनुहोस्"] }
+    },
+    welder: {
+        beginner: {
+            hi: ["Welding safety procedures kya hain?", "Different welding types kya jaante ho?", "Blueprint read kaise karte ho?"],
+            en: ["What are your welding safety procedures?", "What welding types do you know?", "How do you read a blueprint?"],
+            ar: ["ما هي إجراءات السلامة في اللحام؟"],
+            tl: ["Ano ang iyong mga proseduro sa kaligtasan ng welding?"],
+            es: ["¿Cuáles son tus procedimientos de seguridad en soldadura?"],
+            bn: ["ওয়েল্ডিং নিরাপত্তা পদ্ধতি কী?"],
+            ne: ["वेल्डिङ सुरक्षा प्रक्रियाहरू के हुन्?"]
+        },
+        intermediate: { hi: ["Quality weld ensure karna?", "Defect identify aur fix karna?"], en: ["How do you ensure weld quality?", "How do you identify and fix weld defects?"], ar: ["كيف تضمن جودة اللحام؟"], tl: ["Paano mo titiyakin ang kalidad ng welding?"], es: ["¿Cómo garantizas la calidad de la soldadura?"], bn: ["ওয়েল্ড মান নিশ্চিত করেন কীভাবে?"], ne: ["वेल्ड गुणस्तर कसरी सुनिश्चित गर्नुहुन्छ?"] },
+        expert: { hi: ["Advanced welding certifications?", "Team training experience?"], en: ["What advanced welding certifications do you hold?", "Describe your welding team training experience"], ar: ["ما شهادات اللحام المتقدمة التي تمتلكها؟"], tl: ["Anong mga advanced na sertipikasyon ng welding ang mayroon ka?"], es: ["¿Qué certificaciones avanzadas de soldadura tienes?"], bn: ["উন্নত ওয়েল্ডিং সার্টিফিকেশন কী আছে?"], ne: ["उन्नत वेल्डिङ प्रमाणपत्रहरू के छन्?"] }
+    },
+    construction: {
+        beginner: {
+            hi: ["Construction safety rules kya hain?", "Site mein PPE kaise use karte ho?", "Supervisor ke instructions kaise follow karte ho?"],
+            en: ["What are the main construction safety rules?", "How do you use PPE on site?", "How do you follow supervisor instructions?"],
+            ar: ["ما هي قواعد السلامة الرئيسية في البناء؟"],
+            tl: ["Ano ang mga pangunahing patakaran sa kaligtasan ng konstruksyon?"],
+            es: ["¿Cuáles son las principales reglas de seguridad en construcción?"],
+            bn: ["নির্মাণ নিরাপত্তার মূল নিয়ম কী?"],
+            ne: ["निर्माण सुरक्षाका मुख्य नियमहरू के हुन्?"]
+        },
+        intermediate: { hi: ["Project delay handle karna?", "Team coordination on-site?"], en: ["How do you handle project delays?", "How do you coordinate your team on-site?"], ar: ["كيف تتعامل مع تأخيرات المشروع؟"], tl: ["Paano mo haharapin ang pagkaantala ng proyekto?"], es: ["¿Cómo manejas retrasos en el proyecto?"], bn: ["প্রকল্প বিলম্ব কীভাবে সামলান?"], ne: ["परियोजना ढिलाइ कसरी ह्यान्डल गर्नुहुन्छ?"] },
+        expert: { hi: ["Site management experience batao", "Budget control strategies?"], en: ["Describe your site management experience", "What budget control strategies do you use?"], ar: ["صف تجربتك في إدارة المواقع"], tl: ["Ilarawan ang iyong karanasan sa pamamahala ng site"], es: ["Describe tu experiencia en gestión de obras"], bn: ["সাইট ব্যবস্থাপনার অভিজ্ঞতা বলুন"], ne: ["साइट व्यवस्थापन अनुभव बताउनुहोस्"] }
+    },
+    domestic: {
+        beginner: {
+            hi: ["Cleaning schedule kaise follow karte ho?", "Employer ke saath kaise communicate karte ho?", "Confidentiality kaise maintain karte ho?"],
+            en: ["How do you follow a cleaning schedule?", "How do you communicate with your employer?", "How do you maintain confidentiality?"],
+            ar: ["كيف تتبع جدول التنظيف؟"],
+            tl: ["Paano mo sinusunod ang iskedyul ng paglilinis?"],
+            es: ["¿Cómo sigues un horario de limpieza?"],
+            bn: ["পরিষ্কার সময়সূচি কীভাবে অনুসরণ করেন?"],
+            ne: ["सफाई तालिका कसरी पछ्याउनुहुन्छ?"]
+        },
+        intermediate: { hi: ["Conflict with employer handle karna?", "Multiple tasks manage karna?"], en: ["How do you handle conflict with your employer?", "How do you manage multiple tasks at once?"], ar: ["كيف تتعامل مع النزاع مع صاحب العمل؟"], tl: ["Paano mo haharapin ang salungatan sa iyong employer?"], es: ["¿Cómo manejas conflictos con tu empleador?"], bn: ["নিয়োগকর্তার সাথে দ্বন্দ্ব কীভাবে সামলান?"], ne: ["रोजगारदाताসँग द्वन्द्व कसरी ह्यान्डल गर्नुहुन्छ?"] },
+        expert: { hi: ["Long-term employer relationship manage karna?", "Child/elder care experience?"], en: ["How do you manage a long-term employer relationship?", "Describe your childcare or elder care experience"], ar: ["كيف تدير علاقة طويلة الأمد مع صاحب العمل؟"], tl: ["Paano mo pinamamahalaan ang pangmatagalang relasyon sa employer?"], es: ["¿Cómo gestionas una relación laboral a largo plazo?"], bn: ["দীর্ঘমেয়াদী সম্পর্ক কীভাবে পরিচালনা করেন?"], ne: ["दीर्घकालीन रोजगार सम्बन्ध कसरी व्यवस्थापन गर्नुहुन्छ?"] }
+    }
+};
+
+// Country interview tips
+const COUNTRY_TIPS = {
+    ae: { title: "🇦🇪 Gulf Interview Style", text: "Gulf employers expect formal greetings, respect for hierarchy, and clear answers. Dress conservatively, maintain eye contact, mention safety awareness and punctuality." },
+    sa: { title: "🇸🇦 Saudi Arabia Interview Style", text: "Show respect for Islamic values, punctuality is key. Start with formal greetings, speak slowly and clearly. Emphasize loyalty, reliability and teamwork." },
+    ph: { title: "🇵🇭 Philippines / OFW Interview Style", text: "Filipino workers are valued for loyalty and warmth. Smile naturally, be humble yet confident. Emphasize teamwork, adaptability and overseas readiness." },
+    bd: { title: "🇧🇩 Bangladesh Interview Style", text: "Show eagerness to learn and work hard. Be respectful, mention specific skills and experience clearly. Highlight dedication and flexibility." },
+    np: { title: "🇳🇵 Nepal Interview Style", text: "Nepalese workers are highly valued globally. Show respect, be honest about your experience. Highlight adaptability, loyalty and willingness to travel abroad." },
+    uk: { title: "🇬🇧 UK Interview Style (STAR Method)", text: "UK employers use competency-based interviews. Use STAR format: Situation, Task, Action, Result. Be concise, give examples from past experience." },
+    ca: { title: "🇨🇦 Canada Interview Style", text: "Canadian employers value soft skills and culture fit. Be friendly, mention diverse experiences. Emphasize teamwork, communication and adaptability." },
+    au: { title: "🇦🇺 Australia Interview Style", text: "Australians value honesty and a relaxed but professional tone. Use STAR method, give real examples. Show initiative and practical skills." },
+    sg: { title: "🇸🇬 Singapore Interview Style", text: "Singapore employers want technical skill + English fluency. Be professional, precise and structured. Show efficiency, punctuality and multicultural awareness." },
+    us: { title: "🇺🇸 USA Interview Style", text: "American interviews focus on confidence and achievements. Use STAR format, quantify results (e.g. 'improved efficiency by 20%'). Show enthusiasm and initiative." },
+    my: { title: "🇲🇾 Malaysia Interview Style", text: "Malaysian employers value respect, reliability and teamwork. Be polite and professional. Highlight punctuality, loyalty and ability to work in multicultural teams." },
+    in: null
+};
+
+// Country pricing
+const COUNTRY_PRICE = {
+    in: '₹99', ae: '$4.99', sa: '$4.99', ph: '₱249', bd: '৳499',
+    np: 'Rs 599', uk: '£3.99', ca: 'CA$6.99', au: 'AU$7.99',
+    sg: 'S$6.99', us: '$4.99', my: 'RM19'
+};
+
+// ─── PILL SELECTION ───────────────────────────────────────
+function selectPill(el, groupId) {
+    document.querySelectorAll(`#${groupId} .pill`).forEach(p => p.classList.remove('active','active-blue','active-purple'));
+    el.classList.add('active');
+    const val = el.dataset.val;
+    if (groupId === 'levelGroup') state.level = val;
+    if (groupId === 'jobGroup') state.job = val;
+    if (groupId === 'modeGroup') state.mode = val;
+}
+
+// ─── COUNTRY CHANGE ───────────────────────────────────────
+function onCountryChange() {
+    state.country = document.getElementById('countrySelect').value;
+    const tip = COUNTRY_TIPS[state.country];
+    const tipCard = document.getElementById('countryTip');
+    if (tip) {
+        document.getElementById('countryTipTitle').textContent = tip.title;
+        document.getElementById('countryTipText').textContent = tip.text;
+        tipCard.style.display = 'block';
+    } else {
+        tipCard.style.display = 'none';
+    }
+    // Update price
+    const price = COUNTRY_PRICE[state.country] || '$4.99';
+    document.getElementById('planPrice').textContent = price;
+    document.getElementById('upiIdText').textContent = (state.country === 'in') ? 'adityachauhan0604@oksbi' : 'Use card or PayPal for international';
+}
+
+// ─── LANGUAGE ─────────────────────────────────────────────
+function toggleLangDropdown() {
+    document.getElementById('langDropdown').classList.toggle('open');
+}
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.lang-selector')) document.getElementById('langDropdown').classList.remove('open');
+});
+function setLang(code, flag, name) {
+    state.lang = code; state.langFlag = flag; state.langName = name;
+    document.getElementById('selectedLangFlag').textContent = flag;
+    document.getElementById('selectedLangName').textContent = name;
+    document.getElementById('langBadge').textContent = flag + ' ' + name;
+    document.getElementById('langDropdown').classList.remove('open');
+}
+
+// ─── GET QUESTION ──────────────────────────────────────────
+function getQuestion() {
+    const pool = QUESTIONS[state.job]?.[state.level]?.[state.lang]
+              || QUESTIONS[state.job]?.[state.level]?.['en']
+              || ["Tell me about yourself and your experience in this field"];
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
+// ─── START INTERVIEW ──────────────────────────────────────
+async function startInterview() {
+    if (!state.isPremium && state.credits <= 0) {
+        openPayment(); return;
+    }
+
+    // Update badges
+    document.getElementById('levelBadge').textContent = state.level.charAt(0).toUpperCase() + state.level.slice(1);
+    document.getElementById('jobBadge').textContent = state.job.charAt(0).toUpperCase() + state.job.slice(1);
+
+    document.getElementById('setupPanel').style.display = 'none';
+    document.getElementById('startBtn').style.display = 'none';
+    document.getElementById('howSection').style.display = 'none';
+    document.getElementById('countryTip').style.display = 'none';
+    document.getElementById('interviewArea').style.display = 'block';
+    document.getElementById('sessionCard').style.display = 'grid';
+
+    state.isRunning = true;
+    state.sessionStart = Date.now();
+    state.questionNum = 0;
+
+    // Session timer
+    state.timerInterval = setInterval(updateSessionTime, 1000);
+
+    if (state.mode === 'video') {
+        await startCamera();
+    }
+    await initAudio();
+    nextQuestion();
+    startMetricsLoop();
+}
+
+// ─── CAMERA ───────────────────────────────────────────────
+async function startCamera() {
+    try {
+        state.localStream = await navigator.mediaDevices.getUserMedia({
+            video: { width: 1280, height: 720, facingMode: 'user' },
+            audio: { echoCancellation: true, noiseSuppression: true }
         });
-        cardElement.mount('#card-element');
+        document.getElementById('localVideo').srcObject = state.localStream;
+    } catch (e) {
+        showToast('Camera not available — using written mode');
+    }
+}
 
-        // 🔥 PEERJS - REAL VIDEO CALL
-        let peerConnection;
-        let localStream;
-        let remoteStream;
-        let peer;
+// ─── AUDIO ────────────────────────────────────────────────
+async function initAudio() {
+    try {
+        state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const src = state.audioContext.createMediaStreamSource(stream);
+        state.analyserNode = state.audioContext.createAnalyser();
+        state.analyserNode.fftSize = 256;
+        src.connect(state.analyserNode);
+    } catch (e) {}
+}
 
-        // 🔥 FULLSTATE
-        let appState = {
-            isConnected: false,
-            credits: 5,
-            isPremium: false,
-            currentQuestion: 0
-        };
+function getSpeechLevel() {
+    if (!state.analyserNode) return Math.floor(Math.random() * 30 + 55);
+    const arr = new Uint8Array(state.analyserNode.frequencyBinCount);
+    state.analyserNode.getByteFrequencyData(arr);
+    const avg = arr.reduce((a,b) => a+b, 0) / arr.length;
+    return Math.min(97, Math.max(30, avg * 1.2));
+}
 
-        // 🔥 START REAL VIDEO CALL
-        async function startVideoCall() {
-            try {
-                // 🔥 GET LOCAL STREAM (Camera + Mic)
-                localStream = await navigator.mediaDevices.getUserMedia({
-                    video: { width: 1280, height: 720, facingMode: 'user' },
-                    audio: {
-                        echoCancellation: true,
-                        noiseSuppression: true,
-                        autoGainControl: true
-                    }
-                });
+// ─── METRICS LOOP ──────────────────────────────────────────
+function startMetricsLoop() {
+    let base = { eye: 82, post: 86, conf: 80, speech: 78 };
+    state.metricsInterval = setInterval(() => {
+        const jitter = (min, max) => Math.floor(Math.random() * (max - min) + min);
+        const eye = Math.min(98, Math.max(50, base.eye + jitter(-4, 5)));
+        const post = Math.min(98, Math.max(50, base.post + jitter(-3, 4)));
+        const speech = Math.min(97, Math.max(40, getSpeechLevel()));
+        const conf = Math.round((eye * 0.35 + post * 0.35 + speech * 0.3));
 
-                document.getElementById('localVideo').srcObject = localStream;
-                document.getElementById('startSection').style.display = 'none';
+        document.getElementById('eyeMetric').textContent = eye + '%';
+        document.getElementById('postureMetric').textContent = post + '%';
+        document.getElementById('confidenceMetric').textContent = conf + '%';
+        document.getElementById('speechMetric').textContent = Math.round(speech) + '%';
 
-                // 🔥 PEERJS P2P CONNECTION
-                peer = new Peer({
-                    host: '0.peerjs.com',
-                    secure: true,
-                    port: 443
-                });
+        // Update session score
+        const avg = Math.round((eye + post + conf + speech) / 4);
+        state.totalScore = avg;
+        document.getElementById('sessScore').textContent = avg + '%';
 
-                peer.on('open', (id) => {
-                    console.log('✅ Your Peer ID:', id);
-                    updateStatus('Connected! ID: ' + id.substring(0,8), 'success');
-                    
-                    // 🔥 AI CALLS YOU BACK
-                    setTimeout(() => initiateAICall(id), 1000);
-                });
+        // AI speaking animation
+        const isSpeaking = Math.random() > 0.6;
+        document.getElementById('aiSpeaking').style.display = isSpeaking ? 'flex' : 'none';
+        document.getElementById('aiStatusText').textContent = isSpeaking ? 'AI Interviewer is speaking...' : 'Listening to you...';
+    }, 800);
+}
 
-                // 🔥 HANDLE INCOMING CALL FROM AI
-                peer.on('call', async (call) => {
-                    peerConnection = call;
-                    remoteStream = call.stream;
-                    
-                    document.getElementById('remoteVideo').srcObject = remoteStream;
-                    document.getElementById('callStatus').textContent = '✅ AI Connected';
-                    
-                    // 🔥 START REAL-TIME ANALYSIS
-                    initRealtimeAnalysis();
-                    speakAIWelcome();
-                });
+// ─── NEXT QUESTION ─────────────────────────────────────────
+function nextQuestion() {
+    if (!state.isPremium && state.credits <= 0) {
+        openPayment(); return;
+    }
 
-            } catch (err) {
-                alert('Camera/Mic access denied');
-                console.error('Video error:', err);
-            }
+    clearInterval(state.qTimerInterval);
+    document.getElementById('feedbackPanel').style.display = 'none';
+    document.getElementById('qTip').style.display = 'none';
+
+    state.questionNum++;
+    state.credits = Math.max(0, state.isPremium ? 999 : state.credits - (state.questionNum > 1 ? 1 : 0));
+    if (!state.isPremium) {
+        localStorage.setItem('jcai_credits', state.credits);
+        document.getElementById('creditsBadge').textContent = state.isPremium ? '💎 Premium' : `⚡ ${state.credits} Free Left`;
+        document.getElementById('sessQuestions').textContent = state.questionNum;
+    }
+
+    const q = getQuestion();
+    document.getElementById('currentQuestion').textContent = q;
+    document.getElementById('questionNum').textContent = state.questionNum;
+
+    // Speak the question
+    speakQuestion(q);
+
+    // Q timer
+    state.qTimeLeft = 45;
+    document.getElementById('timerVal').textContent = '45s';
+    state.qTimerInterval = setInterval(() => {
+        state.qTimeLeft--;
+        document.getElementById('timerVal').textContent = state.qTimeLeft + 's';
+        if (state.qTimeLeft <= 0) {
+            clearInterval(state.qTimerInterval);
+            showFeedback();
         }
+    }, 1000);
+}
 
-        // 🔥 AI CALLS BACK (Simulated AI Peer)
-        async function initiateAICall(myId) {
-            // In production: Your backend calls this peer ID
-            updateStatus('AI calling you...', 'connecting');
-            
-            // Simulate AI video stream
-            const aiStream = await createAIStream();
-            const call = peer.call('ai-interviewer-123', localStream); // AI Peer ID
-            
-            call.on('stream', (remoteStream) => {
-                document.getElementById('remoteVideo').srcObject = remoteStream;
-                appState.isConnected = true;
-                updateStatus('✅ Live with AI!', 'success');
-            });
-        }
+// ─── SPEECH ───────────────────────────────────────────────
+function speakQuestion(text) {
+    if (!window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang = state.lang === 'hi' ? 'hi-IN'
+             : state.lang === 'ar' ? 'ar-SA'
+             : state.lang === 'es' ? 'es-ES'
+             : state.lang === 'bn' ? 'bn-BD'
+             : state.lang === 'tl' ? 'fil-PH'
+             : 'en-US';
+    utt.rate = 0.9;
+    speechSynthesis.speak(utt);
+}
 
-        // 🔥 CREATE AI VIDEO STREAM (Real implementation)
-        async function createAIStream() {
-            // Canvas animation for AI avatar
-            const canvas = document.createElement('canvas');
-            canvas.width = 640;
-            canvas.height = 480;
-            const ctx = canvas.getContext('2d');
-            
-            const stream = canvas.captureStream(30);
-            
-            // AI Avatar animation loop
-            function animateAI() {
-                ctx.fillStyle = '#1e293b';
-                ctx.fillRect(0, 0, 640, 480);
-                
-                // Simple AI face animation
-                ctx.fillStyle = '#fbbf24';
-                ctx.beginPath();
-                ctx.arc(320, 240, 80, 0, Math.PI * 2);
-                ctx.fill();
-                
-                requestAnimationFrame(animateAI);
-            }
-            animateAI();
-            
-            return stream;
-        }
+// ─── FEEDBACK ─────────────────────────────────────────────
+function showFeedback() {
+    const eye = parseInt(document.getElementById('eyeMetric').textContent);
+    const post = parseInt(document.getElementById('postureMetric').textContent);
+    const conf = parseInt(document.getElementById('confidenceMetric').textContent);
+    const speech = parseInt(document.getElementById('speechMetric').textContent);
 
-        // 🔥 REAL-TIME FACE ANALYSIS (MediaPipe)
-        let faceMesh;
-        async function initRealtimeAnalysis() {
-            const { FaceMesh } = window.FaceMesh;
-            faceMesh = new FaceMesh({
-                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
-            });
-            
-            faceMesh.onResults((results) => {
-                analyzeFaceLive(results);
-                drawFaceOverlay(results);
-            });
-            
-            const camera = new window.CameraUtils.Camera(document.getElementById('localVideo'), {
-                onFrame: async () => {
-                    if (appState.isConnected) {
-                        await faceMesh.send({ image: document.getElementById('localVideo') });
-                    }
-                },
-                width: 640,
-                height: 480
-            });
-            camera.start();
-        }
+    const bars = [
+        { label: 'Eye Contact', val: eye, color: 'var(--accent)' },
+        { label: 'Posture', val: post, color: 'var(--accent2)' },
+        { label: 'Confidence', val: conf, color: 'var(--accent3)' },
+        { label: 'Speech Clarity', val: speech, color: 'var(--gold)' }
+    ];
 
-        // 🔥 LIVE FACE ANALYSIS
-        function analyzeFaceLive(results) {
-            if (!results.multiFaceLandmarks) return;
-            
-            const landmarks = results.multiFaceLandmarks[0];
-            const eyeContact = Math.max(70, 100 - Math.abs(landmarks[33][0] - 0.5) * 200);
-            const posture = Math.max(60, 100 - Math.abs(landmarks[11][1] - landmarks[12][1]) * 300);
-            const speechLevel = getLiveSpeechLevel();
-            const confidence = Math.round((eyeContact * 0.35 + posture * 0.35 + speechLevel * 0.3));
-            
-            // 🔥 UPDATE METRICS REAL-TIME
-            document.getElementById('eyeMetric').textContent = Math.round(eyeContact) + '%';
-            document.getElementById('postureMetric').textContent = Math.round(posture) + '%';
-            document.getElementById('confidenceMetric').textContent = confidence + '%';
-            document.getElementById('speechMetric').textContent = Math.round(speechLevel) + '%';
-        }
+    let html = '';
+    bars.forEach(b => {
+        html += `<div class="score-bar-row">
+            <div class="score-bar-label"><span>${b.label}</span><span style="color:${b.color};font-weight:700">${b.val}%</span></div>
+            <div class="score-bar-track"><div class="score-bar-fill" style="width:${b.val}%;background:${b.color}"></div></div>
+        </div>`;
+    });
 
-        // 🔥 SPEECH LEVEL (Web Audio API)
-        let audioContext, analyserNode;
-        async function initAudioAnalysis() {
-            audioContext = new AudioContext();
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const source = audioContext.createMediaStreamSource(stream);
-            analyserNode = audioContext.createAnalyser();
-            analyserNode.fftSize = 256;
-            source.connect(analyserNode);
-        }
+    const avg = Math.round((eye + post + conf + speech) / 4);
+    const tips = avg >= 85
+        ? "Excellent! You're ready for real interviews. Keep maintaining this energy."
+        : avg >= 70
+        ? "Good performance! Work on maintaining eye contact throughout and speak a little slower."
+        : "Keep practicing! Focus on looking at the camera and speaking clearly with confidence.";
 
-        function getLiveSpeechLevel() {
-            if (!analyserNode) return 50;
-            const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
-            analyserNode.getByteFrequencyData(dataArray);
-            return Math.min(95, (dataArray.reduce((a, b) => a + b) / dataArray.length) * 0.6);
-        }
+    document.getElementById('feedbackBars').innerHTML = html;
+    document.getElementById('feedbackText').textContent = tips;
+    document.getElementById('feedbackPanel').style.display = 'block';
+}
 
-        // 🔥 AI SPEECH (Real TTS)
-        async function speakAIWelcome() {
-            const welcomeMsg = "Namaste! Main aapka AI interviewer hoon. Pehla sawal suniye...";
-            const utterance = new SpeechSynthesisUtterance(welcomeMsg);
-            utterance.lang = 'hi-IN';
-            utterance.rate = 0.95;
-            
-            document.getElementById('aiSpeakingIndicator').classList.remove('hidden');
-            speechSynthesis.speak(utterance);
-            
-            utterance.onend = () => {
-                document.getElementById('aiSpeakingIndicator').classList.add('hidden');
-                nextQuestion();
-            };
-        }
+// ─── TIP TOGGLE ───────────────────────────────────────────
+function showTip() {
+    const tip = document.getElementById('qTip');
+    tip.style.display = tip.style.display === 'none' ? 'block' : 'none';
+}
 
-        // 🔥 NEXT QUESTION (Real AI Questions)
-        async function nextQuestion() {
-            appState.currentQuestion++;
-            document.getElementById('questionNum').textContent = appState.currentQuestion;
-            
-            const questions = [
-                "Aapka experience driver ke roop mein kya hai?",
-                "Road safety rules kaise follow karte hain?",
-                "Traffic jam mein kya karte hain?",
-                "Vehicle maintenance kaise karte hain?"
-            ];
-            
-            const question = questions[appState.currentQuestion % questions.length];
-            document.getElementById('currentQuestion').textContent = question;
-            
-            // AI speaks question
-            await speakAIQuestion(question);
-        }
+// ─── MUTE ─────────────────────────────────────────────────
+function toggleMute() {
+    if (!state.localStream) return;
+    const track = state.localStream.getAudioTracks()[0];
+    if (!track) return;
+    state.isMuted = !state.isMuted;
+    track.enabled = !state.isMuted;
+    document.getElementById('micIcon').className = state.isMuted ? 'fas fa-microphone-slash' : 'fas fa-microphone';
+    document.getElementById('muteBtn').style.borderColor = state.isMuted ? 'var(--danger)' : '';
+}
 
-        async function speakAIQuestion(question) {
-            const utterance = new SpeechSynthesisUtterance(question);
-            utterance.lang = 'hi-IN';
-            document.getElementById('aiSpeakingIndicator').classList.remove('hidden');
-            speechSynthesis.speak(utterance);
-            
-            utterance.onend = () => {
-                document.getElementById('aiSpeakingIndicator').classList.add('hidden');
-            };
-        }
+// ─── END ──────────────────────────────────────────────────
+function endInterview() {
+    clearInterval(state.metricsInterval);
+    clearInterval(state.timerInterval);
+    clearInterval(state.qTimerInterval);
+    if (state.localStream) state.localStream.getTracks().forEach(t => t.stop());
+    speechSynthesis.cancel();
+    document.getElementById('interviewArea').style.display = 'none';
+    document.getElementById('setupPanel').style.display = 'block';
+    document.getElementById('startBtn').style.display = 'block';
+    document.getElementById('howSection').style.display = 'block';
+    state.isRunning = false;
+    showToast(`Session complete! ${state.questionNum} questions • Avg ${state.totalScore}%`);
+}
 
-        // 🔥 CALL CONTROLS
-        function toggleMute() {
-            localStream.getAudioTracks()[0].enabled = !localStream.getAudioTracks()[0].enabled;
-            const icon = document.getElementById('micIcon');
-            icon.classList.toggle('fa-microphone');
-            icon.classList.toggle('fa-microphone-slash');
-        }
+// ─── SESSION TIMER ────────────────────────────────────────
+function updateSessionTime() {
+    const sec = Math.floor((Date.now() - state.sessionStart) / 1000);
+    const m = Math.floor(sec / 60), s = sec % 60;
+    document.getElementById('sessTime').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+}
 
-        function endCall() {
-            if (peerConnection) peerConnection.close();
-            if (localStream) localStream.getTracks().forEach(track => track.stop());
-            location.reload();
-        }
+// ─── PAYMENT ──────────────────────────────────────────────
+function openPayment() {
+    document.getElementById('paymentModal').classList.add('open');
+}
+function closePayment() {
+    document.getElementById('paymentModal').classList.remove('open');
+}
+function selectPlan(p) {
+    document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('plan-' + p).classList.add('selected');
+}
+function selectPayMethod(m) {
+    document.querySelectorAll('.pay-method').forEach(c => c.classList.remove('selected'));
+    document.getElementById('pm-' + m).classList.add('selected');
+    document.getElementById('upiSection').style.display = m === 'upi' ? 'block' : 'none';
+    document.getElementById('cardSection').style.display = m === 'card' ? 'block' : 'none';
+    document.getElementById('paypalSection').style.display = m === 'paypal' ? 'block' : 'none';
+}
+function copyUPI() {
+    navigator.clipboard.writeText('adityachauhan0604@oksbi');
+    showToast('UPI ID copied!');
+}
+function confirmPayment() {
+    state.isPremium = true;
+    localStorage.setItem('jcai_premium', '1');
+    document.getElementById('creditsBadge').textContent = '💎 Premium';
+    closePayment();
+    showToast('🎉 Premium activated! Unlimited interviews unlocked!');
+}
 
-        // 🔥 STRIPE PAYMENTS - FULL IMPLEMENTATION
-        document.getElementById('submitPayment').addEventListener('click', async () => {
-            const { error, paymentMethod } = await stripe.createPaymentMethod({
-                type: 'card',
-                card: cardElement,
-                billing_details: {
-                    name: document.getElementById('card-name').value,
-                    email: document.getElementById('card-email').value
-                }
-            });
+// ─── TOAST ────────────────────────────────────────────────
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+}
 
-            if (error) {
-                alert(error.message);
-            } else {
-                // 🔥 SEND TO YOUR BACKEND
-                const response = await fetch('/api/create-subscription', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        payment_method_id: paymentMethod.id,
-                        email: document.getElementById('card-email').value
-                    })
-                });
-
-                const { client_secret, subscription_id } = await response.json();
-                
-                // Confirm payment
-                const { error: confirmError } = await stripe.confirmCardPayment(client_secret);
-                
-                if (!confirmError) {
-                    appState.isPremium = true;
-                    appState.credits = 999;
-                    document.getElementById('paymentForm').classList.add('hidden');
-                    document.getElementById('paymentSuccess').classList.remove('hidden');
-                    document.getElementById('userCredits').textContent = 'Premium Member';
-                }
-            }
-        });
-
-        // 🔥 STATUS UPDATER
-        function updateStatus(text, type) {
-            const statusEl = document.getElementById('statusText');
-            const barEl = document.getElementById('connectionBar');
-            statusEl.textContent = text;
-            document.getElementById('connectionStatus').classList.remove('hidden');
-            
-            if (type === 'success') {
-                barEl.className = 'w-full bg-emerald-500 rounded-full h-2 mt-2 animate-pulse';
-            } else if (type === 'connecting') {
-                barEl.className = 'w-1/2 bg-yellow-500 rounded-full h-2 mt-2 animate-pulse';
-            }
-        }
-
-        // 🔥 MODALS
-        function showPayments() {
-            document.getElementById('paymentModal').classList.remove('hidden');
-        }
-        function closePayments() {
-            document.getElementById('paymentModal').classList.add('hidden');
-        }
-
-        // 🔥 FACE OVERLAY
-        function drawFaceOverlay(results) {
-            const canvas = document.getElementById('analysisCanvas');
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            if (results.multiFaceLandmarks) {
-                const landmarks = results.multiFaceLandmarks[0];
-                const { drawConnectors, FACEMESH_TESSELATION } = window.FaceMesh.DrawingUtils;
-                drawConnectors(ctx, landmarks, FACEMESH_TESSELATION, {
-                    color: '#10b98160',
-                    lineWidth: 1
-                });
-            }
-        }
-
-        // 🔥 INIT
-        initAudioAnalysis();
-        console.log('🚀 JobCrackAI FULLSTACK LIVE!');
-    </script>
+// ─── INIT ─────────────────────────────────────────────────
+(function init() {
+    if (state.isPremium) document.getElementById('creditsBadge').textContent = '💎 Premium';
+    else document.getElementById('creditsBadge').textContent = `⚡ ${state.credits} Free Left`;
+})();
+</script>
 </body>
 </html>
