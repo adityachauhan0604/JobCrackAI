@@ -3,394 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JobCrackAI - Live AI Video Interview 🇮🇳</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>JobCrackAI - Beginner Interview Practice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection@1.0.2/dist/face-landmarks-detection.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="manifest" href="manifest.json">
     <style>
         * { font-family: 'Inter', sans-serif; }
-        .glass { background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.25); }
-        .ai-avatar { 
-            width: 120px; height: 120px; 
-            background: linear-gradient(135deg, #8B5CF6, #EC4899);
-            border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center;
-            font-size: 3rem; box-shadow: 0 20px 40px rgba(139,92,246,0.4);
+        .glass { 
+            background: rgba(255,255,255,0.1); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255,255,255,0.2); 
         }
-        @keyframes speak { 0%,100%{transform:scale(1);} 50%{transform:scale(1.1);} }
-        .speaking { animation: speak 1.5s infinite; }
-        .blink { animation: blink 3s infinite; }
-        @keyframes blink { 0%,90%{opacity:1;} 95%{opacity:0;} }
+        .premium-badge {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            box-shadow: 0 4px 14px rgba(255,215,0,0.4);
+        }
+        @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+        .float { animation: float 3s ease-in-out infinite; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-pink-900 min-h-screen">
-    
-    <div id="root"></div>
+<body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 min-h-screen p-4 text-white">
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef, useCallback } = React;
-
-        // Global AI Model Refs
-        let faceMesh = null;
-        let model = null;
-        let camera = null;
-
-        function App() {
-            const [page, setPage] = useState('home');
-            const [interviewActive, setInterviewActive] = useState(false);
-            const [aiSpeaking, setAiSpeaking] = useState(false);
-            const [userSpeaking, setUserSpeaking] = useState(false);
-            const [currentQuestion, setCurrentQuestion] = useState('');
-            const [metrics, setMetrics] = useState({
-                eyeContact: 0,
-                confidence: 0,
-                speechClarity: 0,
-                posture: 0,
-                nervousness: 100
-            });
-            const [aiQuestions, setAiQuestions] = useState([]);
-            const [questionHistory, setQuestionHistory] = useState([]);
+    <div class="max-w-2xl mx-auto space-y-8">
+        
+        <!-- Premium Header -->
+        <div class="glass p-8 rounded-3xl text-center shadow-2xl float">
+            <div class="premium-badge px-6 py-3 rounded-2xl inline-block font-bold text-black mb-6 shadow-lg">
+                ⭐ PREMIUM UNLOCKED ⭐
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black bg-gradient-to-r from-white to-blue-300 bg-clip-text text-transparent mb-4">
+                JobCrackAI
+            </h1>
+            <div class="text-2xl font-semibold text-blue-200 mb-6">Beginner Level Practice</div>
             
-            const videoRef = useRef(null);
-            const canvasRef = useRef(null);
-            const audioContextRef = useRef(null);
-            const analyserRef = useRef(null);
-            const aiVoiceRef = useRef(null);
+            <!-- Level Navigation -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="intermediate.html" class="glass px-8 py-4 rounded-2xl font-bold hover:scale-105 transition-all text-center">
+                    ⚡ Intermediate Level
+                </a>
+                <a href="expert.html" class="glass px-8 py-4 rounded-2xl font-bold hover:scale-105 transition-all text-center">
+                    👑 Expert Level
+                </a>
+            </div>
+        </div>
 
-            // Hindi Job Questions
-            const jobQuestions = {
-                driver: [
-                    "भाई, आपका driving experience कितना है?",
-                    "Road पर emergency हो तो क्या करोगे?",
-                    "Vehicle daily check कैसे करते हो?",
-                    "Customer complaint आए तो?",
-                    "Traffic rules सब याद हैं?"
-                ],
-                factory: [
-                    "Shift perfect attend करते हो?",
-                    "Machine breakdown हो तो?",
-                    "Quality check कैसे करते हो?",
-                    "Target miss हो जाए तो?",
-                    "Safety gear हमेशा पहनते हो?"
-                ],
-                security: [
-                    "Patrol duty कैसे करते हो?",
-                    "Suspicious person देखा तो?",
-                    "VIP आने पर protocol क्या?",
-                    "CCTV monitoring कैसे?",
-                    "Emergency evacuation plan?"
-                ]
-            };
+        <!-- Video Interview Section -->
+        <div class="glass p-8 rounded-3xl shadow-2xl">
+            <div class="flex gap-4 mb-6">
+                <button onclick="selectJob('driver')" class="job-btn flex-1 py-4 px-6 rounded-2xl font-bold transition-all ${currentJob === 'driver' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg' : 'glass hover:scale-105'}">
+                    🚗 Driver
+                </button>
+                <button onclick="selectJob('factory')" class="job-btn flex-1 py-4 px-6 rounded-2xl font-bold transition-all ${currentJob === 'factory' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg' : 'glass hover:scale-105'}">
+                    🏭 Factory
+                </button>
+                <button onclick="selectJob('security')" class="job-btn flex-1 py-4 px-6 rounded-2xl font-bold transition-all ${currentJob === 'security' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg' : 'glass hover:scale-105'}">
+                    🛡️ Security
+                </button>
+            </div>
 
-            // Initialize AI Face Detection
-            const initFaceMesh = async () => {
-                const faceMeshModel = await window.FaceMesh.createFromOptions({
-                    maxNumFaces: 1,
-                    refineLandmarks: true,
-                    minDetectionConfidence: 0.5,
-                    minTrackingConfidence: 0.5
-                });
-                faceMesh = faceMeshModel;
-            };
+            <!-- Video + Question -->
+            <video id="userVideo" autoplay muted playsinline class="w-full h-72 md:h-96 rounded-3xl object-cover shadow-2xl mb-6 hidden"></video>
+            
+            <div id="currentQuestion" class="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-4 border-purple-400/50 p-8 rounded-3xl text-center shadow-2xl mb-8 min-h-[160px] flex flex-col justify-center">
+                <div class="text-3xl font-black text-white mb-4">👈 Select Job Type</div>
+                <div class="text-xl text-blue-300">Click START to begin interview!</div>
+            </div>
 
-            // Real Eye Contact Detection
-            const detectEyeContact = (landmarks) => {
-                if (!landmarks || landmarks.length === 0) return 0;
-                
-                const leftEye = landmarks[33]; // Left eye center
-                const rightEye = landmarks[362]; // Right eye center
-                const noseTip = landmarks[1]; // Nose tip
-                
-                // Calculate eye direction (gaze estimation)
-                const eyeCenterX = (leftEye[0] + rightEye[0]) / 2;
-                const cameraCenterX = 0.5;
-                
-                const gazeOffset = Math.abs(eyeCenterX - cameraCenterX);
-                const eyeContactScore = Math.max(0, 100 - (gazeOffset * 200));
-                
-                return Math.round(eyeContactScore);
-            };
+            <!-- Controls -->
+            <div class="flex gap-4 mb-6">
+                <button onclick="startVideo()" id="startBtn" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white py-5 px-8 rounded-3xl font-black text-xl shadow-2xl hover:scale-105 transition-all">
+                    🎥 START VIDEO CALL
+                </button>
+                <button onclick="nextQuestion()" class="glass p-5 rounded-3xl text-3xl font-bold shadow-xl hover:scale-110 transition-all">
+                    ❓ NEXT
+                </button>
+            </div>
+        </div>
 
-            // Speech Analysis from Microphone
-            const initAudioAnalysis = () => {
-                navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-                    audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-                    const source = audioContextRef.current.createMediaStreamSource(stream);
-                    analyserRef.current = audioContextRef.current.createAnalyser();
-                    analyserRef.current.fftSize = 256;
-                    const bufferLength = analyserRef.current.frequencyBinCount;
-                    const dataArray = new Uint8Array(bufferLength);
-                    
-                    source.connect(analyserRef.current);
-                    
-                    const detectSpeech = () => {
-                        analyserRef.current.getByteFrequencyData(dataArray);
-                        const average = dataArray.reduce((a, b) => a + b) / bufferLength;
-                        const volume = average / 255;
-                        
-                        setUserSpeaking(volume > 0.15); // Speech threshold
-                        const clarity = Math.min(100, volume * 200);
-                        setMetrics(m => ({ ...m, speechClarity: Math.round(clarity) }));
-                        
-                        requestAnimationFrame(detectSpeech);
-                    };
-                    detectSpeech();
-                });
-            };
+        <!-- Live Metrics -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="glass p-8 rounded-3xl text-center shadow-xl hover:scale-105 transition-all">
+                <div id="eyeContact" class="text-4xl font-black text-green-400 mb-2">85%</div>
+                <div class="text-blue-200 font-semibold">Eye Contact</div>
+            </div>
+            <div class="glass p-8 rounded-3xl text-center shadow-xl hover:scale-105 transition-all">
+                <div id="confidence" class="text-4xl font-black text-blue-400 mb-2">78%</div>
+                <div class="text-blue-200 font-semibold">Confidence</div>
+            </div>
+            <div class="glass p-8 rounded-3xl text-center shadow-xl hover:scale-105 transition-all">
+                <div id="speech" class="text-4xl font-black text-yellow-400 mb-2">72%</div>
+                <div class="text-blue-200 font-semibold">Speech Clarity</div>
+            </div>
+            <div class="glass p-8 rounded-3xl text-center shadow-xl hover:scale-105 transition-all">
+                <div id="posture" class="text-4xl font-black text-purple-400 mb-2">81%</div>
+                <div class="text-blue-200 font-semibold">Posture</div>
+            </div>
+        </div>
 
-            // AI Speaking with Web Speech Synthesis
-            const speakQuestion = (question, jobType) => {
-                setAiSpeaking(true);
-                const utterance = new SpeechSynthesisUtterance(question);
-                utterance.lang = 'hi-IN';
-                utterance.rate = 0.9;
-                utterance.pitch = 1.1;
-                utterance.volume = 0.8;
-                
-                utterance.onstart = () => {
-                    setCurrentQuestion(question);
-                    aiVoiceRef.current = utterance;
-                };
-                
-                utterance.onend = () => {
-                    setAiSpeaking(false);
-                    aiVoiceRef.current = null;
-                    // Auto next question after 3s
-                    setTimeout(() => nextQuestion(jobType), 3000);
-                };
-                
-                speechSynthesis.speak(utterance);
-            };
-
-            // Next AI Question
-            const nextQuestion = (jobType = 'driver') => {
-                const questions = jobQuestions[jobType] || jobQuestions.driver;
-                const randomQ = questions[Math.floor(Math.random() * questions.length)];
-                speakQuestion(randomQ, jobType);
-                
-                setQuestionHistory(prev => [...prev.slice(-4), randomQ]);
-                setAiQuestions(prev => [...prev.slice(-2), randomQ]);
-            };
-
-            // Start Live AI Interview
-            const startLiveInterview = async (jobType = 'driver') => {
-                try {
-                    // Camera + Face Detection
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        video: { width: 640, height: 480, facingMode: 'user' }
-                    });
-                    
-                    if (videoRef.current) {
-                        videoRef.current.srcObject = stream;
-                        videoRef.current.play();
-                    }
-                    
-                    // Initialize AI
-                    await initFaceMesh();
-                    initAudioAnalysis();
-                    
-                    setInterviewActive(true);
-                    nextQuestion(jobType);
-                    
-                } catch (err) {
-                    alert('📱 Camera + Mic Permission दो!\nSettings → Privacy → Camera/Mic ON करो');
-                }
-            };
-
-            // Live Face Analysis Loop
-            useEffect(() => {
-                let animationId;
-                
-                const analyzeFace = async () => {
-                    if (!faceMesh || !videoRef.current?.videoWidth) {
-                        animationId = requestAnimationFrame(analyzeFace);
-                        return;
-                    }
-                    
-                    const video = videoRef.current;
-                    const predictions = await faceMesh.estimateFaces(video);
-                    
-                    if (predictions.length > 0) {
-                        const eyeContactScore = detectEyeContact(predictions[0].scaledMesh);
-                        
-                        // Posture analysis (head tilt)
-                        const noseTip = predictions[0].scaledMesh[1];
-                        const chin = predictions[0].scaledMesh[152];
-                        const headTilt = Math.abs(noseTip[1] - chin[1]);
-                        const postureScore = Math.max(0, 100 - (headTilt * 2));
-                        
-                        // Nervousness (blink rate + head movement)
-                        const nervousness = 100 - eyeContactScore * 0.6 - postureScore * 0.4;
-                        
-                        setMetrics({
-                            eyeContact: Math.round(eyeContactScore),
-                            posture: Math.round(postureScore),
-                            nervousness: Math.round(Math.max(0, nervousness)),
-                            confidence: Math.round((eyeContactScore * 0.5 + postureScore * 0.3 + metrics.speechClarity * 0.2)),
-                        });
-                    }
-                    
-                    animationId = requestAnimationFrame(analyzeFace);
-                };
-                
-                if (interviewActive) {
-                    animationId = requestAnimationFrame(analyzeFace);
-                }
-                
-                return () => cancelAnimationFrame(animationId);
-            }, [interviewActive, metrics.speechClarity]);
-
-            const stopInterview = () => {
-                if (videoRef.current?.srcObject) {
-                    videoRef.current.srcObject.getTracks().forEach(track => track.stop());
-                }
-                if (aiVoiceRef.current) {
-                    speechSynthesis.cancel();
-                }
-                if (audioContextRef.current) {
-                    audioContextRef.current.close();
-                }
-                setInterviewActive(false);
-                setAiSpeaking(false);
-                setUserSpeaking(false);
-                setMetrics({ eyeContact: 0, confidence: 0, speechClarity: 0, posture: 0, nervousness: 100 });
-            };
-
-            const HomePage = () => (
-                <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-8">
-                    <div className="ai-avatar mb-8 shadow-2xl">
-                        <span className="blink">🤖</span>
-                    </div>
-                    
-                    <div>
-                        <h1 className="text-4xl md:text-6xl font-black bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent mb-6">
-                            Live AI Interview
-                        </h1>
-                        <p className="text-xl md:text-2xl text-purple-100 mb-8 max-w-2xl mx-auto leading-relaxed">
-                            Camera से Eye Contact check करेगा।<br/>
-                            Live Voice Analysis + Real Questions!
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full mb-12">
-                        {[
-                            { job: 'driver', emoji: '🚗', title: 'ड्राइवर भर्ती' },
-                            { job: 'factory', emoji: '🏭', title: 'फैक्टरी वर्कर' },
-                            { job: 'security', emoji: '🛡️', title: 'सिक्योरिटी गार्ड' }
-                        ].map(({ job, emoji, title }) => (
-                            <div key={job} className="glass p-8 rounded-3xl hover:scale-105 transition-all cursor-pointer shadow-2xl border-4 border-transparent hover:border-purple-400"
-                                onClick={() => startLiveInterview(job)}>
-                                <div className="text-5xl mb-6 mx-auto">{emoji}</div>
-                                <h3 className="text-2xl font-bold text-white mb-4">{title}</h3>
-                                <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-2xl font-bold inline-block hover:scale-110">
-                                    अभी शुरू करो
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="glass p-6 rounded-3xl max-w-md w-full shadow-2xl">
-                        <h3 className="text-xl font-bold mb-4">AI क्या Check करेगा?</h3>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div className="flex items-center space-x-2"><span className="text-lg">👁️</span><span>Eye Contact</span></div>
-                            <div className="flex items-center space-x-2"><span className="text-lg">🎤</span><span>Speech Clarity</span></div>
-                            <div className="flex items-center space-x-2"><span className="text-lg">🧍</span><span>Posture</span></div>
-                            <div className="flex items-center space-x-2"><span className="text-lg">😊</span><span>Confidence</span></div>
-                        </div>
-                    </div>
+        <!-- Question History -->
+        <div class="glass p-8 rounded-3xl shadow-2xl">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-2xl flex items-center justify-center text-2xl font-bold">📜</div>
+                <div>
+                    <h3 class="text-2xl font-bold">Question History</h3>
+                    <div class="text-blue-300">Q<span id="questionCount">0</span></div>
                 </div>
-            );
+            </div>
+            <div id="historyList" class="space-y-3 max-h-64 overflow-y-auto pr-2"></div>
+        </div>
+    </div>
 
-            const InterviewPage = () => (
-                <div className="min-h-screen p-6 relative">
-                    {/* Top Bar */}
-                    <div className="glass p-4 rounded-3xl mb-6 flex items-center justify-between">
-                        <button onClick={stopInterview} className="text-2xl hover:scale-110">🏠</button>
-                        <div className="flex items-center space-x-4">
-                            <div className={`w-3 h-3 rounded-full ${userSpeaking ? 'bg-green-400 animate-pulse' : 'bg-gray-500'}`}></div>
-                            <div className={`w-3 h-3 rounded-full ${aiSpeaking ? 'bg-purple-400 speaking' : 'bg-gray-500'}`}></div>
-                        </div>
-                    </div>
+    <script>
+        // Global Variables
+        let videoStream = null;
+        let currentJob = 'driver';
+        let questionCount = 0;
+        let analysisInterval;
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                        {/* User Video + Analysis */}
-                        <div className="space-y-4">
-                            <div className="glass rounded-3xl p-4 relative">
-                                <video ref={videoRef} autoPlay muted playsInline 
-                                    className="w-full h-80 lg:h-96 rounded-2xl object-cover shadow-2xl" />
-                                <canvas ref={canvasRef} className="absolute inset-0 w-full h-full rounded-2xl pointer-events-none" />
-                            </div>
-                            
-                            {/* Live Metrics */}
-                            <div className="grid grid-cols-2 gap-4">
-                                {Object.entries(metrics).map(([key, value]) => {
-                                    const color = value > 75 ? 'from-green-500 to-emerald-500' : 
-                                                 value > 50 ? 'from-yellow-500 to-orange-500' : 'from-red-500 to-pink-500';
-                                    return (
-                                        <div key={key} className={`glass p-4 rounded-2xl text-center shadow-xl ${color}`}>
-                                            <div className="text-2xl font-black">{Math.round(value)}%</div>
-                                            <div className="text-xs capitalize">{key.replace('_', ' ')}</div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
+        // BEGINNER LEVEL QUESTIONS
+        const BEGINNER_QUESTIONS = {
+            driver: [
+                '"Tell me about your driving experience?"',
+                '"What are the basic road safety rules?"',
+                '"What is your daily vehicle checklist?"',
+                '"How do you handle heavy traffic?"',
+                '"Why should we hire you as a driver?"',
+                '"What documents do you have for driving?"',
+                '"How do you maintain vehicle cleanliness?"'
+            ],
+            factory: [
+                '"What shifts are you available for?"',
+                '"What are basic machine safety rules?"',
+                '"How do you check product quality?"',
+                '"What if you miss your daily target?"',
+                '"Tell me about your teamwork experience?"',
+                '"How do you handle repetitive work?"',
+                '"What safety gear do you use?"'
+            ],
+            security: [
+                '"How do you perform patrol duty?"',
+                '"What is the ID checking procedure?"',
+                '"How do you handle visitors?"',
+                '"What if you see suspicious activity?"',
+                '"What is your emergency response?"',
+                '"How do you report incidents?"',
+                '"What security equipment do you use?"'
+            ]
+        };
 
-                        {/* AI Avatar + Chat */}
-                        <div className="space-y-6">
-                            <div className={`ai-avatar mx-auto shadow-2xl ${aiSpeaking ? 'speaking' : ''}`}>
-                                <span className="text-4xl">🤖</span>
-                            </div>
-                            
-                            {/* Current Question */}
-                            {currentQuestion && (
-                                <div className="glass p-6 rounded-3xl shadow-2xl bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-2 border-purple-400/50">
-                                    <div className="text-2xl font-bold text-white mb-4">🎤 AI पूछ रहा है:</div>
-                                    <div className="text-xl leading-relaxed bg-white/10 p-4 rounded-2xl backdrop-blur-sm">
-                                        "{currentQuestion}"
-                                    </div>
-                                </div>
-                            )}
-                            
-                            {/* Question History */}
-                            <div className="glass p-4 rounded-2xl max-h-64 overflow-y-auto space-y-2">
-                                <div className="text-sm font-bold text-purple-300 mb-3">पिछले सवाल:</div>
-                                {questionHistory.map((q, i) => (
-                                    <div key={i} className="text-sm bg-white/10 p-3 rounded-xl backdrop-blur-sm">
-                                        {q}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Control Buttons */}
-                    <div className="glass p-6 rounded-3xl flex gap-4 justify-center">
-                        <button onClick={stopInterview}
-                            className="flex-1 bg-gradient-to-r from-red-500 to-pink-500 text-white py-4 px-6 rounded-2xl font-bold text-lg shadow-2xl hover:scale-105">
-                            🛑 Interview समाप्त करें
-                        </button>
-                        <button onClick={() => nextQuestion('driver')}
-                            className="glass p-4 rounded-2xl text-2xl shadow-xl hover:scale-110"
-                            title="अगला सवाल">
-                            ➡️
-                        </button>
-                    </div>
-                </div>
-            );
-
-            return interviewActive ? <InterviewPage /> : <HomePage />;
+        // Job Selection
+        function selectJob(job) {
+            currentJob = job;
+            document.querySelectorAll('.job-btn').forEach(btn => {
+                btn.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-blue-600', 'text-white', 'shadow-lg');
+                btn.classList.add('glass', 'hover:scale-105');
+            });
+            event.target.classList.remove('glass', 'hover:scale-105');
+            event.target.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-blue-600', 'text-white', 'shadow-lg');
         }
 
-        ReactDOM.render(<App />, document.getElementById('root'));
+        // Start Video Call
+        async function startVideo() {
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: 640, height: 480, facingMode: 'user' },
+                    audio: true
+                });
+                
+                const video = document.getElementById('userVideo');
+                video.srcObject = videoStream;
+                video.classList.remove('hidden');
+                video.play();
+                
+                document.getElementById('startBtn').textContent = '🔴 STOP VIDEO';
+                document.getElementById('startBtn').classList.replace('from-emerald-500', 'from-red-500');
+                document.getElementById('startBtn').classList.replace('to-teal-600', 'to-pink-500');
+                
+                nextQuestion();
+                startLiveAnalysis();
+            } catch(err) {
+                alert('Please allow Camera & Microphone access!');
+            }
+        }
+
+        // Next Question
+        function nextQuestion() {
+            questionCount++;
+            document.getElementById('questionCount').textContent = questionCount;
+            
+            const questions = BEGINNER_QUESTIONS[currentJob];
+            const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
+            document.getElementById('currentQuestion').innerHTML = `
+                <div class="text-3xl font-black text-white mb-6">Q${questionCount}</div>
+                <div class="text-2xl bg-white/20 p-6 rounded-2xl backdrop-blur-sm">${randomQuestion}</div>
+            `;
+            
+            addToHistory(randomQuestion);
+        }
+
+        // Add to History
+        function addToHistory(question) {
+            const history = document.getElementById('historyList');
+            const div = document.createElement('div');
+            div.className = 'p-4 bg-white/10 rounded-2xl backdrop-blur-sm hover:bg-white/20 transition-all';
+            div.innerHTML = `<strong>Q${questionCount}:</strong> ${question}`;
+            history.insertBefore(div, history.firstChild);
+        }
+
+        // Live Analysis (Fake AI)
+        function startLiveAnalysis() {
+            const metrics = {
+                eyeContact: 85,
+                confidence: 78,
+                speech: 72,
+                posture: 81
+            };
+
+            analysisInterval = setInterval(() => {
+                Object.keys(metrics).forEach(key => {
+                    const change = (Math.random() - 0.5) * 15;
+                    metrics[key] = Math.max(40, Math.round(metrics[key] + change));
+                    document.getElementById(key).textContent = metrics[key] + '%';
+                });
+            }, 2500);
+        }
+
+        // Stop Video (Double click start button)
+        document.getElementById('startBtn').addEventListener('dblclick', () => {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                document.getElementById('userVideo').classList.add('hidden');
+                document.getElementById('startBtn').textContent = '🎥 START VIDEO CALL';
+                document.getElementById('startBtn').classList.replace('from-red-500', 'from-emerald-500');
+                document.getElementById('startBtn').classList.replace('to-pink-500', 'to-teal-600');
+                
+                if (analysisInterval) clearInterval(analysisInterval);
+            }
+        });
     </script>
 </body>
 </html>
