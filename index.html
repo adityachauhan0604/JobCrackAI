@@ -106,6 +106,7 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:40px 20p
 }
 .hero-pill .dot{width:5px;height:5px;background:var(--accent);border-radius:50%;animation:blink 1.4s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 h1{
   font-family:'Instrument Serif',serif;
@@ -694,6 +695,42 @@ footer{
       </div>
     </div>
 
+    <!-- VOICE TRANSCRIPT PANEL -->
+    <div class="feedback-panel" id="voicePanel" style="display:none;border-color:rgba(34,211,165,0.2)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div id="voiceListenDot" style="width:10px;height:10px;background:var(--danger);border-radius:50%;animation:blink 1s infinite;display:none"></div>
+        <h3 style="font-family:'Instrument Serif',serif;font-size:1.05rem;font-style:italic;margin:0" id="voicePanelTitle">🎙️ Aapka Jawab Sun Raha Hoon...</h3>
+      </div>
+      <div id="transcriptBox" style="min-height:56px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;font-size:0.9rem;color:var(--text);line-height:1.7;position:relative">
+        <span style="color:var(--muted)" id="transcriptPlaceholder">Bolna shuru karo... AI sun raha hai 👂</span>
+        <span id="transcriptText" style="display:none"></span>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+        <button id="startVoiceBtn" onclick="startVoiceAnswer()" style="background:rgba(34,211,165,0.12);border:1px solid rgba(34,211,165,0.3);color:var(--accent);padding:6px 14px;border-radius:8px;font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">
+          🎙️ Bolna Shuru Karo
+        </button>
+        <button id="stopVoiceBtn" onclick="stopVoiceAnswer()" style="display:none;background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.3);color:var(--danger);padding:6px 14px;border-radius:8px;font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">
+          ⏹ Ruk Jao – AI Ko Do
+        </button>
+        <button id="submitVoiceBtn" onclick="submitAnswerToAI()" style="display:none;background:linear-gradient(135deg,var(--accent2),#4f46e5);border:none;color:white;padding:6px 16px;border-radius:8px;font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:700">
+          ✅ AI Se Feedback Lo
+        </button>
+      </div>
+    </div>
+
+    <!-- AI VOICE FEEDBACK PANEL -->
+    <div class="feedback-panel" id="aiFeedbackPanel" style="display:none;border-color:rgba(99,102,241,0.3)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <span style="font-size:1.1rem">🤖</span>
+        <h3 style="font-family:'Instrument Serif',serif;font-size:1.05rem;font-style:italic;margin:0;color:#a5b4fc">AI Interviewer Ka Feedback</h3>
+        <div id="aiFeedbackLoader" style="margin-left:auto;display:none">
+          <div style="width:18px;height:18px;border:2px solid rgba(99,102,241,0.3);border-top-color:#818cf8;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+        </div>
+      </div>
+      <div id="aiFeedbackText" style="font-size:0.9rem;line-height:1.8;color:var(--text);padding:14px;background:rgba(99,102,241,0.05);border:1px solid rgba(99,102,241,0.15);border-radius:10px;min-height:60px"></div>
+      <div id="aiNextAction" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(34,211,165,0.07);border:1px solid rgba(34,211,165,0.2);border-radius:10px;font-size:0.85rem;color:var(--accent)"></div>
+    </div>
+
     <!-- FEEDBACK PANEL -->
     <div class="feedback-panel" id="feedbackPanel">
       <h3 style="font-family:'Instrument Serif',serif;font-size:1.1rem;font-style:italic;margin-bottom:14px">📊 Answer Analysis</h3>
@@ -1219,8 +1256,267 @@ function closeVerify(){document.getElementById('verifyModal').classList.remove('
   if(p.get('activate')==='jcai2025admin'){S.isPremium=true;localStorage.setItem('jcai_premium','1');document.getElementById('creditsBadge').textContent='💎 Premium';showToast('🎉 Premium activated!')}
 })();
 
+
 // ─── TOAST ───
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500)}
+
+// ─── VOICE RECOGNITION + AI FEEDBACK SYSTEM ───
+let recognition = null;
+let voiceTranscript = '';
+let voiceActive = false;
+
+function initVoiceSystem() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    document.getElementById('voicePanel').style.display = 'block';
+    document.getElementById('startVoiceBtn').textContent = '❌ Voice not supported in this browser';
+    document.getElementById('startVoiceBtn').disabled = true;
+    return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = S.lang === 'hi' ? 'hi-IN'
+                   : S.lang === 'ar' ? 'ar-SA'
+                   : S.lang === 'es' ? 'es-ES'
+                   : S.lang === 'bn' ? 'bn-BD'
+                   : S.lang === 'pa' ? 'pa-IN'
+                   : S.lang === 'ta' ? 'ta-IN'
+                   : S.lang === 'ne' ? 'ne-NP'
+                   : 'en-US';
+
+  recognition.onresult = (e) => {
+    let interim = '';
+    let final = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript + ' ';
+      else interim += e.results[i][0].transcript;
+    }
+    if (final) voiceTranscript += final;
+    const display = voiceTranscript + interim;
+    if (display.trim()) {
+      document.getElementById('transcriptPlaceholder').style.display = 'none';
+      document.getElementById('transcriptText').style.display = 'inline';
+      document.getElementById('transcriptText').textContent = display;
+    }
+  };
+
+  recognition.onend = () => {
+    if (voiceActive) {
+      // auto-stop when browser cuts off — show submit button
+      voiceActive = false;
+      document.getElementById('startVoiceBtn').style.display = 'inline-flex';
+      document.getElementById('stopVoiceBtn').style.display = 'none';
+      document.getElementById('voiceListenDot').style.display = 'none';
+      if (voiceTranscript.trim().length > 8) {
+        document.getElementById('submitVoiceBtn').style.display = 'inline-flex';
+        document.getElementById('voicePanelTitle').textContent = '✅ Jawab Record Hua – AI Ko Do';
+      }
+    }
+  };
+
+  recognition.onerror = (e) => {
+    voiceActive = false;
+    document.getElementById('startVoiceBtn').style.display = 'inline-flex';
+    document.getElementById('stopVoiceBtn').style.display = 'none';
+    document.getElementById('voiceListenDot').style.display = 'none';
+    if (e.error !== 'aborted') showToast('🎤 Mic error: ' + e.error + ' — browser permissions check karo');
+  };
+}
+
+function startVoiceAnswer() {
+  if (!recognition) { showToast('❌ Voice recognition not available'); return; }
+  // Reset
+  voiceTranscript = '';
+  voiceActive = true;
+  document.getElementById('transcriptPlaceholder').style.display = 'inline';
+  document.getElementById('transcriptText').style.display = 'none';
+  document.getElementById('transcriptText').textContent = '';
+  document.getElementById('transcriptPlaceholder').textContent = 'AI sun raha hai... bolna shuru karo 🎙️';
+  document.getElementById('aiFeedbackPanel').style.display = 'none';
+  document.getElementById('aiNextAction').style.display = 'none';
+  document.getElementById('startVoiceBtn').style.display = 'none';
+  document.getElementById('stopVoiceBtn').style.display = 'inline-flex';
+  document.getElementById('submitVoiceBtn').style.display = 'none';
+  document.getElementById('voiceListenDot').style.display = 'inline-block';
+  document.getElementById('voicePanelTitle').textContent = '🎙️ Sun Raha Hoon... Jawab Do';
+  // Stop AI speech first
+  speechSynthesis.cancel();
+  // Set lang for this recognition
+  recognition.lang = S.lang === 'hi' ? 'hi-IN'
+                   : S.lang === 'ar' ? 'ar-SA'
+                   : S.lang === 'es' ? 'es-ES'
+                   : S.lang === 'bn' ? 'bn-BD'
+                   : S.lang === 'pa' ? 'pa-IN'
+                   : S.lang === 'ta' ? 'ta-IN'
+                   : S.lang === 'ne' ? 'ne-NP'
+                   : 'en-US';
+  recognition.start();
+  document.getElementById('aiStatus').textContent = 'Listening to your answer...';
+}
+
+function stopVoiceAnswer() {
+  voiceActive = false;
+  if (recognition) recognition.stop();
+  document.getElementById('startVoiceBtn').style.display = 'inline-flex';
+  document.getElementById('stopVoiceBtn').style.display = 'none';
+  document.getElementById('voiceListenDot').style.display = 'none';
+  document.getElementById('aiStatus').textContent = 'Processing answer...';
+  if (voiceTranscript.trim().length > 5) {
+    document.getElementById('submitVoiceBtn').style.display = 'inline-flex';
+    document.getElementById('voicePanelTitle').textContent = '✅ Jawab Ready – AI Ko Bhejo';
+  } else {
+    document.getElementById('transcriptPlaceholder').style.display = 'inline';
+    document.getElementById('transcriptPlaceholder').textContent = 'Kuch zyada nahi suna... dobara try karo 🎤';
+    document.getElementById('transcriptText').style.display = 'none';
+    document.getElementById('voicePanelTitle').textContent = '🎙️ Aapka Jawab Sun Raha Hoon...';
+  }
+}
+
+async function submitAnswerToAI() {
+  const answer = voiceTranscript.trim();
+  if (!answer) { showToast('Pehle kuch bolo! 🎤'); return; }
+  const question = document.getElementById('currentQ').textContent;
+  const job = S.job, level = S.level, lang = S.lang, country = S.country;
+
+  document.getElementById('submitVoiceBtn').style.display = 'none';
+  document.getElementById('aiFeedbackPanel').style.display = 'block';
+  document.getElementById('aiFeedbackLoader').style.display = 'block';
+  document.getElementById('aiFeedbackText').textContent = '';
+  document.getElementById('aiNextAction').style.display = 'none';
+  document.getElementById('aiStatus').textContent = 'AI analyzing your answer...';
+
+  const systemPrompt = `You are an expert AI interview coach helping a ${job} job seeker at ${level} level. The candidate is from country code: ${country}. They answered in language: ${lang}. 
+
+IMPORTANT RULES:
+1. Reply in the SAME LANGUAGE as the candidate's answer (if they answered in Hindi, reply in Hindi; English → English; mix → Hinglish)
+2. Be conversational and encouraging like a real human interviewer
+3. Give SPECIFIC feedback on what was RIGHT and what was WRONG in their answer
+4. If answer was correct/good → praise it briefly then ask the NEXT related question
+5. If answer had mistakes → CORRECT the mistake clearly, explain why, then ask them to try again OR move to next question
+6. Keep feedback to 3-4 sentences max. Be direct, warm, practical.
+7. End with either: (A) a follow-up question if answer was incomplete/wrong, OR (B) say "Agle question pe chalte hain" if answer was good
+
+Format your response as:
+FEEDBACK: [your assessment]
+ACTION: [either NEXT_QUESTION or RETRY]
+NEXT_Q: [if NEXT_QUESTION, write the next question here, else leave blank]`;
+
+  const userMsg = `Interview Question: "${question}"
+Candidate's Answer: "${answer}"
+
+Evaluate this answer and respond according to your instructions.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMsg }]
+      })
+    });
+    const data = await res.json();
+    const rawText = data.content?.map(c => c.text || '').join('') || '';
+
+    // Parse response
+    const feedbackMatch = rawText.match(/FEEDBACK:\s*([\s\S]*?)(?:ACTION:|$)/);
+    const actionMatch = rawText.match(/ACTION:\s*(\w+)/);
+    const nextQMatch = rawText.match(/NEXT_Q:\s*([\s\S]*?)$/);
+
+    const feedbackText = feedbackMatch ? feedbackMatch[1].trim() : rawText;
+    const action = actionMatch ? actionMatch[1].trim() : 'NEXT_QUESTION';
+    const nextQ = nextQMatch ? nextQMatch[1].trim() : '';
+
+    document.getElementById('aiFeedbackLoader').style.display = 'none';
+    document.getElementById('aiFeedbackText').textContent = feedbackText;
+    document.getElementById('aiStatus').textContent = 'AI Interviewer is speaking...';
+
+    // Speak the feedback
+    if (window.speechSynthesis) {
+      const utter = new SpeechSynthesisUtterance(feedbackText);
+      utter.lang = S.lang === 'hi' ? 'hi-IN' : S.lang === 'ar' ? 'ar-SA' : S.lang === 'es' ? 'es-ES' : 'en-US';
+      utter.rate = 0.9;
+      speechSynthesis.speak(utter);
+      utter.onend = () => {
+        document.getElementById('aiStatus').textContent = 'Listening...';
+        // If next question, speak it too
+        if (action === 'NEXT_QUESTION' && nextQ) {
+          setTimeout(() => speakQ(nextQ), 600);
+        }
+      };
+    }
+
+    // Show action area
+    document.getElementById('aiNextAction').style.display = 'block';
+    if (action === 'RETRY') {
+      document.getElementById('aiNextAction').innerHTML = `⚠️ Dobara try karo! <button onclick="resetVoiceForRetry()" style="margin-left:10px;background:rgba(34,211,165,0.15);border:1px solid rgba(34,211,165,0.3);color:var(--accent);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem">🎙️ Phir Se Jawab Do</button>`;
+    } else {
+      if (nextQ) {
+        S.qNum++;
+        document.getElementById('sessQ').textContent = S.qNum;
+        document.getElementById('currentQ').textContent = nextQ;
+        document.getElementById('qNum').textContent = S.qNum;
+        document.getElementById('aiNextAction').innerHTML = `✅ AI agla question pooch raha hai... <button onclick="resetVoiceForNextQ()" style="margin-left:10px;background:rgba(34,211,165,0.15);border:1px solid rgba(34,211,165,0.3);color:var(--accent);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem">🎙️ Jawab Do</button>`;
+      } else {
+        document.getElementById('aiNextAction').innerHTML = `✅ Badiya! <button onclick="nextQ()" style="margin-left:10px;background:rgba(34,211,165,0.15);border:1px solid rgba(34,211,165,0.3);color:var(--accent);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem">➡️ Agla Question</button>`;
+      }
+    }
+  } catch (err) {
+    document.getElementById('aiFeedbackLoader').style.display = 'none';
+    document.getElementById('aiFeedbackText').textContent = '⚠️ AI feedback load nahi hua. Internet check karo ya Next Question dabao.';
+    document.getElementById('aiNextAction').style.display = 'block';
+    document.getElementById('aiNextAction').innerHTML = `<button onclick="nextQ()" style="background:rgba(34,211,165,0.15);border:1px solid rgba(34,211,165,0.3);color:var(--accent);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem">➡️ Agla Question</button>`;
+    console.error('AI feedback error:', err);
+  }
+}
+
+function resetVoiceForRetry() {
+  document.getElementById('aiFeedbackPanel').style.display = 'none';
+  document.getElementById('transcriptPlaceholder').style.display = 'inline';
+  document.getElementById('transcriptPlaceholder').textContent = 'Dobara jawab do... AI sun raha hai 🎙️';
+  document.getElementById('transcriptText').style.display = 'none';
+  document.getElementById('voicePanelTitle').textContent = '🎙️ Dobara Jawab Do';
+  document.getElementById('submitVoiceBtn').style.display = 'none';
+  voiceTranscript = '';
+}
+
+function resetVoiceForNextQ() {
+  document.getElementById('aiFeedbackPanel').style.display = 'none';
+  document.getElementById('transcriptPlaceholder').style.display = 'inline';
+  document.getElementById('transcriptPlaceholder').textContent = 'Bolna shuru karo... AI sun raha hai 👂';
+  document.getElementById('transcriptText').style.display = 'none';
+  document.getElementById('voicePanelTitle').textContent = '🎙️ Aapka Jawab Sun Raha Hoon...';
+  document.getElementById('submitVoiceBtn').style.display = 'none';
+  voiceTranscript = '';
+}
+
+// ─── HOOK into startInterview to show voice panel + init ───
+const _origStart = startInterview;
+startInterview = async function() {
+  await _origStart.call(this);
+  document.getElementById('voicePanel').style.display = 'block';
+  initVoiceSystem();
+};
+
+// ─── HOOK into nextQ to reset voice ───
+const _origNextQ = nextQ;
+nextQ = function() {
+  _origNextQ.call(this);
+  document.getElementById('aiFeedbackPanel').style.display = 'none';
+  document.getElementById('aiNextAction').style.display = 'none';
+  voiceTranscript = '';
+  document.getElementById('transcriptPlaceholder').style.display = 'inline';
+  document.getElementById('transcriptPlaceholder').textContent = 'Bolna shuru karo... AI sun raha hai 👂';
+  document.getElementById('transcriptText').style.display = 'none';
+  document.getElementById('startVoiceBtn').style.display = 'inline-flex';
+  document.getElementById('stopVoiceBtn').style.display = 'none';
+  document.getElementById('submitVoiceBtn').style.display = 'none';
+  document.getElementById('voiceListenDot').style.display = 'none';
+  document.getElementById('voicePanelTitle').textContent = '🎙️ Aapka Jawab Sun Raha Hoon...';
+};
 </script>
 </body>
 </html>
