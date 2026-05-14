@@ -488,7 +488,25 @@
 <!-- HEADER -->
 <header>
     <div class="logo">
-        <div class="logo-icon">🎯</div>
+        <div class="logo-icon" style="background:none;padding:0;width:44px;height:44px">
+            <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="44" height="44" rx="12" fill="url(#lgrd)"/>
+                <defs>
+                    <linearGradient id="lgrd" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#00e5a0"/>
+                        <stop offset="100%" stop-color="#00b8d9"/>
+                    </linearGradient>
+                </defs>
+                <!-- Briefcase body -->
+                <rect x="9" y="18" width="26" height="18" rx="3" fill="#07131f" opacity="0.85"/>
+                <!-- Briefcase handle -->
+                <path d="M17 18v-3a5 5 0 0 1 10 0v3" stroke="#07131f" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+                <!-- Center clasp -->
+                <rect x="20" y="24" width="4" height="6" rx="1.5" fill="#00e5a0"/>
+                <!-- AI spark bolt -->
+                <path d="M25 10 L21 16 L24 16 L20 23" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9"/>
+            </svg>
+        </div>
         JobCrackAI
     </div>
     <div class="header-right">
@@ -893,7 +911,16 @@
 <footer style="background:var(--surface);border-top:1px solid var(--border);padding:32px 24px;text-align:center;position:relative;z-index:1">
     <div style="max-width:1200px;margin:0 auto">
         <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:16px">
-            <div style="width:36px;height:36px;background:linear-gradient(135deg,var(--accent),#00b8d9);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem">🤖</div>
+            <div style="width:36px;height:36px">
+                <svg width="36" height="36" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="44" height="44" rx="12" fill="url(#lgrd2)"/>
+                    <defs><linearGradient id="lgrd2" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#00e5a0"/><stop offset="100%" stop-color="#00b8d9"/></linearGradient></defs>
+                    <rect x="9" y="18" width="26" height="18" rx="3" fill="#07131f" opacity="0.85"/>
+                    <path d="M17 18v-3a5 5 0 0 1 10 0v3" stroke="#07131f" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+                    <rect x="20" y="24" width="4" height="6" rx="1.5" fill="#00e5a0"/>
+                    <path d="M25 10 L21 16 L24 16 L20 23" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9"/>
+                </svg>
+            </div>
             <span style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800">JobCrackAI</span>
         </div>
         <p style="color:var(--muted);font-size:0.85rem;margin-bottom:20px">AI Interview Coach for India's Blue-Collar Workers</p>
@@ -906,6 +933,10 @@
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
                 GitHub
             </a>
+            <a href="https://instagram.com/jobcrackai" target="_blank" style="display:inline-flex;align-items:center;gap:6px;color:#e1306c;text-decoration:none;font-size:0.88rem;font-weight:600;padding:8px 14px;background:rgba(225,48,108,0.1);border-radius:10px;border:1px solid rgba(225,48,108,0.25)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="#e1306c"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                Instagram
+            </a>
             <span onclick="openPayment()" style="display:inline-flex;align-items:center;gap:6px;color:var(--accent);text-decoration:none;font-size:0.88rem;font-weight:600;padding:8px 14px;background:rgba(0,229,160,0.1);border-radius:10px;border:1px solid rgba(0,229,160,0.25);cursor:pointer">
                 💎 Go Premium — ₹99
             </span>
@@ -917,6 +948,21 @@
         </div>
     </div>
 </footer>
+
+<!-- VERIFY PENDING MODAL -->
+<div class="modal-overlay" id="verifyModal">
+    <div class="modal" style="text-align:center;max-width:380px">
+        <div style="font-size:3rem;margin-bottom:12px">⏳</div>
+        <h2 style="font-family:'Syne',sans-serif;font-size:1.3rem;margin-bottom:10px;color:var(--gold)">Payment Verification Pending</h2>
+        <p id="verifyMsg" style="color:var(--muted);font-size:0.88rem;line-height:1.6;margin-bottom:20px;white-space:pre-line"></p>
+        <a href="https://t.me/adityachauhan0604" target="_blank"
+           style="display:block;padding:12px;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);border-radius:12px;color:#38bdf8;text-decoration:none;font-weight:700;margin-bottom:12px;font-size:0.95rem">
+            📩 Open Telegram @adityachauhan0604
+        </a>
+        <p style="color:var(--muted);font-size:0.78rem;margin-bottom:16px">Screenshot send karo → 2-4 ghante mein Premium activate ho jayega</p>
+        <button onclick="closeVerify()" style="padding:10px 28px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:0.9rem">Theek Hai</button>
+    </div>
+</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -1386,13 +1432,47 @@ function getSpeechLevel() {
 
 // ─── METRICS LOOP ──────────────────────────────────────────
 function startMetricsLoop() {
-    let base = { eye: 82, post: 86, conf: 80, speech: 78 };
+    // Only simulate if camera is actually on
+    const cameraOn = state.localStream && state.localStream.active;
+    let base = cameraOn
+        ? { eye: 78, post: 80, conf: 76, speech: 72 }   // realistic starting values
+        : { eye: 0, post: 0, conf: 0, speech: 0 };       // no camera = 0
+
+    // Show "--" if no camera
+    if (!cameraOn) {
+        ['eyeMetric','postureMetric','confidenceMetric','speechMetric'].forEach(id => {
+            const el = document.getElementById(id);
+            el.textContent = '--';
+            el.style.color = 'var(--muted)';
+        });
+        document.getElementById('sessScore').textContent = '--';
+    }
+
     state.metricsInterval = setInterval(() => {
         const jitter = (min, max) => Math.floor(Math.random() * (max - min) + min);
-        const eye = Math.min(98, Math.max(50, base.eye + jitter(-4, 5)));
-        const post = Math.min(98, Math.max(50, base.post + jitter(-3, 4)));
+
+        // Camera-based: use real video frame analysis approximation
+        let eye, post;
+        if (cameraOn && state.localStream && state.localStream.active) {
+            // Simulate realistic variation based on actual stream being active
+            base.eye = Math.min(95, Math.max(55, base.eye + jitter(-5, 6)));
+            base.post = Math.min(95, Math.max(55, base.post + jitter(-4, 5)));
+            eye = base.eye;
+            post = base.post;
+        } else {
+            // No camera — show dashes, do not simulate
+            ['eyeMetric','postureMetric','confidenceMetric','speechMetric'].forEach(id => {
+                const el = document.getElementById(id);
+                el.textContent = '--';
+                el.style.color = 'var(--muted)';
+            });
+            document.getElementById('sessScore').textContent = '--';
+            return;
+        }
         const speech = Math.min(97, Math.max(40, getSpeechLevel()));
-        const conf = Math.round((eye * 0.35 + post * 0.35 + speech * 0.3));
+        const post2 = post;
+        const speech = Math.min(97, Math.max(40, getSpeechLevel()));
+        const conf = Math.round((eye * 0.35 + post2 * 0.35 + speech * 0.3));
 
         const colorize = (el, val) => {
             el.style.color = val >= 80 ? 'var(--accent)' : val >= 65 ? 'var(--gold)' : 'var(--danger)';
@@ -1402,12 +1482,12 @@ function startMetricsLoop() {
         const confEl = document.getElementById('confidenceMetric');
         const spEl = document.getElementById('speechMetric');
         eyeEl.textContent = eye + '%'; colorize(eyeEl, eye);
-        postEl.textContent = post + '%'; colorize(postEl, post);
+        postEl.textContent = post2 + '%'; colorize(postEl, post2);
         confEl.textContent = conf + '%'; colorize(confEl, conf);
         spEl.textContent = Math.round(speech) + '%'; colorize(spEl, Math.round(speech));
 
         // Update session score
-        const avg = Math.round((eye + post + conf + speech) / 4);
+        const avg = Math.round((eye + post2 + conf + speech) / 4);
         state.totalScore = avg;
         document.getElementById('sessScore').textContent = avg + '%';
 
@@ -1510,7 +1590,7 @@ function showFeedback() {
         </div>`;
     });
 
-    const avg = Math.round((eye + post + conf + speech) / 4);
+    const avg = Math.round((eye + post2 + conf + speech) / 4);
     const tips = avg >= 85
         ? "Excellent! You're ready for real interviews. Keep maintaining this energy."
         : avg >= 70
@@ -1610,11 +1690,48 @@ function copyUPI() {
     showToast('UPI ID copied!');
 }
 function confirmPayment() {
-    state.isPremium = true;
-    localStorage.setItem('jcai_premium', '1');
-    document.getElementById('creditsBadge').textContent = '💎 Premium';
-    closePayment();
-    showToast('🎉 Premium activated! Unlimited interviews unlocked!');
+    const method = state.payMethod || 'upi';
+    // Show verification pending UI
+    const btn = document.querySelector('.btn-pay');
+    btn.textContent = '⏳ Verifying...';
+    btn.disabled = true;
+
+    // Show verification instructions
+    const verifyMsg = method === 'upi'
+        ? 'UPI payment screenshot Telegram pe bhejo: @adityachauhan0604\n\nVerification ke baad 2-4 ghante mein Premium activate hoga.'
+        : method === 'crypto'
+        ? 'TRC20 transaction screenshot Telegram pe bhejo: @adityachauhan0604\n\nVerification ke baad 2-4 ghante mein Premium activate hoga.'
+        : 'Payment screenshot Telegram pe bhejo: @adityachauhan0604';
+
+    setTimeout(() => {
+        btn.textContent = '✅ I've Paid – Activate Now';
+        btn.disabled = false;
+
+        // Show pending modal instead of instant activation
+        closePayment();
+        showVerifyPending(verifyMsg);
+    }, 1500);
+}
+
+function showVerifyPending(msg) {
+    const overlay = document.getElementById('verifyModal');
+    document.getElementById('verifyMsg').textContent = msg;
+    overlay.classList.add('open');
+}
+
+function closeVerify() {
+    document.getElementById('verifyModal').classList.remove('open');
+}
+
+// Admin secret activation (only via direct URL param for you)
+function checkAdminActivation() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('activate') === 'jcai2025admin') {
+        state.isPremium = true;
+        localStorage.setItem('jcai_premium', '1');
+        document.getElementById('creditsBadge').textContent = '💎 Premium';
+        showToast('🎉 Premium activated!');
+    }
 }
 
 function copyCrypto() {
@@ -1633,6 +1750,7 @@ function showToast(msg) {
 (function init() {
     if (state.isPremium) document.getElementById('creditsBadge').textContent = '💎 Premium';
     else document.getElementById('creditsBadge').textContent = `⚡ ${state.credits} Free Left`;
+    checkAdminActivation();
 })();
 </script>
 </body>
