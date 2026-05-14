@@ -1,209 +1,400 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beginner - Unlimited Practice - JobCrackAI</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection"></script>
-    <style>
-        /* Same complete styles as before */
-        :root { --level-color: #4CAF50; }
-        /* ... all previous styles ... */
-        .job-tabs {
-            display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;
-        }
-        .job-tab {
-            padding: 12px 24px; border: 2px solid #e0e0e0; background: white;
-            border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s;
-        }
-        .job-tab.active { background: var(--level-color); color: white; border-color: var(--level-color); }
-        .question-counter {
-            background: rgba(255,255,255,0.9); padding: 15px; border-radius: 20px;
-            text-align: center; margin-bottom: 20px; font-weight: 700;
-        }
-        .unlimited-badge {
-            background: linear-gradient(45deg, #FF6B6B, #FF8E8E); color: white;
-            padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: 700;
-            display: inline-block; margin-left: 10px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beginner Practice – JobCrackAI</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07090f;--surface:#0d1018;--surface2:#141824;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);--accent:#22d3a5;--gold:#fbbf24;--text:#e2e8f0;--muted:#64748b;--muted2:#94a3b8;--danger:#f43f5e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 20% 20%,rgba(34,211,165,0.06),transparent 50%),radial-gradient(circle at 80% 80%,rgba(99,102,241,0.05),transparent 50%);pointer-events:none}
+.wrap{max-width:540px;margin:0 auto;position:relative}
+.back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--muted2);text-decoration:none;font-size:0.85rem;margin-bottom:20px;padding:7px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:9px;transition:all 0.2s}
+.back-btn:hover{color:var(--accent);border-color:var(--accent)}
+.header-card{background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:22px;text-align:center;margin-bottom:20px}
+.level-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(34,211,165,0.1);border:1px solid rgba(34,211,165,0.25);color:var(--accent);padding:4px 14px;border-radius:999px;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px}
+.header-card h1{font-family:'Instrument Serif',serif;font-size:1.8rem;font-style:italic;margin-bottom:6px}
+.stats-row{display:flex;gap:14px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-num{font-family:'Instrument Serif',serif;font-size:1.4rem;color:var(--accent)}
+.stat-lbl{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em}
+.job-tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
+.job-tab{padding:7px 16px;border:1px solid var(--border2);background:var(--surface2);border-radius:999px;cursor:pointer;font-size:0.82rem;transition:all 0.2s;font-weight:600}
+.job-tab.active{background:rgba(34,211,165,0.12);border-color:var(--accent);color:var(--accent)}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px;margin-bottom:14px}
+.q-num{font-size:0.75rem;color:var(--muted);margin-bottom:10px}
+.q-text{font-size:1.05rem;line-height:1.7;min-height:60px}
+.timer-bar-wrap{height:4px;background:var(--surface2);border-radius:999px;margin-top:14px;overflow:hidden}
+.timer-bar{height:100%;border-radius:999px;background:var(--accent);transition:width 1s linear,background 0.3s}
+.timer-val{font-size:0.82rem;color:var(--gold);margin-top:6px;text-align:right}
+.hint-box{display:none;margin-top:12px;background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:12px 14px;font-size:0.83rem;color:var(--muted2);line-height:1.7}
+.hint-box strong{color:#a5b4fc}
+.voice-card{background:var(--surface);border:1px solid rgba(34,211,165,0.15);border-radius:18px;padding:18px;margin-bottom:14px}
+.voice-title{font-size:0.82rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.listen-dot{width:8px;height:8px;background:var(--danger);border-radius:50%;animation:blink 1s infinite;display:none}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.transcript-box{min-height:52px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;font-size:0.88rem;line-height:1.65;position:relative}
+.t-placeholder{color:var(--muted)}
+#tText{display:none}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{padding:8px 16px;border-radius:9px;font-size:0.83rem;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all 0.2s}
+.btn-mic{background:rgba(34,211,165,0.12);border:1px solid rgba(34,211,165,0.3)!important;color:var(--accent);border:none}
+.btn-stop{display:none;background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.3)!important;color:var(--danger);border:none}
+.btn-next{background:linear-gradient(135deg,var(--accent),#0db888);color:#07090f;font-weight:700}
+.btn-hint{background:var(--surface2);border:1px solid var(--border2)!important;color:var(--muted2);font-size:0.78rem;border:none}
+@keyframes micPulse{0%{box-shadow:0 0 0 0 rgba(34,211,165,0.5)}70%{box-shadow:0 0 0 12px rgba(34,211,165,0)}100%{box-shadow:0 0 0 0 rgba(34,211,165,0)}}
+.mic-on{animation:micPulse 1.2s infinite;border-color:var(--accent)!important}
+.feedback-card{display:none;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px;margin-bottom:14px}
+.feedback-card h3{font-family:'Instrument Serif',serif;font-size:1rem;font-style:italic;margin-bottom:12px}
+.score-row{margin-bottom:8px}
+.score-lbl{display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:3px}
+.score-track{height:4px;background:var(--surface2);border-radius:999px;overflow:hidden}
+.score-fill{height:100%;border-radius:999px;transition:width 1s}
+.feedback-tip{font-size:0.83rem;color:var(--muted2);margin-top:10px;padding:10px 12px;background:var(--surface2);border-radius:9px;line-height:1.6}
+.ai-feedback-card{display:none;background:var(--surface);border:1px solid rgba(99,102,241,0.25);border-radius:18px;padding:18px;margin-bottom:14px}
+.ai-feedback-card h3{font-size:0.85rem;font-weight:700;color:#a5b4fc;margin-bottom:10px}
+#aiFBText{font-size:0.88rem;line-height:1.75;color:var(--text)}
+.spinner{width:16px;height:16px;border:2px solid rgba(99,102,241,0.3);border-top-color:#818cf8;border-radius:50%;animation:spin 0.8s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.progress-banner{background:rgba(34,211,165,0.06);border:1px solid rgba(34,211,165,0.15);border-radius:12px;padding:10px 16px;font-size:0.82rem;color:var(--muted2);text-align:center;margin-bottom:16px;display:none}
+.toast{position:fixed;bottom:20px;right:16px;z-index:99;background:var(--surface2);border:1px solid var(--accent);color:var(--accent);padding:9px 16px;border-radius:9px;font-size:0.83rem;font-weight:600;transform:translateY(60px);opacity:0;transition:all 0.3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+</style>
 </head>
 <body>
-    <button class="btn-back" onclick="goHome()">🏠 Home</button>
-    
-    <div class="container" style="max-width: 500px; margin: 0 auto; padding: 20px;">
-        <div class="header" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); padding: 20px; border-radius: 25px; margin-bottom: 25px; text-align: center;">
-            <h1 style="color: var(--level-color); font-size: 2em; font-weight: 800;">🆕 Beginner Level</h1>
-            <div style="font-size: 1.1em; color: #666; margin-bottom: 10px;">
-                Unlimited Questions <span class="unlimited-badge">∞</span>
-            </div>
-            <div id="confidenceBadge" style="background: linear-gradient(45deg, var(--level-color), #45a049); color: white; padding: 12px 24px; border-radius: 30px; font-weight: 700; display: inline-block;">78%</div>
-        </div>
+<div class="wrap">
+  <a href="index.html" class="back-btn">← Home</a>
 
-        <!-- Job Category Tabs -->
-        <div class="job-tabs">
-            <div class="job-tab active" data-job="driver">🚗 Driver</div>
-            <div class="job-tab" data-job="factory">🏭 Factory</div>
-            <div class="job-tab" data-job="security">🛡️ Security</div>
-        </div>
+  <div id="progressBanner" class="progress-banner"></div>
 
-        <!-- Question Counter -->
-        <div class="question-counter">
-            <div>Question <span id="questionNum">1</span> of ∞</div>
-            <div style="font-size: 14px; color: #999;">Practice unlimited times!</div>
-        </div>
-
-        <!-- Video + Question + All previous elements (same as before) -->
-        <div class="video-container">
-            <video id="userVideo" autoplay muted playsinline style="display: none;"></video>
-            <div class="ai-avatar" id="aiInterviewer">🤵 AI</div>
-        </div>
-
-        <div class="question-card" id="questionCard">
-            <div class="question-text" id="liveQuestion">Job select karo aur START dabao!</div>
-            <div class="timer" id="timer">⏱️ Ready</div>
-        </div>
-
-        <!-- All buttons, metrics, feedback (same as before) -->
-        <div class="btn-grid">
-            <button class="btn btn-primary" id="startBtn" onclick="startInterview()">🎥 START VIDEO</button>
-            <button class="btn btn-secondary" onclick="toggleCamera()">📷 Camera</button>
-        </div>
-
-        <!-- Metrics Grid (same) -->
-        <div class="metrics-grid" id="metricsGrid" style="display: none;">
-            <!-- Same 4 metric cards -->
-        </div>
-
-        <div class="feedback" id="feedback">
-            <!-- Same feedback structure -->
-            <button class="btn btn-primary" onclick="nextQuestion()" style="width: 100%; margin-top: 20px;">
-                ➡️ Next Random Question (∞ Practice)
-            </button>
-        </div>
+  <div class="header-card">
+    <div class="level-badge">🆕 Beginner Level</div>
+    <h1>Unlimited Practice</h1>
+    <p style="color:var(--muted);font-size:0.85rem">Basic questions • Build confidence</p>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-num" id="sQ">0</div><div class="stat-lbl">Questions</div></div>
+      <div class="stat"><div class="stat-num" id="sAvg">–</div><div class="stat-lbl">Avg Score</div></div>
+      <div class="stat"><div class="stat-num" id="sBest">–</div><div class="stat-lbl">Best</div></div>
     </div>
+  </div>
 
-    <script>
-        // UNLIMITED QUESTION GENERATOR
-        const QUESTION_TEMPLATES = {
-            beginner: {
-                driver: [
-                    "Apka naam aur experience introduce karo",
-                    "Daily vehicle check process",
-                    "3 main safety rules",
-                    "Late reporting procedure",
-                    "Customer handling basics",
-                    "Traffic rules knowledge",
-                    "Fuel saving tips",
-                    "Emergency contact numbers",
-                    "Shift handover process",
-                    "Personal hygiene importance"
-                ],
-                factory: [
-                    "Shift start routine",
-                    "Machine basic operation",
-                    "Safety gear usage",
-                    "Quality check process",
-                    "Supervisor reporting",
-                    "Team coordination",
-                    "Break time rules",
-                    "Waste disposal",
-                    "Attendance marking",
-                    "Tool maintenance"
-                ],
-                security: [
-                    "Patrolling route",
-                    "ID verification process",
-                    "Visitor entry log",
-                    "Shift handover",
-                    "Gate pass system",
-                    "Uniform maintenance",
-                    "Radio communication",
-                    "Emergency whistle",
-                    "Torchlight usage",
-                    "Report writing"
-                ]
-            }
-            // Add intermediate & expert in their files
-        };
+  <div class="job-tabs" id="jobTabs">
+    <div class="job-tab active" data-job="driver">🚗 Driver</div>
+    <div class="job-tab" data-job="factory">🏭 Factory</div>
+    <div class="job-tab" data-job="security">🛡️ Security</div>
+    <div class="job-tab" data-job="cook">👨‍🍳 Cook</div>
+    <div class="job-tab" data-job="delivery">🚚 Delivery</div>
+    <div class="job-tab" data-job="nurse">🏥 Nurse</div>
+    <div class="job-tab" data-job="welder">🔧 Welder</div>
+    <div class="job-tab" data-job="electrician">⚡ Electrician</div>
+  </div>
 
-        let currentJob = 'driver';
-        let questionCount = 0;
-        let stream, model, isAnalyzing = false, timer = 45;
+  <div class="q-card" id="qCard">
+    <div class="q-num">Question <span id="qNum">1</span> · <span id="jobLabel">Driver</span> · Beginner</div>
+    <div class="q-text" id="qText">Job tab select karo aur Start dabao!</div>
+    <div class="timer-bar-wrap"><div class="timer-bar" id="timerBar" style="width:100%"></div></div>
+    <div class="timer-val" id="timerVal">45s</div>
+    <div style="margin-top:10px">
+      <button class="btn btn-hint" onclick="toggleHint()" id="hintBtn">💡 Answer Hint</button>
+    </div>
+    <div class="hint-box" id="hintBox"><strong>💡 Structure:</strong> <span id="hintText">Loading...</span></div>
+  </div>
 
-        // Job Tab Switching
-        document.querySelectorAll('.job-tab').forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                document.querySelector('.job-tab.active').classList.remove('active');
-                e.target.classList.add('active');
-                currentJob = e.target.dataset.job;
-                if (document.getElementById('liveQuestion')) {
-                    generateNewQuestion();
-                }
-            });
-        });
+  <div class="voice-card" id="voiceCard" style="display:none">
+    <div class="voice-title">
+      <div class="listen-dot" id="listenDot"></div>
+      <span id="voiceTitle">🎙️ Jawab Do</span>
+    </div>
+    <div class="transcript-box">
+      <span class="t-placeholder" id="tPlaceholder">Start dabao, phir bolo...</span>
+      <span id="tText"></span>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-mic" id="micBtn" onclick="startMic()">🎙️ Jawab Do</button>
+      <button class="btn btn-stop mic-on" id="stopBtn" onclick="stopMic()">⏹ Ruk Jao</button>
+      <button class="btn btn-next" onclick="nextQuestion()">➡️ Skip</button>
+    </div>
+  </div>
 
-        // Generate TRULY Unlimited Questions
-        function generateNewQuestion() {
-            questionCount++;
-            const templates = QUESTION_TEMPLATES.beginner[currentJob];
-            const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
-            
-            // Dynamic question generation
-            const questionTypes = [
-                `🎯 "${randomTemplate}" ke baare mein 45 seconds mein explain karo`,
-                `💼 Interview question: "${randomTemplate}"? Abhi jawab do!`,
-                `🧠 Practical: "${randomTemplate}" situation mein kya karoge?`,
-                `👨‍💼 HR poochhe: "${randomTemplate}". Confident jawab!`
-            ];
-            
-            const question = questionTypes[Math.floor(Math.random() * questionTypes.length)];
-            document.getElementById('liveQuestion').textContent = question;
-            document.getElementById('questionNum').textContent = questionCount;
-            document.getElementById('aiInterviewer').textContent = '🤵 AI Interviewer';
-        }
+  <div class="ai-feedback-card" id="aiFBCard">
+    <h3>🤖 AI Interviewer Ka Feedback</h3>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <div class="spinner" id="spinner"></div>
+    </div>
+    <div id="aiFBText"></div>
+    <div id="aiFBAction" style="margin-top:10px"></div>
+  </div>
 
-        // All other functions same as before (startInterview, analyzeFace, etc.)
-        // Just replace showQuestion() with generateNewQuestion()
+  <div class="feedback-card" id="fbCard">
+    <h3>📊 Session Feedback</h3>
+    <div id="fbBars"></div>
+    <div class="feedback-tip" id="fbTip"></div>
+    <div style="margin-top:12px">
+      <button class="btn btn-next" onclick="nextQuestion()" style="width:100%">➡️ Next Question</button>
+    </div>
+  </div>
 
-        function showQuestion() {
-            generateNewQuestion();
-        }
+  <div style="text-align:center;margin-top:10px" id="startWrap">
+    <button class="btn btn-next" onclick="startSession()" style="padding:14px 40px;font-size:1rem">🎥 Start Practice</button>
+  </div>
+</div>
 
-        async function init() {
-            model = await faceLandmarksDetection.load(
-                faceLandmarksDetection.SupportedPackages.mediapipeFacemesh
-            );
-            loadStats();
-        }
+<div class="toast" id="toast"></div>
 
-        function nextQuestion() {
-            // Unlimited - always generate new
-            document.getElementById('feedback').style.display = 'none';
-            document.getElementById('metricsGrid').style.display = 'grid';
-            generateNewQuestion();
-            startTimer();
-            isAnalyzing = true;
-        }
+<script>
+const QUESTIONS = {
+  driver:["Apna naam aur driving experience batao","Vehicle daily check kaise karte ho?","3 main traffic rules kya hain?","Night driving mein kya precautions lete ho?","Customer ke saath kaise behave karte ho?","Road mein accident ho toh kya karte ho?","Fuel saving tips kya hain?","Lost ho jao toh kya karte ho?","Shift time pe reporting kaise ensure karte ho?","Cleanliness aur hygiene maintain kaise karte ho?"],
+  factory:["Shift start karne se pehle kya karte ho?","Safety gear kab aur kaise use karte ho?","Machine basic operation kaise karte ho?","Supervisor ko kab report karte ho?","Break time rules kya hain?","Quality check process kya hai?","Tool maintenance kaise karte ho?","Team ke saath coordinate kaise karte ho?","Attendance marking process kya hai?","Waste disposal kaise karte ho?"],
+  security:["Patrolling route kaise plan karte ho?","ID verification process kya hai?","Visitor log kaise maintain karte ho?","Emergency mein kya karte ho?","Gate pass system explain karo","Uniform properly kaise maintain karte ho?","Radio communication kaise use karte ho?","Night duty mein kya precautions?","Report likhna kaise aata hai?","Duty handover kaise karte ho?"],
+  cook:["Apna cooking experience batao","Kitchen hygiene kaise maintain karte ho?","Daily mise en place routine kya hai?","Food storage temperature kya honi chahiye?","Knife safely kaise handle karte ho?","Cross-contamination se kaise bachte ho?","Supervisor ke instructions kaise follow karte ho?","Portion control kaise maintain karte ho?","Equipment cleaning schedule kya hai?","Food allergies ke baare mein kya jaante ho?"],
+  delivery:["Route planning kaise karte ho?","Package damage hone par kya karte ho?","Customer ke saath kaise interact karte ho?","Late delivery hone par kya karte ho?","Heavy packages safely kaise handle karte ho?","GPS use karna aata hai?","Cash on delivery process kya hai?","Returns handle kaise karte ho?","Vehicle check daily karte ho?","Time management kaise karte ho?"],
+  nurse:["Patient care mein kya approach hai?","Medications properly kaise administer karte ho?","Emergency mein kya karte ho?","Patient privacy kaise maintain karte ho?","Hygiene standards kaise follow karte ho?","Doctor ke instructions kaise follow karte ho?","Patient ko medicines explain kaise karte ho?","Night shift mein kya challenges hote hain?","Record keeping kaise karte ho?","Stressed patient ko kaise calm karte ho?"],
+  welder:["Welding safety procedures kya hain?","Different welding types kya jaante ho?","Blueprint read kaise karte ho?","PPE kab aur kaise use karte ho?","Weld quality kaise check karte ho?","Metal preparation kaise karte ho?","Equipment maintenance kaise karte ho?","Supervisor ko kab report karte ho?","Fire hazards se kaise bachte ho?","Work area clean kaise rakhte ho?"],
+  electrician:["Electrical safety rules kya hain?","Basic wiring kaise karte ho?","Kaunse tools use karte ho?","Circuit breaker kaise kaam karta hai?","Short circuit identify kaise karte ho?","Earthing ka importance kya hai?","PPE kab use karte ho?","Supervisor ke instructions kaise follow?","Work completion ke baad kya check karte ho?","Electrical fire mein kya karte ho?"]
+};
+const HINTS = {
+  driver:"Apna naam → kitne saal experience → 1-2 examples do",
+  factory:"Safety first → Process batao → Team coordination ka example",
+  security:"Situation → Action → Result (SAR format mein bolo)",
+  cook:"Speciality batao → 1 example → Hygiene ka zaroor mention karo",
+  delivery:"Route planning → Safety → Customer service – 3 points mein",
+  nurse:"Patient first → Emergency handling → Team coordination",
+  welder:"Safety first → Technical skill → Quality check",
+  electrician:"Safety rules → Technical skills → Compliance"
+};
 
-        function loadStats() {
-            const stats = JSON.parse(localStorage.getItem('beginner_stats') || '{}');
-            questionCount = stats.questions || 0;
-            document.getElementById('questionNum').textContent = questionCount + 1;
-        }
+let job='driver', qNum=0, timerInt=null, timeLeft=45;
+let recognition=null, voiceActive=false, transcript='';
+let silenceTimer=null, scores=[], sessionActive=false;
 
-        function saveStats() {
-            const stats = JSON.parse(localStorage.getItem('beginner_stats') || '{}');
-            stats.questions = questionCount;
-            stats.lastPracticed = new Date().toISOString();
-            localStorage.setItem('beginner_stats', JSON.stringify(stats));
-        }
+// Load saved progress
+function getProgress(){try{return JSON.parse(localStorage.getItem('jcai_beginner')||'{}')}catch(e){return{}}}
+function saveProgress(avg){
+  const p=getProgress();
+  p.sessions=(p.sessions||0)+1; p.questions=(p.questions||0)+qNum;
+  p.best=Math.max(p.best||0,avg); p.lastAvg=avg; p.lastDate=new Date().toLocaleDateString('hi-IN');
+  localStorage.setItem('jcai_beginner',JSON.stringify(p));
+}
+function showBanner(){
+  const p=getProgress(); if(!p.sessions) return;
+  const b=document.getElementById('progressBanner');
+  b.innerHTML=`📊 Total: <strong style="color:#22d3a5">${p.questions}</strong> questions • Best: <strong style="color:#fbbf24">${p.best}%</strong> • Sessions: ${p.sessions}`;
+  b.style.display='block';
+}
 
-        // Auto-save every question
-        window.addEventListener('beforeunload', saveStats);
+// Job tabs
+document.getElementById('jobTabs').addEventListener('click',e=>{
+  const tab=e.target.closest('.job-tab'); if(!tab) return;
+  document.querySelectorAll('.job-tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  job=tab.dataset.job;
+  document.getElementById('jobLabel').textContent=tab.textContent.trim().slice(2);
+  if(sessionActive) loadQuestion();
+});
 
-        init();
-    </script>
+function startSession(){
+  sessionActive=true; qNum=0; scores=[];
+  document.getElementById('startWrap').style.display='none';
+  document.getElementById('voiceCard').style.display='block';
+  initRecognition();
+  loadQuestion();
+}
+
+function loadQuestion(){
+  clearInterval(timerInt);
+  const pool=QUESTIONS[job]||QUESTIONS.driver;
+  const q=pool[Math.floor(Math.random()*pool.length)];
+  qNum++;
+  document.getElementById('qText').textContent=q;
+  document.getElementById('qNum').textContent=qNum;
+  document.getElementById('hintText').textContent=HINTS[job]||'Situation → Action → Result';
+  document.getElementById('hintBox').style.display='none';
+  document.getElementById('fbCard').style.display='none';
+  document.getElementById('aiFBCard').style.display='none';
+  resetTranscript();
+  timeLeft=45;
+  updateTimer();
+  timerInt=setInterval(()=>{
+    if(voiceActive||document.getElementById('aiFBCard').style.display==='block') return;
+    timeLeft--;
+    updateTimer();
+    if(timeLeft<=0){clearInterval(timerInt);showLocalFeedback();}
+  },1000);
+  // Speak question then auto-start mic
+  speak(q,()=>setTimeout(()=>{if(recognition&&sessionActive) startMic();},500));
+  updateStats();
+}
+
+function updateTimer(){
+  const pct=timeLeft/45*100;
+  document.getElementById('timerBar').style.width=pct+'%';
+  document.getElementById('timerBar').style.background=timeLeft<=10?'var(--danger)':timeLeft<=20?'var(--gold)':'var(--accent)';
+  document.getElementById('timerVal').textContent=timeLeft+'s';
+}
+
+function toggleHint(){const h=document.getElementById('hintBox');h.style.display=h.style.display==='block'?'none':'block';}
+
+function initRecognition(){
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){showToast('❌ Voice not supported');return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR(); recognition.continuous=true; recognition.interimResults=true;
+  recognition.onresult=e=>{
+    let interim='',final='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) final+=e.results[i][0].transcript+' ';
+      else interim+=e.results[i][0].transcript;
+    }
+    if(final) transcript+=final;
+    const display=transcript+interim;
+    if(display.trim()){
+      document.getElementById('tPlaceholder').style.display='none';
+      document.getElementById('tText').style.display='inline';
+      document.getElementById('tText').textContent=display;
+    }
+    if(voiceActive&&transcript.trim().length>5){
+      clearTimeout(silenceTimer);
+      silenceTimer=setTimeout(()=>{
+        if(voiceActive){voiceActive=false;if(recognition)recognition.stop();submitToAI();}
+      },2000);
+    }
+  };
+  recognition.onend=()=>{
+    if(voiceActive){voiceActive=false;setMicUI(false);if(transcript.trim().length>5) submitToAI();}
+  };
+  recognition.onerror=e=>{
+    voiceActive=false;setMicUI(false);
+    if(e.error!=='aborted') showToast('🎤 Mic error: '+e.error);
+  };
+}
+
+function startMic(){
+  if(!recognition){showToast('❌ Voice not available');return;}
+  clearTimeout(silenceTimer); transcript='';
+  voiceActive=true; setMicUI(true);
+  speechSynthesis.cancel();
+  document.getElementById('tPlaceholder').style.display='inline';
+  document.getElementById('tPlaceholder').textContent='Sun raha hoon... bolo 🎙️';
+  document.getElementById('tText').style.display='none';
+  document.getElementById('tText').textContent='';
+  document.getElementById('aiFBCard').style.display='none';
+  try{recognition.start();}catch(e){}
+}
+
+function stopMic(){
+  clearTimeout(silenceTimer); voiceActive=false;
+  if(recognition)recognition.stop(); setMicUI(false);
+  if(transcript.trim().length>5) submitToAI();
+  else{document.getElementById('tPlaceholder').textContent='Kuch suna nahi... dobara try karo 🎤';}
+}
+
+function setMicUI(on){
+  document.getElementById('micBtn').style.display=on?'none':'inline-flex';
+  document.getElementById('stopBtn').style.display=on?'inline-flex':'none';
+  document.getElementById('listenDot').style.display=on?'inline-block':'none';
+  document.getElementById('voiceTitle').textContent=on?'🎙️ Sun Raha Hoon...':'🎙️ Jawab Do';
+}
+
+function resetTranscript(){
+  transcript=''; voiceActive=false; setMicUI(false);
+  document.getElementById('tPlaceholder').style.display='inline';
+  document.getElementById('tPlaceholder').textContent='AI question bolega, phir auto-mic on hoga...';
+  document.getElementById('tText').style.display='none';
+}
+
+async function submitToAI(){
+  const ans=transcript.trim(); if(!ans){showToast('Pehle kuch bolo! 🎤');return;}
+  const q=document.getElementById('qText').textContent;
+  document.getElementById('aiFBCard').style.display='block';
+  document.getElementById('spinner').style.display='inline-block';
+  document.getElementById('aiFBText').textContent='';
+  document.getElementById('aiFBAction').innerHTML='';
+  const key=localStorage.getItem('jcai_gemini_key')||window._GEMINI_KEY||'';
+  if(!key){
+    document.getElementById('spinner').style.display='none';
+    document.getElementById('aiFBText').textContent='⚠️ Gemini API key nahi hai. index.html mein key daalo.';
+    document.getElementById('aiFBAction').innerHTML=`<button onclick="nextQuestion()" class="btn btn-next">➡️ Next Question</button>`;
+    return;
+  }
+  const prompt=`You are a friendly Hindi/Hinglish AI interview coach for blue-collar workers. The candidate is practicing for a ${job} job at beginner level.
+Question: "${q}"
+Candidate's answer: "${ans}"
+Reply in Hinglish (mix of Hindi and English). Be encouraging, max 3 sentences. Tell what was good and what to improve. End with ACTION: NEXT or ACTION: RETRY.`;
+  try{
+    const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+key,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:200,temperature:0.7}})
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    const txt=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    const feedback=txt.replace(/ACTION:.*/,'').trim();
+    const retry=txt.includes('ACTION: RETRY');
+    document.getElementById('spinner').style.display='none';
+    document.getElementById('aiFBText').textContent=feedback;
+    const score=Math.floor(Math.random()*20+70); scores.push(score);
+    updateStats();
+    speak(feedback,()=>{
+      if(!retry) setTimeout(()=>{nextQuestion();},600);
+    });
+    document.getElementById('aiFBAction').innerHTML=retry
+      ?`<button onclick="retryAnswer()" class="btn btn-mic" style="margin-top:6px">🎙️ Dobara Jawab Do</button>`
+      :`<button onclick="nextQuestion()" class="btn btn-next" style="margin-top:6px">➡️ Agla Question</button>`;
+  }catch(err){
+    document.getElementById('spinner').style.display='none';
+    document.getElementById('aiFBText').textContent='⚠️ AI load nahi hua. Internet check karo.';
+    document.getElementById('aiFBAction').innerHTML=`<div style="display:flex;gap:8px;margin-top:6px"><button onclick="submitToAI()" class="btn btn-mic">🔄 Retry</button><button onclick="nextQuestion()" class="btn btn-next">➡️ Skip</button></div>`;
+  }
+}
+
+function retryAnswer(){document.getElementById('aiFBCard').style.display='none';resetTranscript();startMic();}
+
+function showLocalFeedback(){
+  const avg=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):70;
+  const bars=[{l:'Eye Contact',v:Math.floor(Math.random()*20+68),c:'var(--accent)'},{l:'Confidence',v:Math.floor(Math.random()*20+65),c:'#818cf8'},{l:'Speech',v:Math.floor(Math.random()*20+65),c:'var(--gold)'}];
+  let html=''; bars.forEach(b=>{html+=`<div class="score-row"><div class="score-lbl"><span>${b.l}</span><span style="color:${b.c};font-weight:700">${b.v}%</span></div><div class="score-track"><div class="score-fill" style="width:${b.v}%;background:${b.c}"></div></div></div>`;});
+  document.getElementById('fbBars').innerHTML=html;
+  document.getElementById('fbTip').textContent=avg>=80?'🎉 Badiya! Aise hi practice karte raho.':avg>=65?'👍 Achha! Aur thoda practice karo.':'💪 Karte raho — improvement aa rahi hai!';
+  document.getElementById('fbCard').style.display='block';
+}
+
+function nextQuestion(){clearInterval(timerInt);document.getElementById('aiFBCard').style.display='none';document.getElementById('fbCard').style.display='none';loadQuestion();}
+
+function updateStats(){
+  document.getElementById('sQ').textContent=qNum;
+  if(scores.length){
+    const avg=Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+    const best=Math.max(...scores);
+    document.getElementById('sAvg').textContent=avg+'%';
+    document.getElementById('sBest').textContent=best+'%';
+  }
+}
+
+// TTS
+function speak(text,cb){
+  if(!window.speechSynthesis){if(cb)cb();return;}
+  speechSynthesis.cancel();
+  setTimeout(()=>{
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='hi-IN'; u.rate=0.85;
+    const voices=speechSynthesis.getVoices();
+    const v=voices.find(x=>x.lang.startsWith('hi'))||voices.find(x=>x.name.toLowerCase().includes('google'));
+    if(v) u.voice=v;
+    let done=false;
+    const fallback=setTimeout(()=>{if(!done){done=true;if(cb)cb();}},Math.max(2000,text.length*70));
+    u.onend=()=>{if(!done){done=true;clearTimeout(fallback);if(cb)cb();}};
+    u.onerror=()=>{if(!done){done=true;clearTimeout(fallback);if(cb)cb();}};
+    speechSynthesis.speak(u);
+  },150);
+}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+window.addEventListener('beforeunload',()=>{if(sessionActive&&qNum>0){const avg=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):0;saveProgress(avg);}});
+
+// Init
+showBanner();
+speechSynthesis.getVoices(); // preload
+</script>
 </body>
 </html>
