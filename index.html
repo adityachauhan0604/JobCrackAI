@@ -480,7 +480,6 @@ footer{
   padding:28px 20px;text-align:center;position:relative;z-index:1
 }
 </style>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
 
@@ -604,8 +603,8 @@ footer{
       <div class="setup-group">
         <label>🎬 Practice Mode</label>
         <div class="pill-group" id="modeGroup">
-          <div class="pill active" data-val="video" onclick="setPill(this,'modeGroup','mode')">📹 Video Call</div>
-          <div class="pill" data-val="written" onclick="setPill(this,'modeGroup','mode')">✍️ Written</div>
+          <div class="pill" data-val="video" onclick="setPill(this,'modeGroup','mode')">📹 Video Call</div>
+          <div class="pill active" data-val="written" onclick="setPill(this,'modeGroup','mode')">✍️ Written</div>
         </div>
         <!-- NEW: Breathing exercise toggle -->
         <div style="margin-top:10px">
@@ -738,6 +737,7 @@ footer{
         <span id="silenceCountdown" style="display:none;position:absolute;right:10px;bottom:8px;font-size:0.75rem;color:var(--accent);font-weight:700"></span>
         <span id="transcriptText" style="display:none"></span>
       </div>
+      <textarea id="writtenAnswerBox" placeholder="✍️ Yahan apna jawab likho aur Submit karo..." style="width:100%;min-height:80px;margin-top:10px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;font-size:0.9rem;color:var(--text);font-family:'DM Sans',sans-serif;resize:vertical;box-sizing:border-box;display:none"></textarea>
       <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
         <button id="startVoiceBtn" onclick="startVoiceAnswer()" style="background:rgba(34,211,165,0.12);border:1px solid rgba(34,211,165,0.3);color:var(--accent);padding:6px 14px;border-radius:8px;font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">
           🎙️ Jawab Do (Auto-Submit)
@@ -931,19 +931,19 @@ footer{
 
 <script>
 // ─── STATE ───
-const S = {
-  lang:'hi',langName:'Hindi',langFlag:'🇮🇳',
-  level:'beginner',job:'driver',country:'in',mode:'video',
-  credits:parseInt(localStorage.getItem('jcai_credits')||'5'),
-  isPremium:true, // Payment wall removed
-  qNum:0,totalScore:0,sessionStart:null,
-  timerInt:null,qTimerInt:null,metricsInt:null,tipsRotInt:null,breathInt:null,
-  qTimeLeft:45,isRunning:false,isMuted:false,
-  localStream:null,audioCtx:null,analyser:null,
-  scoreHistory:[],
-  selPlan:'jobseeker',payM:'upi',
-  breathActive:false
+// STATE - stored on window so it's always globally accessible
+window.S = {
+  lang:'hi', langName:'Hindi', langFlag:'🇮🇳',
+  level:'beginner', job:'driver', country:'in', mode:'written',
+  credits: parseInt(localStorage.getItem('jcai_credits')||'5'),
+  isPremium: true,
+  qNum:0, totalScore:0, sessionStart:null,
+  timerInt:null, qTimerInt:null, metricsInt:null, tipsRotInt:null, breathInt:null,
+  qTimeLeft:45, isRunning:false, isMuted:false,
+  localStream:null, audioCtx:null, analyser:null,
+  scoreHistory:[], selPlan:'jobseeker', payM:'upi', breathActive:false
 };
+var S = window.S;
 
 // ─── QUESTIONS DB ───
 const Q = {
@@ -1070,24 +1070,55 @@ function getQ(){
 
 // ─── START ───
 async function startInterview(){
-  document.getElementById('lvlBadge').textContent=S.level.charAt(0).toUpperCase()+S.level.slice(1);
-  document.getElementById('jobBadge').textContent=S.job.charAt(0).toUpperCase()+S.job.slice(1);
+  try{
+  // Ensure S is always available
+  if(typeof S === 'undefined' || !S){ 
+    S = window.S || {lang:'hi',level:'beginner',job:'driver',country:'in',mode:'written',isPremium:true,qNum:0,totalScore:0,sessionStart:null,timerInt:null,qTimerInt:null,metricsInt:null,tipsRotInt:null,breathInt:null,qTimeLeft:45,isRunning:false,isMuted:false,localStream:null,audioCtx:null,analyser:null,scoreHistory:[],selPlan:'jobseeker',payM:'upi',breathActive:false};
+  }
+  // Make sure all keys have defaults
+  S.mode = S.mode || 'written';
+  S.level = S.level || 'beginner';
+  S.job = S.job || 'driver';
+  S.lang = S.lang || 'hi';
+  S.country = S.country || 'in';
+  S.scoreHistory = S.scoreHistory || [];
+  window.S = S;
+  // Init voice system and show panel
+  try{initVoiceSystem();}catch(e){}
+  document.getElementById('voicePanel').style.display='block';
+  // Written mode setup
+  var writtenBox=document.getElementById('writtenAnswerBox');
+  if(S.mode==='written'){
+    if(writtenBox) writtenBox.style.display='block';
+    document.getElementById('startVoiceBtn').style.display='none';
+    document.getElementById('submitVoiceBtn').style.display='inline-flex';
+    document.getElementById('submitVoiceBtn').textContent='✅ Jawab Submit Karo';
+    document.getElementById('voicePanelTitle').textContent='✍️ Jawab Likho Aur Submit Karo';
+  }
+  var _lvl = S.level || 'beginner';
+  var _job = S.job || 'driver';
+  document.getElementById('lvlBadge').textContent=_lvl.charAt(0).toUpperCase()+_lvl.slice(1);
+  document.getElementById('jobBadge').textContent=_job.charAt(0).toUpperCase()+_job.slice(1);
   document.getElementById('setupPanel').style.display='none';
   document.getElementById('startBtn').style.display='none';
   document.getElementById('howSection').style.display='none';
   document.getElementById('countryTip').style.display='none';
   document.getElementById('breathGuide').style.display='none';
   document.getElementById('interviewArea').style.display='block';
-  const ss=document.getElementById('sessionStats');ss.style.display='grid';
+  var ss=document.getElementById('sessionStats');ss.style.display='grid';
   document.getElementById('scoreHistoryPanel').style.display='block';
   S.isRunning=true;S.sessionStart=Date.now();S.qNum=0;S.scoreHistory=[];
   S.timerInt=setInterval(updateTime,1000);
-  if(S.mode==='video')await startCamera();
-  await initAudio();
+  if(S.mode==='video'){try{await startCamera();}catch(e){showToast('Camera nahi mili — written mode mein chal raha hai');}}
+  try{await initAudio();}catch(e){}
   nextQ();
-  startMetrics();
+  try{startMetrics();}catch(e){}
   document.getElementById('tipsPanel').style.display='block';
-  startTipsRotation();
+  try{startTipsRotation();}catch(e){}
+  }catch(err){
+    showToast('❌ Error: '+err.message);
+    console.error('startInterview error:',err);
+  }
 }
 
 // ─── CAMERA ───
@@ -1159,7 +1190,7 @@ function nextQ(){
   document.getElementById('hintText').textContent=HINTS[S.job]||"Answer structure: Situation → Action → Result";
   speakQ(q);
   S.qTimeLeft=45;document.getElementById('timerVal').textContent='45s';
-  S.qTimerInt=setInterval(()=>{\
+  S.qTimerInt=setInterval(()=>{
     // Pause timer while user is actively answering or AI is giving feedback
     if(voiceActive) return;
     if(document.getElementById('aiFeedbackPanel').style.display==='block') return;
@@ -1333,7 +1364,7 @@ function startTipsRotation(){tipIdx=0;tipsRotInt=setInterval(()=>{tipIdx=(tipIdx
 function stopTipsRotation(){clearInterval(tipsRotInt)}
 
 // ─── PAYMENT ───
-const PLANS={
+var PLANS={
   trial:{name:'🆓 Trial',price:'₹0',isFree:true},
   jobseeker:{name:'💼 Job Seeker — 1 Month',price:'₹99',isFree:false},
   global:{name:'✈️ Global Migrant',price:'$9.99',isFree:false},
@@ -1369,13 +1400,12 @@ function selPay(m){
   document.getElementById('cryptoSec').style.display=m==='crypto'?'block':'none';
   S.payM=m;
 }
-function copyUPI(){navigator.clipboard.writeText('adityachauhan0604@oksbi');showToast('✅ UPI ID copied!')}
 function copyCrypto(){navigator.clipboard.writeText('TNWWxebAmvDVh8Qz8bTrKbAkiHfKCHffc7');showToast('✅ Wallet copied!')}
 // ─── PAYMENT FUNCTIONS ───
-const UPI_ID = 'adityachauhan0604@oksbi';
-const INSTA = 'jobcrackai';
+var UPI_ID = 'adityachauhan0604@oksbi';
+var INSTA = 'jobcrackai';
 
-const PLAN_AMOUNTS = {
+var PLAN_AMOUNTS = {
   jobseeker: { name: '💼 Job Seeker — 1 Month', price: '₹99' },
   global:    { name: '✈️ Global Plan',           price: '$9.99' },
   lifetime:  { name: '🏆 Career Pro — Lifetime', price: '₹499' },
@@ -1420,25 +1450,24 @@ function handlePayment() {
     return;
   }
 
+  // Check if screenshot uploaded (optional now)
   const ssImg = document.getElementById('ssImg');
   const hasScreenshot = ssImg && ssImg.src && ssImg.src.length > 100;
 
-  if (!hasScreenshot) {
-    showToast('⚠️ Pehle payment screenshot upload karo!');
-    document.getElementById('ssUploadBox').style.border = '2px dashed var(--danger)';
-    setTimeout(() => {
-      document.getElementById('ssUploadBox').style.border = '2px dashed var(--border2)';
-    }, 2000);
-    return;
+  if (hasScreenshot) {
+    // Screenshot uploaded — show code entry box
+    document.getElementById('ssUploadBox').style.border = '2px solid var(--accent)';
+    document.getElementById('mainPayBtn').style.display = 'none';
+    document.getElementById('activateCodeBox').style.display = 'block';
+    showToast('📲 Screenshot mil gaya! Activation code daalo ya Instagram pe contact karo.');
+    window.open('https://www.instagram.com/jobcrackai', '_blank');
+  } else {
+    // No screenshot — show code box directly, ask them to DM
+    document.getElementById('mainPayBtn').style.display = 'none';
+    document.getElementById('activateCodeBox').style.display = 'block';
+    showToast('📲 Pay karke Instagram pe screenshot bhejo aur code pao!');
+    window.open('https://www.instagram.com/jobcrackai', '_blank');
   }
-
-  // Screenshot uploaded — show code entry box
-  document.getElementById('ssUploadBox').style.border = '2px solid var(--accent)';
-  document.getElementById('mainPayBtn').style.display = 'none';
-  document.getElementById('activateCodeBox').style.display = 'block';
-  showToast('📲 Screenshot mil gaya! Aditya se activation code lo.');
-  // Open Instagram DM
-  window.open('https://www.instagram.com/jobcrackai', '_blank');
 }
 
 function activateWithCode() {
@@ -1470,10 +1499,11 @@ function saveKey(v){
   if(v.length>10) localStorage.setItem('jcai_gemini_key',v);
 }
 (function(){
-  // Load saved key from localStorage only — no hardcoded key in source
-  const k=localStorage.getItem('jcai_gemini_key')||'';
-  if(k){window._GEMINI_KEY=k;const el=document.getElementById('geminiApiKey');if(el)el.value=k;}
-  // Show API key input section so user can enter it
+  const HARDCODED_KEY='AIzaSyA16hi_4woA9u_sWw4zRmV3RcPXSfTSQyw';
+  const k=localStorage.getItem('jcai_gemini_key')||HARDCODED_KEY;
+  window._GEMINI_KEY=k;
+  localStorage.setItem('jcai_gemini_key',k);
+  const el=document.getElementById('geminiApiKey');if(el)el.value=k;
   const sec=document.getElementById('apiKeySection');
   if(sec) sec.style.display='flex';
 })();
@@ -1673,8 +1703,11 @@ function stopVoiceAnswer() {
 }
 
 async function submitAnswerToAI() {
-  const answer = voiceTranscript.trim();
-  if (!answer) { showToast('Pehle kuch bolo! 🎤'); return; }
+  // Support both voice transcript and written text input
+  var writtenBox = document.getElementById('writtenAnswerBox');
+  const writtenVal = writtenBox ? writtenBox.value.trim() : '';
+  const answer = writtenVal || voiceTranscript.trim();
+  if (!answer) { showToast('Pehle jawab likho ya bolo! ✍️🎤'); return; }
   const question = document.getElementById('currentQ').textContent;
   const job = S.job, level = S.level, lang = S.lang, country = S.country;
 
@@ -1816,31 +1849,43 @@ function resetVoiceForNextQ() {
   voiceTranscript = '';
 }
 
-// ─── HOOK into startInterview to show voice panel + init ───
-const _origStart = startInterview;
-startInterview = async function() {
-  // Init voice FIRST so recognition exists before speakQ callback
-  initVoiceSystem();
-  document.getElementById('voicePanel').style.display = 'block';
-  await _origStart.call(this);
-};
+// Voice init now handled inside startInterview directly
 
 // ─── HOOK into nextQ to reset voice ───
-const _origNextQ = nextQ;
+var _origNextQ = nextQ;
 nextQ = function() {
   _origNextQ.call(this);
-  document.getElementById('voicePanel').style.display = 'block'; // always visible
+  document.getElementById('voicePanel').style.display = 'block';
   document.getElementById('aiFeedbackPanel').style.display = 'none';
   document.getElementById('aiNextAction').style.display = 'none';
   voiceTranscript = '';
-  document.getElementById('transcriptPlaceholder').style.display = 'inline';
-  document.getElementById('transcriptPlaceholder').textContent = 'AI question bol raha hai... phir automatically sun ega 🎙️';
-  document.getElementById('transcriptText').style.display = 'none';
-  document.getElementById('startVoiceBtn').style.display = 'inline-flex';
-  document.getElementById('stopVoiceBtn').style.display = 'none';
-  document.getElementById('submitVoiceBtn').style.display = 'none';
-  document.getElementById('voiceListenDot').style.display = 'none';
-  document.getElementById('voicePanelTitle').textContent = '🎙️ AI Bol Raha Hai...';
+  // Reset written box
+  var writtenBox = document.getElementById('writtenAnswerBox');
+  if (writtenBox) writtenBox.value = '';
+  var _mode = (typeof S !== 'undefined' && S) ? (S.mode || 'written') : 'written';
+  if (_mode === 'written') {
+    // Written mode UI
+    if (writtenBox) writtenBox.style.display = 'block';
+    document.getElementById('transcriptPlaceholder').style.display = 'none';
+    document.getElementById('transcriptText').style.display = 'none';
+    document.getElementById('startVoiceBtn').style.display = 'none';
+    document.getElementById('stopVoiceBtn').style.display = 'none';
+    document.getElementById('submitVoiceBtn').style.display = 'inline-flex';
+    document.getElementById('submitVoiceBtn').textContent = '✅ Jawab Submit Karo';
+    document.getElementById('voiceListenDot').style.display = 'none';
+    document.getElementById('voicePanelTitle').textContent = '✍️ Jawab Likho Aur Submit Karo';
+  } else {
+    // Voice mode UI
+    if (writtenBox) writtenBox.style.display = 'none';
+    document.getElementById('transcriptPlaceholder').style.display = 'inline';
+    document.getElementById('transcriptPlaceholder').textContent = 'AI question bol raha hai... phir automatically sun ega 🎙️';
+    document.getElementById('transcriptText').style.display = 'none';
+    document.getElementById('startVoiceBtn').style.display = 'inline-flex';
+    document.getElementById('stopVoiceBtn').style.display = 'none';
+    document.getElementById('submitVoiceBtn').style.display = 'none';
+    document.getElementById('voiceListenDot').style.display = 'none';
+    document.getElementById('voicePanelTitle').textContent = '🎙️ AI Bol Raha Hai...';
+  }
 };
 </script>
 </body>
