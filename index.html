@@ -474,6 +474,7 @@ footer{
   padding:28px 20px;text-align:center;position:relative;z-index:1
 }
 </style>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
 
@@ -843,15 +844,16 @@ footer{
       <p style="color:var(--muted);font-size:0.82rem;margin-bottom:4px">Send to:</p>
       <div class="upi-id">adityachauhan0604@oksbi</div><br>
       <button class="btn-copy" onclick="copyUPI()">📋 Copy UPI ID</button>
-      <p style="color:var(--muted);font-size:0.74rem;margin-top:9px">Screenshot send karo Telegram pe: <strong style="color:var(--accent)">@adityachauhan0604</strong></p>
+      <button onclick="handlePayment()" style="margin-top:10px;width:100%;background:linear-gradient(135deg,#22d3a5,#4f46e5);border:none;color:white;padding:10px;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.9rem">⚡ Pay via Razorpay (Card/UPI/NetBanking)</button>
+      <p style="color:var(--muted);font-size:0.72rem;margin-top:8px">Ya manually UPI karo aur screenshot Telegram bhejo: <strong style="color:var(--accent)">@adityachauhan0604</strong></p>
     </div>
-    <div id="cardSec" style="display:none;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);font-size:0.82rem;color:var(--muted);text-align:center">🔒 Add your Stripe key to activate card payments</div>
+    <div id="cardSec" style="display:none;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);font-size:0.9rem;color:var(--text);text-align:center"><p style="margin-bottom:10px;color:var(--muted)">Card / UPI / Netbanking — sab kuch Razorpay se</p><button onclick="openRazorpay()" style="background:linear-gradient(135deg,#2563eb,#4f46e5);border:none;color:white;padding:10px 24px;border-radius:8px;font-size:0.9rem;font-weight:700;cursor:pointer;width:100%">💳 Pay with Razorpay</button></div>
     <div id="cryptoSec" style="display:none;text-align:center">
       <p style="color:var(--muted);font-size:0.82rem;margin-bottom:6px">USDT TRC20 wallet:</p>
       <div class="upi-id" style="font-size:0.68rem;word-break:break-all">TNWWxebAmvDVh8Qz8bTrKbAkiHfKCHffc7</div><br>
       <button class="btn-copy" onclick="copyCrypto()">📋 Copy Address</button>
     </div>
-    <button class="btn-pay" onclick="confirmPay()">✅ I've Paid – Activate Now</button>
+    <button class="btn-pay" id="mainPayBtn" onclick="handlePayment()">✅ Pay & Activate Now</button>
   </div>
 </div>
 
@@ -1256,17 +1258,95 @@ function selPay(m){
 }
 function copyUPI(){navigator.clipboard.writeText('adityachauhan0604@oksbi');showToast('✅ UPI ID copied!')}
 function copyCrypto(){navigator.clipboard.writeText('TNWWxebAmvDVh8Qz8bTrKbAkiHfKCHffc7');showToast('✅ Wallet copied!')}
-function confirmPay(){
-  if(S.selPlan==='trial'){S.credits=2;localStorage.setItem('jcai_credits','2');closePayment();showToast('🆓 Free Trial: 2 interviews ready!');document.getElementById('creditsBadge').textContent='⚡ 2 Free';return}
-  const btn=document.querySelector('.btn-pay');btn.textContent='⏳ Verifying...';btn.disabled=true;
-  setTimeout(()=>{
-    btn.textContent="✅ I've Paid – Activate Now";btn.disabled=false;
-    closePayment();
-    const msg=`Plan: ${PLANS[S.selPlan||'jobseeker'].name} (${PLANS[S.selPlan||'jobseeker'].price})\nUPI screenshot Telegram pe bhejo: @adityachauhan0604\n\n2-4 ghante mein activate hoga.`;
-    document.getElementById('verifyMsg').textContent=msg;
-    document.getElementById('verifyModal').classList.add('open');
-  },1500);
+// ─── RAZORPAY CONFIG ───
+const RAZORPAY_KEY = 'rzp_test_YOUR_KEY_HERE'; // Replace with your Razorpay Key ID
+
+const PLAN_AMOUNTS = {
+  jobseeker: { amount: 9900,  currency: 'INR', name: '💼 Job Seeker — 1 Month' },
+  global:    { amount: 82900, currency: 'INR', name: '✈️ Global Plan' },
+  lifetime:  { amount: 49900, currency: 'INR', name: '🏆 Career Pro — Lifetime' },
+};
+
+function activatePremium(plan) {
+  S.isPremium = true;
+  localStorage.setItem('jcai_premium', '1');
+  localStorage.setItem('jcai_plan', plan);
+  localStorage.setItem('jcai_plan_expiry', Date.now() + 30*24*60*60*1000);
+  document.getElementById('creditsBadge').textContent = '💎 Premium';
+  closePayment();
+  showToast('🎉 Premium activated! Ab unlimited interviews!');
 }
+
+function openRazorpay() {
+  handlePayment();
+}
+
+function handlePayment() {
+  const plan = S.selPlan || 'jobseeker';
+
+  // Free trial
+  if (plan === 'trial') {
+    S.isPremium = true;
+    localStorage.setItem('jcai_premium', '1');
+    closePayment();
+    showToast('🆓 Free Trial shuru! 2 interviews milenge.');
+    document.getElementById('creditsBadge').textContent = '✅ Trial';
+    return;
+  }
+
+  const planInfo = PLAN_AMOUNTS[plan];
+  if (!planInfo) return;
+
+  // If UPI selected — show manual + Razorpay both
+  const payMode = S.payM;
+
+  const options = {
+    key: RAZORPAY_KEY,
+    amount: planInfo.amount, // in paise
+    currency: planInfo.currency,
+    name: 'JobCrackAI',
+    description: planInfo.name,
+    image: 'https://img.icons8.com/emoji/96/briefcase-emoji.png',
+    prefill: {
+      name: '',
+      email: '',
+      contact: ''
+    },
+    theme: { color: '#22d3a5' },
+    handler: function(response) {
+      // Payment success — auto activate
+      console.log('Payment success:', response.razorpay_payment_id);
+      activatePremium(plan);
+    },
+    modal: {
+      ondismiss: function() {
+        // If UPI manual — show verify modal
+        if (payMode === 'upi') {
+          document.getElementById('verifyMsg').textContent =
+            'UPI screenshot @adityachauhan0604 pe Telegram karo. 1-2 ghante mein activate hoga.';
+          document.getElementById('verifyModal').classList.add('open');
+        }
+        showToast('Payment cancelled. Dobara try karo.');
+      }
+    }
+  };
+
+  try {
+    const rzp = new Razorpay(options);
+    rzp.on('payment.failed', function(response) {
+      showToast('❌ Payment failed: ' + response.error.description);
+    });
+    rzp.open();
+  } catch(e) {
+    // Razorpay not loaded or key not set — fallback to manual UPI
+    closePayment();
+    document.getElementById('verifyMsg').textContent =
+      'UPI ID: adityachauhan0604@oksbi\nPlan: ' + planInfo.name + '\nScreenshot Telegram pe bhejo: @adityachauhan0604';
+    document.getElementById('verifyModal').classList.add('open');
+  }
+}
+
+function confirmPay() { handlePayment(); }
 function closeVerify(){document.getElementById('verifyModal').classList.remove('open')}
 
 // ─── API KEY SAVE ───
