@@ -1155,12 +1155,53 @@ function nextQ(){
   },1000);
 }
 
-function speakQ(text){
-  if(!window.speechSynthesis)return;
+// ─── SPEECH ENGINE ───
+function getLang() {
+  return S.lang==='hi'?'hi-IN':S.lang==='ar'?'ar-SA':S.lang==='es'?'es-ES':S.lang==='bn'?'bn-BD':S.lang==='tl'?'fil-PH':'en-US';
+}
+
+function getBestVoice(lang) {
+  const voices = window.speechSynthesis.getVoices();
+  // Exact match first
+  let v = voices.find(x => x.lang === lang);
+  // Prefix match (hi-IN → hi)
+  if (!v) v = voices.find(x => x.lang.startsWith(lang.split('-')[0]));
+  // Fallback: any Google voice
+  if (!v) v = voices.find(x => x.name.toLowerCase().includes('google'));
+  return v || null;
+}
+
+function speakText(text, onEndCb) {
+  if (!window.speechSynthesis) { if(onEndCb) onEndCb(); return; }
   speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(text);
-  u.lang=S.lang==='hi'?'hi-IN':S.lang==='ar'?'ar-SA':S.lang==='es'?'es-ES':S.lang==='bn'?'bn-BD':S.lang==='tl'?'fil-PH':'en-US';
-  u.rate=0.88;speechSynthesis.speak(u);
+
+  function doSpeak() {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = getLang();
+    u.rate = 0.88;
+    u.pitch = 1;
+    u.volume = 1;
+    const voice = getBestVoice(u.lang);
+    if (voice) u.voice = voice;
+    u.onend = () => { if (onEndCb) onEndCb(); };
+    u.onerror = (e) => { console.warn('Speech error:', e.error); if (onEndCb) onEndCb(); };
+    speechSynthesis.speak(u);
+  }
+
+  // Chrome needs voices to be loaded first
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length > 0) {
+    doSpeak();
+  } else {
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.onvoiceschanged = null;
+      doSpeak();
+    };
+  }
+}
+
+function speakQ(text) {
+  speakText(text, null);
 }
 
 function toggleHint(){
@@ -1632,33 +1673,23 @@ Evaluate this answer and respond according to your instructions.`;
     document.getElementById('aiFeedbackText').textContent = feedbackText;
     document.getElementById('aiStatus').textContent = 'AI Interviewer is speaking...';
 
-    // Speak the feedback
-    if (window.speechSynthesis) {
-      const utter = new SpeechSynthesisUtterance(feedbackText);
-      utter.lang = S.lang === 'hi' ? 'hi-IN' : S.lang === 'ar' ? 'ar-SA' : S.lang === 'es' ? 'es-ES' : 'en-US';
-      utter.rate = 0.9;
-      speechSynthesis.speak(utter);
-      utter.onend = () => {
-        document.getElementById('aiStatus').textContent = 'Listening...';
-        // If next question, speak it too then auto-start mic
-        if (action === 'NEXT_QUESTION' && nextQ) {
-          const q2 = new SpeechSynthesisUtterance(nextQ);
-          q2.lang = utter.lang; q2.rate = 0.88;
-          q2.onend = () => {
-            setTimeout(() => {
-              resetVoiceForNextQ();
-              startVoiceAnswer();
-            }, 600);
-          };
-          setTimeout(() => speechSynthesis.speak(q2), 600);
-        } else if (action === 'RETRY') {
-          setTimeout(() => { resetVoiceForRetry(); startVoiceAnswer(); }, 800);
-        } else {
-          // No next q from AI — just auto-start for retry
-          setTimeout(() => { resetVoiceForNextQ(); startVoiceAnswer(); }, 800);
-        }
-      };
-    }
+    // Speak the feedback then next question
+    document.getElementById('aiStatus').textContent = 'AI Interviewer is speaking...';
+    speakText(feedbackText, () => {
+      document.getElementById('aiStatus').textContent = 'Listening...';
+      if (action === 'NEXT_QUESTION' && nextQ) {
+        // Speak next question then auto-start mic
+        setTimeout(() => {
+          speakText(nextQ, () => {
+            setTimeout(() => { resetVoiceForNextQ(); startVoiceAnswer(); }, 500);
+          });
+        }, 500);
+      } else if (action === 'RETRY') {
+        setTimeout(() => { resetVoiceForRetry(); startVoiceAnswer(); }, 600);
+      } else {
+        setTimeout(() => { resetVoiceForNextQ(); startVoiceAnswer(); }, 600);
+      }
+    });
 
     // Show action area
     document.getElementById('aiNextAction').style.display = 'block';
