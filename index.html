@@ -800,61 +800,69 @@ footer{
 <div class="modal-overlay" id="payModal">
   <div class="modal">
     <button class="modal-close" onclick="closePayment()">✕</button>
-    <div style="text-align:center;margin-bottom:22px">
-      <div style="font-size:2.2rem;margin-bottom:8px">💎</div>
-      <h2 style="font-family:'Instrument Serif',serif;font-size:1.4rem;font-style:italic;margin-bottom:4px">Unlock Premium</h2>
-      <p style="color:var(--muted);font-size:0.83rem">Unlimited interviews • All languages • All countries</p>
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="font-size:2rem;margin-bottom:6px">💎</div>
+      <h2 style="font-family:'Instrument Serif',serif;font-size:1.35rem;font-style:italic;margin-bottom:4px">Unlock Premium</h2>
+      <p style="color:var(--muted);font-size:0.82rem">Unlimited interviews • All languages • All countries</p>
     </div>
+
+    <!-- Plans -->
     <div class="plans-grid">
       <div class="plan-card" id="pl-trial" onclick="selPlan('trial')">
         <div class="plan-name">🆓 Trial</div>
         <div class="plan-price" style="color:var(--muted)">₹0</div>
-        <div class="plan-features">✓ 2 interviews<br>✓ Basic feedback<br>✓ 1 language</div>
+        <div class="plan-features">✓ 2 interviews<br>✓ Basic feedback</div>
       </div>
       <div class="plan-card selected" id="pl-jobseeker" onclick="selPlan('jobseeker')">
         <div class="plan-tag">Popular</div>
         <div class="plan-name">💼 Job Seeker</div>
         <div class="plan-price" id="planPrice">₹99</div>
-        <div class="plan-features">✓ 1 month unlimited<br>✓ Hindi + English<br>✓ Live coaching</div>
+        <div class="plan-features">✓ 1 month unlimited<br>✓ Hindi + English</div>
       </div>
       <div class="plan-card" id="pl-global" onclick="selPlan('global')">
         <div class="plan-tag" style="background:var(--accent2)">🌍 Gulf</div>
         <div class="plan-name">✈️ Global</div>
         <div class="plan-price" style="color:#818cf8">$9.99</div>
-        <div class="plan-features">✓ All 8 languages<br>✓ Country style<br>✓ Visa prep</div>
+        <div class="plan-features">✓ All 8 languages<br>✓ Gulf country style</div>
       </div>
       <div class="plan-card" id="pl-lifetime" onclick="selPlan('lifetime')">
         <div class="plan-tag" style="background:var(--accent3)">👑 Best</div>
         <div class="plan-name">🏆 Career Pro</div>
         <div class="plan-price" style="color:var(--gold)">₹499</div>
-        <div class="plan-features">✓ Lifetime access<br>✓ AI Resume tips<br>✓ All future features</div>
+        <div class="plan-features">✓ Lifetime access<br>✓ All features</div>
       </div>
     </div>
-    <div id="planSummaryRow" style="background:rgba(34,211,165,0.07);border:1px solid rgba(34,211,165,0.15);border-radius:10px;padding:9px 14px;margin-bottom:12px;display:flex;justify-content:space-between;font-size:0.83rem">
+
+    <!-- Summary -->
+    <div id="planSummaryRow" style="background:rgba(34,211,165,0.07);border:1px solid rgba(34,211,165,0.15);border-radius:10px;padding:9px 14px;margin-bottom:14px;display:flex;justify-content:space-between;font-size:0.83rem">
       <span id="sumName" style="font-weight:600">💼 Job Seeker — 1 Month</span>
       <span id="sumPrice" style="color:var(--accent);font-weight:700">₹99</span>
     </div>
-    <p style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:9px">Pay via</p>
-    <div class="pay-methods">
-      <div class="pay-btn selected" id="pm-upi" onclick="selPay('upi')"><div class="pay-icon">📱</div>UPI</div>
-      <div class="pay-btn" id="pm-card" onclick="selPay('card')"><div class="pay-icon">💳</div>Card</div>
-      <div class="pay-btn" id="pm-crypto" onclick="selPay('crypto')"><div class="pay-icon">🪙</div>Crypto</div>
+
+    <!-- UPI Payment Box -->
+    <div id="upiPayBox" style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;margin-bottom:14px">
+      <p style="font-size:0.78rem;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em">UPI se Payment Karo</p>
+      <div style="font-size:1.25rem;font-weight:700;color:var(--accent);letter-spacing:0.03em;margin-bottom:6px">adityachauhan0604@oksbi</div>
+      <button onclick="copyUPI()" style="background:rgba(34,211,165,0.12);border:1px solid rgba(34,211,165,0.3);color:var(--accent);padding:5px 14px;border-radius:7px;font-size:0.8rem;cursor:pointer;margin-bottom:10px">📋 UPI Copy Karo</button>
+      <p style="font-size:0.75rem;color:var(--muted)">Payment ke baad niche screenshot upload karo 👇</p>
     </div>
-    <div id="upiSec" style="text-align:center">
-      <p style="color:var(--muted);font-size:0.82rem;margin-bottom:4px">Send to:</p>
-      <div class="upi-id">adityachauhan0604@oksbi</div><br>
-      <button class="btn-copy" onclick="copyUPI()">📋 Copy UPI ID</button>
-      <button onclick="handlePayment()" style="margin-top:10px;width:100%;background:linear-gradient(135deg,#22d3a5,#4f46e5);border:none;color:white;padding:10px;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.9rem">⚡ Pay via Razorpay (Card/UPI/NetBanking)</button>
-      <p style="color:var(--muted);font-size:0.72rem;margin-top:8px">Ya manually UPI karo aur screenshot Telegram bhejo: <strong style="color:var(--accent)">@adityachauhan0604</strong></p>
+
+    <!-- Screenshot Upload -->
+    <div id="ssUploadBox" style="border:2px dashed var(--border2);border-radius:10px;padding:14px;text-align:center;margin-bottom:12px;cursor:pointer" onclick="document.getElementById('ssInput').click()">
+      <div id="ssPreview" style="display:none"><img id="ssImg" style="max-width:100%;max-height:120px;border-radius:8px;margin-bottom:6px"></div>
+      <div id="ssPlaceholder">
+        <div style="font-size:1.4rem;margin-bottom:4px">📸</div>
+        <div style="font-size:0.82rem;color:var(--muted)">Payment screenshot yahan upload karo</div>
+      </div>
+      <input type="file" id="ssInput" accept="image/*" style="display:none" onchange="previewScreenshot(event)">
     </div>
-    <div id="cardSec" style="display:none;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);font-size:0.9rem;color:var(--text);text-align:center"><p style="margin-bottom:10px;color:var(--muted)">Card / UPI / Netbanking — sab kuch Razorpay se</p><button onclick="openRazorpay()" style="background:linear-gradient(135deg,#2563eb,#4f46e5);border:none;color:white;padding:10px 24px;border-radius:8px;font-size:0.9rem;font-weight:700;cursor:pointer;width:100%">💳 Pay with Razorpay</button></div>
-    <div id="cryptoSec" style="display:none;text-align:center">
-      <p style="color:var(--muted);font-size:0.82rem;margin-bottom:6px">USDT TRC20 wallet:</p>
-      <div class="upi-id" style="font-size:0.68rem;word-break:break-all">TNWWxebAmvDVh8Qz8bTrKbAkiHfKCHffc7</div><br>
-      <button class="btn-copy" onclick="copyCrypto()">📋 Copy Address</button>
-    </div>
-    <button class="btn-pay" id="mainPayBtn" onclick="handlePayment()">✅ Pay & Activate Now</button>
+
+    <!-- Pay Button -->
+    <button class="btn-pay" id="mainPayBtn" onclick="handlePayment()">✅ Maine Pay Kar Diya – Activate Karo</button>
+    <p style="text-align:center;font-size:0.72rem;color:var(--muted);margin-top:8px">Ya Instagram pe DM karo: <a href="https://instagram.com/jobcrackai" target="_blank" style="color:#e1306c;text-decoration:none;font-weight:600">@jobcrackai</a></p>
   </div>
+</div>
+
 </div>
 
 <!-- VERIFY MODAL -->
@@ -1243,10 +1251,20 @@ function selPlan(p){
   document.getElementById('pl-'+p).classList.add('selected');
   S.selPlan=p;
   const info=PLANS[p];
-  document.getElementById('sumName').textContent=info.name;
-  document.getElementById('sumPrice').textContent=info.price;
-  if(info.isFree){document.querySelector('.pay-methods').style.display='none';document.getElementById('upiSec').style.display='none';document.querySelector('.btn-pay').textContent='🆓 Start Free Trial'}
-  else{document.querySelector('.pay-methods').style.display='flex';document.querySelector('.btn-pay').textContent="✅ I've Paid – Activate Now";selPay('upi')}
+  if(document.getElementById('sumName')) document.getElementById('sumName').textContent=info.name;
+  if(document.getElementById('sumPrice')) document.getElementById('sumPrice').textContent=info.price;
+  const upiBox=document.getElementById('upiPayBox');
+  const ssBox=document.getElementById('ssUploadBox');
+  const payBtn=document.getElementById('mainPayBtn');
+  if(info.isFree){
+    if(upiBox) upiBox.style.display='none';
+    if(ssBox) ssBox.style.display='none';
+    if(payBtn) payBtn.textContent='🆓 Start Free Trial';
+  } else {
+    if(upiBox) upiBox.style.display='block';
+    if(ssBox) ssBox.style.display='block';
+    if(payBtn) payBtn.textContent='✅ Maine Pay Kar Diya – Activate Karo';
+  }
 }
 function selPay(m){
   document.querySelectorAll('.pay-btn').forEach(c=>c.classList.remove('selected'));
@@ -1258,92 +1276,78 @@ function selPay(m){
 }
 function copyUPI(){navigator.clipboard.writeText('adityachauhan0604@oksbi');showToast('✅ UPI ID copied!')}
 function copyCrypto(){navigator.clipboard.writeText('TNWWxebAmvDVh8Qz8bTrKbAkiHfKCHffc7');showToast('✅ Wallet copied!')}
-// ─── RAZORPAY CONFIG ───
-const RAZORPAY_KEY = 'rzp_test_YOUR_KEY_HERE'; // Replace with your Razorpay Key ID
+// ─── PAYMENT FUNCTIONS ───
+const UPI_ID = 'adityachauhan0604@oksbi';
+const INSTA = 'jobcrackai';
 
 const PLAN_AMOUNTS = {
-  jobseeker: { amount: 9900,  currency: 'INR', name: '💼 Job Seeker — 1 Month' },
-  global:    { amount: 82900, currency: 'INR', name: '✈️ Global Plan' },
-  lifetime:  { amount: 49900, currency: 'INR', name: '🏆 Career Pro — Lifetime' },
+  jobseeker: { name: '💼 Job Seeker — 1 Month', price: '₹99' },
+  global:    { name: '✈️ Global Plan',           price: '$9.99' },
+  lifetime:  { name: '🏆 Career Pro — Lifetime', price: '₹499' },
 };
+
+function copyUPI() {
+  navigator.clipboard.writeText(UPI_ID).then(() => showToast('✅ UPI ID copy ho gayi!'));
+}
+
+function previewScreenshot(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    document.getElementById('ssImg').src = ev.target.result;
+    document.getElementById('ssPreview').style.display = 'block';
+    document.getElementById('ssPlaceholder').style.display = 'none';
+    document.getElementById('mainPayBtn').textContent = '✅ Screenshot Upload Hua – Activate Karo';
+    document.getElementById('mainPayBtn').style.background = 'linear-gradient(135deg,var(--accent),#059669)';
+  };
+  reader.readAsDataURL(file);
+}
 
 function activatePremium(plan) {
   S.isPremium = true;
   localStorage.setItem('jcai_premium', '1');
-  localStorage.setItem('jcai_plan', plan);
-  localStorage.setItem('jcai_plan_expiry', Date.now() + 30*24*60*60*1000);
+  localStorage.setItem('jcai_plan', plan || 'jobseeker');
   document.getElementById('creditsBadge').textContent = '💎 Premium';
   closePayment();
   showToast('🎉 Premium activated! Ab unlimited interviews!');
 }
 
-function openRazorpay() {
-  handlePayment();
-}
-
 function handlePayment() {
   const plan = S.selPlan || 'jobseeker';
 
-  // Free trial
   if (plan === 'trial') {
     S.isPremium = true;
     localStorage.setItem('jcai_premium', '1');
     closePayment();
-    showToast('🆓 Free Trial shuru! 2 interviews milenge.');
+    showToast('🆓 Free Trial shuru!');
     document.getElementById('creditsBadge').textContent = '✅ Trial';
     return;
   }
 
-  const planInfo = PLAN_AMOUNTS[plan];
-  if (!planInfo) return;
+  const ssImg = document.getElementById('ssImg');
+  const hasScreenshot = ssImg && ssImg.src && ssImg.src.length > 100;
 
-  // If UPI selected — show manual + Razorpay both
-  const payMode = S.payM;
-
-  const options = {
-    key: RAZORPAY_KEY,
-    amount: planInfo.amount, // in paise
-    currency: planInfo.currency,
-    name: 'JobCrackAI',
-    description: planInfo.name,
-    image: 'https://img.icons8.com/emoji/96/briefcase-emoji.png',
-    prefill: {
-      name: '',
-      email: '',
-      contact: ''
-    },
-    theme: { color: '#22d3a5' },
-    handler: function(response) {
-      // Payment success — auto activate
-      console.log('Payment success:', response.razorpay_payment_id);
-      activatePremium(plan);
-    },
-    modal: {
-      ondismiss: function() {
-        // If UPI manual — show verify modal
-        if (payMode === 'upi') {
-          document.getElementById('verifyMsg').textContent =
-            'UPI screenshot @adityachauhan0604 pe Telegram karo. 1-2 ghante mein activate hoga.';
-          document.getElementById('verifyModal').classList.add('open');
-        }
-        showToast('Payment cancelled. Dobara try karo.');
-      }
-    }
-  };
-
-  try {
-    const rzp = new Razorpay(options);
-    rzp.on('payment.failed', function(response) {
-      showToast('❌ Payment failed: ' + response.error.description);
-    });
-    rzp.open();
-  } catch(e) {
-    // Razorpay not loaded or key not set — fallback to manual UPI
-    closePayment();
-    document.getElementById('verifyMsg').textContent =
-      'UPI ID: adityachauhan0604@oksbi\nPlan: ' + planInfo.name + '\nScreenshot Telegram pe bhejo: @adityachauhan0604';
-    document.getElementById('verifyModal').classList.add('open');
+  if (!hasScreenshot) {
+    showToast('⚠️ Pehle payment screenshot upload karo!');
+    document.getElementById('ssUploadBox').style.border = '2px dashed var(--danger)';
+    setTimeout(() => {
+      document.getElementById('ssUploadBox').style.border = '2px dashed var(--border2)';
+    }, 2000);
+    return;
   }
+
+  // Screenshot uploaded — activate premium + send via Instagram/Telegram
+  const btn = document.getElementById('mainPayBtn');
+  btn.textContent = '⏳ Activating...';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    activatePremium(plan);
+    btn.disabled = false;
+    // Open Instagram DM to notify
+    window.open('https://instagram.com/jobcrackai', '_blank');
+  }, 1200);
 }
 
 function confirmPay() { handlePayment(); }
@@ -1563,7 +1567,7 @@ Evaluate this answer and respond according to your instructions.`;
       document.getElementById('aiFeedbackLoader').style.display = 'none';
       document.getElementById('aiFeedbackText').textContent = '⚠️ Pehle Gemini API Key enter karo (upar settings mein) — bilkul free hai!';
       document.getElementById('aiNextAction').style.display = 'block';
-      document.getElementById('aiNextAction').innerHTML = '<button onclick="document.getElementById('apiKeySection').scrollIntoView()" style="background:rgba(34,211,165,0.15);border:1px solid rgba(34,211,165,0.3);color:var(--accent);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem">🔑 API Key Daalo</button>';
+      document.getElementById('aiNextAction').innerHTML = `<button onclick="document.getElementById('apiKeySection').scrollIntoView()" style="background:rgba(34,211,165,0.15);border:1px solid rgba(34,211,165,0.3);color:var(--accent);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem">🔑 API Key Daalo</button>`;
       return;
     }
     const fullPrompt = systemPrompt + '\n\n' + userMsg;
