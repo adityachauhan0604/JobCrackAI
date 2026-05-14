@@ -1175,33 +1175,53 @@ function speakText(text, onEndCb) {
   if (!window.speechSynthesis) { if(onEndCb) onEndCb(); return; }
   speechSynthesis.cancel();
 
-  function doSpeak() {
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = getLang();
-    u.rate = 0.88;
-    u.pitch = 1;
-    u.volume = 1;
-    const voice = getBestVoice(u.lang);
-    if (voice) u.voice = voice;
-    u.onend = () => { if (onEndCb) onEndCb(); };
-    u.onerror = (e) => { console.warn('Speech error:', e.error); if (onEndCb) onEndCb(); };
-    speechSynthesis.speak(u);
-  }
+  // Chrome bug: after cancel(), need small delay before speaking
+  setTimeout(() => {
+    function doSpeak() {
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = getLang();
+      u.rate = 0.85;
+      u.pitch = 1;
+      u.volume = 1;
+      const voice = getBestVoice(u.lang);
+      if (voice) u.voice = voice;
 
-  // Chrome needs voices to be loaded first
-  const voices = window.speechSynthesis.getVoices();
-  if (voices.length > 0) {
-    doSpeak();
-  } else {
-    window.speechSynthesis.onvoiceschanged = () => {
-      window.speechSynthesis.onvoiceschanged = null;
+      let endFired = false;
+      // Fallback timeout in case onend never fires (Chrome bug)
+      const estimatedMs = Math.max(2000, text.length * 75);
+      const fallback = setTimeout(() => {
+        if (!endFired) { endFired = true; if (onEndCb) onEndCb(); }
+      }, estimatedMs);
+
+      u.onend = () => {
+        if (!endFired) { endFired = true; clearTimeout(fallback); if (onEndCb) onEndCb(); }
+      };
+      u.onerror = (e) => {
+        console.warn('Speech error:', e.error);
+        if (!endFired) { endFired = true; clearTimeout(fallback); if (onEndCb) onEndCb(); }
+      };
+      speechSynthesis.speak(u);
+    }
+
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) {
       doSpeak();
-    };
-  }
+    } else {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.onvoiceschanged = null;
+        doSpeak();
+      };
+    }
+  }, 180);
 }
 
 function speakQ(text) {
-  speakText(text, null);
+  // After AI speaks question, auto-start mic
+  speakText(text, () => {
+    setTimeout(() => {
+      if (recognition && S.isRunning) startVoiceAnswer();
+    }, 600);
+  });
 }
 
 function toggleHint(){
@@ -1738,26 +1758,28 @@ function resetVoiceForNextQ() {
 // ─── HOOK into startInterview to show voice panel + init ───
 const _origStart = startInterview;
 startInterview = async function() {
-  await _origStart.call(this);
-  document.getElementById('voicePanel').style.display = 'block';
+  // Init voice FIRST so recognition exists before speakQ callback
   initVoiceSystem();
+  document.getElementById('voicePanel').style.display = 'block';
+  await _origStart.call(this);
 };
 
 // ─── HOOK into nextQ to reset voice ───
 const _origNextQ = nextQ;
 nextQ = function() {
   _origNextQ.call(this);
+  document.getElementById('voicePanel').style.display = 'block'; // always visible
   document.getElementById('aiFeedbackPanel').style.display = 'none';
   document.getElementById('aiNextAction').style.display = 'none';
   voiceTranscript = '';
   document.getElementById('transcriptPlaceholder').style.display = 'inline';
-  document.getElementById('transcriptPlaceholder').textContent = 'Bolna shuru karo... AI sun raha hai 👂';
+  document.getElementById('transcriptPlaceholder').textContent = 'AI question bol raha hai... phir automatically sun ega 🎙️';
   document.getElementById('transcriptText').style.display = 'none';
   document.getElementById('startVoiceBtn').style.display = 'inline-flex';
   document.getElementById('stopVoiceBtn').style.display = 'none';
   document.getElementById('submitVoiceBtn').style.display = 'none';
   document.getElementById('voiceListenDot').style.display = 'none';
-  document.getElementById('voicePanelTitle').textContent = '🎙️ Listning...';
+  document.getElementById('voicePanelTitle').textContent = '🎙️ AI Bol Raha Hai...';
 };
 </script>
 </body>
