@@ -857,11 +857,45 @@
         </div>
 
         <!-- Plans -->
-        <div class="plan-card selected" id="plan-lifetime" onclick="selectPlan('lifetime')">
-            <div class="plan-badge">BEST</div>
-            <div class="plan-name">Lifetime Access</div>
-            <div class="plan-price" id="planPrice">₹99</div>
-            <div class="plan-features">✓ Unlimited interviews<br>✓ All 7 languages<br>✓ All 50+ countries<br>✓ CV builder (coming soon)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+
+            <!-- Trial -->
+            <div class="plan-card" id="plan-trial" onclick="selectPlan('trial')" style="position:relative">
+                <div class="plan-badge" style="background:var(--muted);color:#fff;font-size:0.65rem">FREE</div>
+                <div class="plan-name" style="font-size:0.88rem">🆓 Trial</div>
+                <div class="plan-price" style="font-size:1.2rem;color:var(--muted)">₹0</div>
+                <div class="plan-features" style="font-size:0.75rem">✓ 2 mock interviews<br>✓ Basic feedback<br>✓ 1 language only</div>
+            </div>
+
+            <!-- Job Seeker -->
+            <div class="plan-card selected" id="plan-jobseeker" onclick="selectPlan('jobseeker')" style="position:relative">
+                <div class="plan-badge" style="font-size:0.65rem">POPULAR</div>
+                <div class="plan-name" style="font-size:0.88rem">💼 Job Seeker</div>
+                <div class="plan-price" style="font-size:1.2rem" id="planPrice">₹99</div>
+                <div class="plan-features" style="font-size:0.75rem">✓ 1 month unlimited<br>✓ Hindi + English<br>✓ 10th pass job tips</div>
+            </div>
+
+            <!-- Global Migrant -->
+            <div class="plan-card" id="plan-global" onclick="selectPlan('global')" style="position:relative">
+                <div class="plan-badge" style="background:linear-gradient(135deg,#3b82f6,#a855f7);color:#fff;font-size:0.65rem">🌍 GULF</div>
+                <div class="plan-name" style="font-size:0.88rem">✈️ Global Migrant</div>
+                <div class="plan-price" style="font-size:1.2rem;color:var(--accent2)">$9.99</div>
+                <div class="plan-features" style="font-size:0.75rem">✓ All 7+ languages<br>✓ Country-specific style<br>✓ Visa interview prep</div>
+            </div>
+
+            <!-- Career Pro Lifetime -->
+            <div class="plan-card" id="plan-lifetime" onclick="selectPlan('lifetime')" style="position:relative">
+                <div class="plan-badge" style="background:linear-gradient(135deg,var(--gold),#ef4444);color:#fff;font-size:0.65rem">👑 BEST</div>
+                <div class="plan-name" style="font-size:0.88rem">🏆 Career Pro</div>
+                <div class="plan-price" style="font-size:1.2rem;color:var(--gold)">₹499</div>
+                <div class="plan-features" style="font-size:0.75rem">✓ Lifetime access<br>✓ AI Resume Builder<br>✓ All future features</div>
+            </div>
+        </div>
+
+        <!-- Selected plan summary -->
+        <div id="planSummary" style="background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:0.85rem;display:flex;justify-content:space-between;align-items:center">
+            <span id="planSummaryName" style="font-weight:600">💼 Job Seeker — 1 Month</span>
+            <span id="planSummaryPrice" style="color:var(--accent);font-weight:700">₹99</span>
         </div>
 
         <!-- Payment Method -->
@@ -988,7 +1022,9 @@ const state = {
     localStream: null,
     audioContext: null,
     analyserNode: null,
-    metricsInterval: null
+    metricsInterval: null,
+    selectedPlan: 'jobseeker',
+    payMethod: 'upi'
 };
 
 // ─── QUESTIONS DB (Multi-language, Multi-country, Multi-job) ──
@@ -1674,9 +1710,37 @@ function openPayment() {
 function closePayment() {
     document.getElementById('paymentModal').classList.remove('open');
 }
+const PLAN_INFO = {
+    trial:     { name: '🆓 Trial — Free',           price: '₹0',    upiNote: 'Free plan — no payment needed', isFree: true },
+    jobseeker: { name: '💼 Job Seeker — 1 Month',   price: '₹99',   upiNote: '₹99 bhejo UPI pe', isFree: false },
+    global:    { name: '✈️ Global Migrant',          price: '$9.99', upiNote: '$9.99 equivalent bhejo (approx ₹830)', isFree: false },
+    lifetime:  { name: '🏆 Career Pro — Lifetime',  price: '₹499',  upiNote: '₹499 bhejo UPI pe', isFree: false }
+};
 function selectPlan(p) {
     document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
     document.getElementById('plan-' + p).classList.add('selected');
+    state.selectedPlan = p;
+    const info = PLAN_INFO[p];
+    document.getElementById('planSummaryName').textContent = info.name;
+    document.getElementById('planSummaryPrice').textContent = info.price;
+    // Update UPI note
+    const upiNote = document.querySelector('#upiSection p:last-child');
+    if (upiNote && !info.isFree) {
+        upiNote.innerHTML = info.upiNote + ' → screenshot Telegram pe bhejo <strong style="color:var(--accent)">@adityachauhan0604</strong>';
+    }
+    // Hide payment methods for free trial
+    const payMethods = document.querySelector('.payment-methods');
+    const upiSection = document.getElementById('upiSection');
+    const btnPay = document.querySelector('.btn-pay');
+    if (info.isFree) {
+        payMethods.style.display = 'none';
+        upiSection.style.display = 'none';
+        btnPay.textContent = '🆓 Start Free Trial';
+    } else {
+        payMethods.style.display = 'flex';
+        btnPay.textContent = '✅ I've Paid – Activate Now';
+        selectPayMethod('upi');
+    }
 }
 function selectPayMethod(m) {
     document.querySelectorAll('.pay-method').forEach(c => c.classList.remove('selected'));
@@ -1690,6 +1754,15 @@ function copyUPI() {
     showToast('UPI ID copied!');
 }
 function confirmPayment() {
+    // Free trial — activate immediately with limits
+    if (state.selectedPlan === 'trial') {
+        state.credits = 2;
+        localStorage.setItem('jcai_credits', '2');
+        closePayment();
+        showToast('🆓 Free Trial activated! 2 interviews ready.');
+        document.getElementById('creditsBadge').textContent = '⚡ 2 Free Left';
+        return;
+    }
     const method = state.payMethod || 'upi';
     // Show verification pending UI
     const btn = document.querySelector('.btn-pay');
@@ -1697,8 +1770,10 @@ function confirmPayment() {
     btn.disabled = true;
 
     // Show verification instructions
+    const planLabel = PLAN_INFO[state.selectedPlan || 'jobseeker'].name;
+    const planPrice = PLAN_INFO[state.selectedPlan || 'jobseeker'].price;
     const verifyMsg = method === 'upi'
-        ? 'UPI payment screenshot Telegram pe bhejo: @adityachauhan0604\n\nVerification ke baad 2-4 ghante mein Premium activate hoga.'
+        ? `Plan: ${planLabel} (${planPrice})\nUPI screenshot Telegram pe bhejo: @adityachauhan0604\n\nVerification ke baad 2-4 ghante mein activate hoga.`
         : method === 'crypto'
         ? 'TRC20 transaction screenshot Telegram pe bhejo: @adityachauhan0604\n\nVerification ke baad 2-4 ghante mein Premium activate hoga.'
         : 'Payment screenshot Telegram pe bhejo: @adityachauhan0604';
