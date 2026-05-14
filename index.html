@@ -491,6 +491,16 @@ footer{
     JobCrackAI
   </div>
   <div class="header-right">
+    <div id="apiKeySection" style="display:flex;align-items:center;gap:6px">
+      <input id="geminiApiKey" type="password" placeholder="🔑 Gemini API Key (free)"
+        style="width:190px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);
+        padding:5px 10px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.8rem;outline:none"
+        oninput="saveKey(this.value)"
+        title="Google Gemini API key — alag.ai/gemini se free mein milti hai">
+      <a href="https://aistudio.google.com/app/apikey" target="_blank"
+        style="font-size:0.72rem;color:var(--accent);text-decoration:none;white-space:nowrap"
+        title="Free key lene ke liye click karo">Free key lao ↗</a>
+    </div>
     <div class="lang-selector" onclick="toggleLangDrop()">
       <span id="selFlag">🇮🇳</span>
       <span id="selLang">Hindi</span>
@@ -1261,6 +1271,16 @@ function confirmPay(){
 }
 function closeVerify(){document.getElementById('verifyModal').classList.remove('open')}
 
+// ─── API KEY SAVE ───
+function saveKey(v){
+  window._GEMINI_KEY=v;
+  if(v.length>10) localStorage.setItem('jcai_gemini_key',v);
+}
+(function(){
+  const k=localStorage.getItem('jcai_gemini_key');
+  if(k){window._GEMINI_KEY=k;const el=document.getElementById('geminiApiKey');if(el)el.value=k;}
+})();
+
 // ─── ADMIN ACTIVATION ───
 (function(){
   if(S.isPremium)document.getElementById('creditsBadge').textContent='💎 Premium';
@@ -1421,18 +1441,28 @@ Candidate's Answer: "${answer}"
 Evaluate this answer and respond according to your instructions.`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const GEMINI_KEY = document.getElementById('geminiApiKey').value.trim() || window._GEMINI_KEY || '';
+    if (!GEMINI_KEY) {
+      document.getElementById('aiFeedbackLoader').style.display = 'none';
+      document.getElementById('aiFeedbackText').textContent = '⚠️ Pehle Gemini API Key enter karo (upar settings mein) — bilkul free hai!';
+      document.getElementById('aiNextAction').style.display = 'block';
+      document.getElementById('aiNextAction').innerHTML = '<button onclick="document.getElementById('apiKeySection').scrollIntoView()" style="background:rgba(34,211,165,0.15);border:1px solid rgba(34,211,165,0.3);color:var(--accent);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem">🔑 API Key Daalo</button>';
+      return;
+    }
+    const fullPrompt = systemPrompt + '
+
+' + userMsg;
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + GEMINI_KEY, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userMsg }]
+        contents: [{ parts: [{ text: fullPrompt }] }],
+        generationConfig: { maxOutputTokens: 500, temperature: 0.7 }
       })
     });
     const data = await res.json();
-    const rawText = data.content?.map(c => c.text || '').join('') || '';
+    if (data.error) throw new Error(data.error.message);
+    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
     // Parse response
     const feedbackMatch = rawText.match(/FEEDBACK:\s*([\s\S]*?)(?:ACTION:|$)/);
