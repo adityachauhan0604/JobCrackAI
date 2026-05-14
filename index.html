@@ -178,6 +178,7 @@ h1 em{color:var(--accent);font-style:normal}
 .interview-area{display:none}
 .interview-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 @media(max-width:700px){.interview-grid{grid-template-columns:1fr}}
+@media(max-width:480px){.tips-grid{grid-template-columns:1fr}.header-right{gap:6px}.btn-premium{padding:5px 10px;font-size:0.78rem}}
 
 .video-card{
   background:var(--surface);border:1px solid var(--border);
@@ -469,6 +470,11 @@ h1 em{color:var(--accent);font-style:normal}
 /* ROTATING RING for AI avatar */
 @keyframes rotateRing{from{stroke-dashoffset:200}to{stroke-dashoffset:0}}
 
+/* MIC PULSE RING */
+@keyframes micPulse{0%{box-shadow:0 0 0 0 rgba(34,211,165,0.5)}70%{box-shadow:0 0 0 14px rgba(34,211,165,0)}100%{box-shadow:0 0 0 0 rgba(34,211,165,0)}}
+.mic-listening{animation:micPulse 1.2s infinite!important;border-color:var(--accent)!important;background:rgba(34,211,165,0.15)!important;color:var(--accent)!important}
+@keyframes micPulseRed{0%{box-shadow:0 0 0 0 rgba(244,63,94,0.5)}70%{box-shadow:0 0 0 14px rgba(244,63,94,0)}100%{box-shadow:0 0 0 0 rgba(244,63,94,0)}}
+
 footer{
   background:var(--surface);border-top:1px solid var(--border);
   padding:28px 20px;text-align:center;position:relative;z-index:1
@@ -543,6 +549,9 @@ footer{
     </div>
   </div>
 
+  <!-- PROGRESS BANNER -->
+  <div id="progressBanner" style="display:none;align-items:center;justify-content:center;gap:10px;background:rgba(34,211,165,0.07);border:1px solid rgba(34,211,165,0.18);border-radius:14px;padding:12px 20px;margin-bottom:20px;font-size:0.85rem;color:var(--muted2);text-align:center;flex-wrap:wrap"></div>
+
   <!-- SETUP PANEL -->
   <div class="setup-panel" id="setupPanel">
     <div class="setup-grid">
@@ -552,6 +561,10 @@ footer{
           <div class="pill active" data-val="beginner" onclick="setPill(this,'levelGroup','level')">🆕 Beginner</div>
           <div class="pill" data-val="intermediate" onclick="setPill(this,'levelGroup','level')">⚡ Intermediate</div>
           <div class="pill" data-val="expert" onclick="setPill(this,'levelGroup','level')">👑 Expert</div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:7px;flex-wrap:wrap">
+          <a href="beginner.html" style="font-size:0.73rem;padding:4px 11px;border-radius:7px;background:rgba(34,211,165,0.08);border:1px solid rgba(34,211,165,0.2);color:var(--accent);text-decoration:none;font-weight:600">🆕 Beginner Practice Page ↗</a>
+          <a href="intermediate.html" style="font-size:0.73rem;padding:4px 11px;border-radius:7px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);color:#a5b4fc;text-decoration:none;font-weight:600">⚡ Intermediate Practice Page ↗</a>
         </div>
       </div>
       <div class="setup-group">
@@ -1146,7 +1159,10 @@ function nextQ(){
   document.getElementById('hintText').textContent=HINTS[S.job]||"Answer structure: Situation → Action → Result";
   speakQ(q);
   S.qTimeLeft=45;document.getElementById('timerVal').textContent='45s';
-  S.qTimerInt=setInterval(()=>{
+  S.qTimerInt=setInterval(()=>{\
+    // Pause timer while user is actively answering or AI is giving feedback
+    if(voiceActive) return;
+    if(document.getElementById('aiFeedbackPanel').style.display==='block') return;
     S.qTimeLeft--;
     const tv=document.getElementById('timerVal');
     tv.textContent=S.qTimeLeft+'s';
@@ -1286,17 +1302,24 @@ function toggleMute(){
 // ─── END ───
 function endSession(){
   clearInterval(S.metricsInt);clearInterval(S.timerInt);clearInterval(S.qTimerInt);
+  clearTimeout(silenceTimer);
   stopTipsRotation();
+  voiceActive = false;
+  if(recognition){try{recognition.abort();}catch(e){}}
   if(S.localStream)S.localStream.getTracks().forEach(t=>t.stop());
   speechSynthesis.cancel();
+  // Save progress before resetting
+  if(S.qNum > 0) saveProgress();
   document.getElementById('interviewArea').style.display='none';
   document.getElementById('setupPanel').style.display='block';
   document.getElementById('startBtn').style.display='block';
   document.getElementById('howSection').style.display='block';
   document.getElementById('sessionStats').style.display='none';
   document.getElementById('scoreHistoryPanel').style.display='none';
+  document.getElementById('voicePanel').style.display='none';
   S.isRunning=false;
-  showToast(`✅ Session done! ${S.qNum} questions • Avg ${S.totalScore}%`);
+  showProgressBanner();
+  showToast(`✅ Session done! ${S.qNum} questions • Avg ${S.totalScore}% • Progress saved!`);
 }
 
 // ─── SESSION TIMER ───
@@ -1447,9 +1470,12 @@ function saveKey(v){
   if(v.length>10) localStorage.setItem('jcai_gemini_key',v);
 }
 (function(){
-  window._GEMINI_KEY = 'AIzaSyA16hi_4woA9u_sWw4zRmV3RcPXSfTSQyw';
-  const k=localStorage.getItem('jcai_gemini_key') || 'AIzaSyA16hi_4woA9u_sWw4zRmV3RcPXSfTSQyw';
+  // Load saved key from localStorage only — no hardcoded key in source
+  const k=localStorage.getItem('jcai_gemini_key')||'';
   if(k){window._GEMINI_KEY=k;const el=document.getElementById('geminiApiKey');if(el)el.value=k;}
+  // Show API key input section so user can enter it
+  const sec=document.getElementById('apiKeySection');
+  if(sec) sec.style.display='flex';
 })();
 
 // ─── ADMIN ACTIVATION ───
@@ -1458,8 +1484,37 @@ function saveKey(v){
   document.getElementById('creditsBadge').textContent='✅ Free';
   const p=new URLSearchParams(window.location.search);
   if(p.get('activate')==='jcai2025admin'){S.isPremium=true;localStorage.setItem('jcai_premium','1');document.getElementById('creditsBadge').textContent='💎 Premium';showToast('🎉 Premium activated!')}
+  // Show saved progress on load
+  showProgressBanner();
 })();
 
+
+// ─── PROGRESS PERSISTENCE ───
+function saveProgress() {
+  const data = {
+    totalSessions: (getProgress().totalSessions || 0) + 1,
+    totalQuestions: (getProgress().totalQuestions || 0) + S.qNum,
+    lastScore: S.totalScore,
+    bestScore: Math.max(getProgress().bestScore || 0, S.totalScore),
+    avgScore: Math.round(((getProgress().avgScore || 0) * (getProgress().totalSessions || 0) + S.totalScore) / ((getProgress().totalSessions || 0) + 1)),
+    lastJob: S.job,
+    lastLevel: S.level,
+    lastPlayed: new Date().toLocaleDateString('hi-IN'),
+    scoreHistory: [...(getProgress().scoreHistory || []), ...S.scoreHistory].slice(-50)
+  };
+  localStorage.setItem('jcai_progress', JSON.stringify(data));
+}
+function getProgress() {
+  try { return JSON.parse(localStorage.getItem('jcai_progress') || '{}'); } catch(e) { return {}; }
+}
+function showProgressBanner() {
+  const p = getProgress();
+  if (!p.totalSessions) return;
+  const banner = document.getElementById('progressBanner');
+  if (!banner) return;
+  banner.innerHTML = `<span>📊 Total: <strong style="color:var(--accent)">${p.totalQuestions}</strong> questions • Best: <strong style="color:var(--gold)">${p.bestScore}%</strong> • Sessions: <strong>${p.totalSessions}</strong> • Last: ${p.lastPlayed}</span>`;
+  banner.style.display = 'flex';
+}
 
 // ─── TOAST ───
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500)}
@@ -1576,6 +1631,7 @@ function startVoiceAnswer() {
   document.getElementById('aiNextAction').style.display = 'none';
   document.getElementById('startVoiceBtn').style.display = 'none';
   document.getElementById('stopVoiceBtn').style.display = 'inline-flex';
+  document.getElementById('stopVoiceBtn').classList.add('mic-listening');
   document.getElementById('submitVoiceBtn').style.display = 'none';
   document.getElementById('voiceListenDot').style.display = 'inline-block';
   document.getElementById('voicePanelTitle').textContent = '🎙️ Sun Raha Hoon... Jawab Do';
@@ -1600,6 +1656,7 @@ function stopVoiceAnswer() {
   if (recognition) recognition.stop();
   document.getElementById('startVoiceBtn').style.display = 'inline-flex';
   document.getElementById('stopVoiceBtn').style.display = 'none';
+  document.getElementById('stopVoiceBtn').classList.remove('mic-listening');
   document.getElementById('voiceListenDot').style.display = 'none';
   document.getElementById('aiStatus').textContent = 'Processing answer...';
   if (voiceTranscript.trim().length > 5) {
@@ -1650,7 +1707,7 @@ Candidate's Answer: "${answer}"
 Evaluate this answer and respond according to your instructions.`;
 
   try {
-    const GEMINI_KEY = document.getElementById('geminiApiKey').value.trim() || window._GEMINI_KEY || 'AIzaSyA16hi_4woA9u_sWw4zRmV3RcPXSfTSQyw';
+    const GEMINI_KEY = document.getElementById('geminiApiKey').value.trim() || window._GEMINI_KEY || '';
     if (!GEMINI_KEY) {
       document.getElementById('aiFeedbackLoader').style.display = 'none';
       document.getElementById('aiFeedbackText').textContent = '⚠️ Pehle Gemini API Key enter karo (upar settings mein) — bilkul free hai!';
@@ -1728,9 +1785,13 @@ Evaluate this answer and respond according to your instructions.`;
     }
   } catch (err) {
     document.getElementById('aiFeedbackLoader').style.display = 'none';
-    document.getElementById('aiFeedbackText').textContent = '⚠️ AI feedback load nahi hua. Internet check karo ya Next Question dabao.';
+    document.getElementById('aiFeedbackText').textContent = '⚠️ AI feedback load nahi hua — internet check karo ya retry karo.';
     document.getElementById('aiNextAction').style.display = 'block';
-    document.getElementById('aiNextAction').innerHTML = `<button onclick="nextQ()" style="background:rgba(34,211,165,0.15);border:1px solid rgba(34,211,165,0.3);color:var(--accent);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem">➡️ Agla Question</button>`;
+    document.getElementById('aiNextAction').innerHTML = `
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="submitAnswerToAI()" style="background:rgba(34,211,165,0.15);border:1px solid rgba(34,211,165,0.3);color:var(--accent);padding:5px 14px;border-radius:6px;cursor:pointer;font-size:0.82rem;font-weight:600">🔄 Retry</button>
+        <button onclick="nextQ()" style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.25);color:#a5b4fc;padding:5px 14px;border-radius:6px;cursor:pointer;font-size:0.82rem">➡️ Skip</button>
+      </div>`;
     console.error('AI feedback error:', err);
   }
 }
