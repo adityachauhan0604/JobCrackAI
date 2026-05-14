@@ -721,14 +721,15 @@ footer{
       </div>
       <div id="transcriptBox" style="min-height:56px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;font-size:0.9rem;color:var(--text);line-height:1.7;position:relative">
         <span style="color:var(--muted)" id="transcriptPlaceholder">Bolna shuru karo... AI sun raha hai 👂</span>
+        <span id="silenceCountdown" style="display:none;position:absolute;right:10px;bottom:8px;font-size:0.75rem;color:var(--accent);font-weight:700"></span>
         <span id="transcriptText" style="display:none"></span>
       </div>
       <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
         <button id="startVoiceBtn" onclick="startVoiceAnswer()" style="background:rgba(34,211,165,0.12);border:1px solid rgba(34,211,165,0.3);color:var(--accent);padding:6px 14px;border-radius:8px;font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">
-          🎙️ Bolna Shuru Karo
+          🎙️ Jawab Do (Auto-Submit)
         </button>
         <button id="stopVoiceBtn" onclick="stopVoiceAnswer()" style="display:none;background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.3);color:var(--danger);padding:6px 14px;border-radius:8px;font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">
-          ⏹ Ruk Jao – AI Ko Do
+          ⏹ Ruk Jao (ya chup raho 2s)
         </button>
         <button id="submitVoiceBtn" onclick="submitAnswerToAI()" style="display:none;background:linear-gradient(135deg,var(--accent2),#4f46e5);border:none;color:white;padding:6px 16px;border-radius:8px;font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:700">
           ✅ AI Se Feedback Lo
@@ -1297,6 +1298,8 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 let recognition = null;
 let voiceTranscript = '';
 let voiceActive = false;
+let silenceTimer = null;
+const SILENCE_DELAY = 2000; // 2 second silence → auto submit
 
 function initVoiceSystem() {
   if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -1332,6 +1335,36 @@ function initVoiceSystem() {
       document.getElementById('transcriptText').style.display = 'inline';
       document.getElementById('transcriptText').textContent = display;
     }
+    // AUTO-SUBMIT on 2s silence
+    if (voiceActive) {
+      clearTimeout(silenceTimer);
+      const cd = document.getElementById('silenceCountdown');
+      if (cd) cd.style.display = 'none';
+      if (voiceTranscript.trim().length > 5) {
+        // Show countdown
+        let remaining = 2;
+        if (cd) { cd.style.display = 'inline'; cd.textContent = '⏳ ' + remaining + 's'; }
+        const tick = setInterval(() => {
+          remaining--;
+          if (cd && remaining > 0) cd.textContent = '⏳ ' + remaining + 's';
+          else clearInterval(tick);
+        }, 1000);
+        silenceTimer = setTimeout(() => {
+          clearInterval(tick);
+          if (cd) cd.style.display = 'none';
+          if (voiceActive) {
+            voiceActive = false;
+            if (recognition) recognition.stop();
+            document.getElementById('voicePanelTitle').textContent = '⚡ Jawab mil gaya – AI process kar raha hai...';
+            document.getElementById('voiceListenDot').style.display = 'none';
+            document.getElementById('startVoiceBtn').style.display = 'none';
+            document.getElementById('stopVoiceBtn').style.display = 'none';
+            document.getElementById('submitVoiceBtn').style.display = 'none';
+            submitAnswerToAI();
+          }
+        }, SILENCE_DELAY);
+      }
+    }
   };
 
   recognition.onend = () => {
@@ -1360,6 +1393,9 @@ function initVoiceSystem() {
 function startVoiceAnswer() {
   if (!recognition) { showToast('❌ Voice recognition not available'); return; }
   // Reset
+  clearTimeout(silenceTimer);
+  const cd = document.getElementById('silenceCountdown');
+  if (cd) cd.style.display = 'none';
   voiceTranscript = '';
   voiceActive = true;
   document.getElementById('transcriptPlaceholder').style.display = 'inline';
@@ -1389,6 +1425,7 @@ function startVoiceAnswer() {
 }
 
 function stopVoiceAnswer() {
+  clearTimeout(silenceTimer);
   voiceActive = false;
   if (recognition) recognition.stop();
   document.getElementById('startVoiceBtn').style.display = 'inline-flex';
@@ -1396,8 +1433,10 @@ function stopVoiceAnswer() {
   document.getElementById('voiceListenDot').style.display = 'none';
   document.getElementById('aiStatus').textContent = 'Processing answer...';
   if (voiceTranscript.trim().length > 5) {
-    document.getElementById('submitVoiceBtn').style.display = 'inline-flex';
-    document.getElementById('voicePanelTitle').textContent = '✅ Jawab Ready – AI Ko Bhejo';
+    // Auto submit immediately on manual stop too
+    document.getElementById('voicePanelTitle').textContent = '⚡ AI process kar raha hai...';
+    submitAnswerToAI();
+    return;
   } else {
     document.getElementById('transcriptPlaceholder').style.display = 'inline';
     document.getElementById('transcriptPlaceholder').textContent = 'Kuch zyada nahi suna... dobara try karo 🎤';
@@ -1450,7 +1489,8 @@ Evaluate this answer and respond according to your instructions.`;
       return;
     }
     const fullPrompt = systemPrompt + '\n\n' + userMsg;
-    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + GEMINI_KEY, {
+    // ── Streaming call for instant feedback ──
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:streamGenerateContent?alt=sse&key=' + GEMINI_KEY, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1458,11 +1498,39 @@ Evaluate this answer and respond according to your instructions.`;
         generationConfig: { maxOutputTokens: 500, temperature: 0.7 }
       })
     });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    document.getElementById('aiFeedbackLoader').style.display = 'none';
+    document.getElementById('aiFeedbackPanel').style.display = 'block';
+    document.getElementById('aiFeedbackText').textContent = '';
 
-    // Parse response
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let rawText = '';
+    let streamDone = false;
+    while (!streamDone) {
+      const { done, value } = await reader.read();
+      if (done) { streamDone = true; break; }
+      const chunk = decoder.decode(value, { stream: true });
+      const lines = chunk.split('\n');
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const jsonStr = line.slice(6).trim();
+        if (jsonStr === '[DONE]') { streamDone = true; break; }
+        try {
+          const parsed = JSON.parse(jsonStr);
+          const piece = parsed.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          if (piece) {
+            rawText += piece;
+            // Show partial feedback immediately (just FEEDBACK part)
+            const partialFB = rawText.match(/FEEDBACK:\s*([\s\S]*?)(?:ACTION:|$)/);
+            if (partialFB) document.getElementById('aiFeedbackText').textContent = partialFB[1].trim();
+            else document.getElementById('aiFeedbackText').textContent = rawText;
+          }
+        } catch(_) {}
+      }
+    }
+
+    // Parse final
     const feedbackMatch = rawText.match(/FEEDBACK:\s*([\s\S]*?)(?:ACTION:|$)/);
     const actionMatch = rawText.match(/ACTION:\s*(\w+)/);
     const nextQMatch = rawText.match(/NEXT_Q:\s*([\s\S]*?)$/);
@@ -1471,7 +1539,6 @@ Evaluate this answer and respond according to your instructions.`;
     const action = actionMatch ? actionMatch[1].trim() : 'NEXT_QUESTION';
     const nextQ = nextQMatch ? nextQMatch[1].trim() : '';
 
-    document.getElementById('aiFeedbackLoader').style.display = 'none';
     document.getElementById('aiFeedbackText').textContent = feedbackText;
     document.getElementById('aiStatus').textContent = 'AI Interviewer is speaking...';
 
@@ -1483,9 +1550,22 @@ Evaluate this answer and respond according to your instructions.`;
       speechSynthesis.speak(utter);
       utter.onend = () => {
         document.getElementById('aiStatus').textContent = 'Listening...';
-        // If next question, speak it too
+        // If next question, speak it too then auto-start mic
         if (action === 'NEXT_QUESTION' && nextQ) {
-          setTimeout(() => speakQ(nextQ), 600);
+          const q2 = new SpeechSynthesisUtterance(nextQ);
+          q2.lang = utter.lang; q2.rate = 0.88;
+          q2.onend = () => {
+            setTimeout(() => {
+              resetVoiceForNextQ();
+              startVoiceAnswer();
+            }, 600);
+          };
+          setTimeout(() => speechSynthesis.speak(q2), 600);
+        } else if (action === 'RETRY') {
+          setTimeout(() => { resetVoiceForRetry(); startVoiceAnswer(); }, 800);
+        } else {
+          // No next q from AI — just auto-start for retry
+          setTimeout(() => { resetVoiceForNextQ(); startVoiceAnswer(); }, 800);
         }
       };
     }
@@ -1560,4 +1640,4 @@ nextQ = function() {
 };
 </script>
 </body>
-</html> 
+</html>
