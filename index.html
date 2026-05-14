@@ -505,6 +505,10 @@
             </div>
         </div>
         <span class="credits-badge" id="creditsBadge">⚡ 5 Free Left</span>
+        <a href="https://t.me/adityachauhan0604" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;background:rgba(0,136,204,0.15);border:1px solid rgba(0,136,204,0.35);color:#38bdf8;font-size:0.85rem;font-weight:600;text-decoration:none;transition:opacity 0.2s" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#38bdf8"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.014 9.492c-.148.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.877.729z"/></svg>
+            Support
+        </a>
         <button class="btn-upgrade" onclick="openPayment()">💎 Go Premium</button>
     </div>
 </header>
@@ -655,6 +659,33 @@
             </div>
         </div>
 
+        <!-- AI LIVE TIPS PANEL -->
+        <div id="aiTipsPanel" style="display:none;background:var(--surface);border:1px solid rgba(0,229,160,0.2);border-radius:16px;padding:16px 20px;margin-bottom:16px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+                <span style="font-size:1rem">🤖</span>
+                <span style="font-size:0.82rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em">AI Live Coach Tips</span>
+                <span style="margin-left:auto;width:8px;height:8px;background:var(--accent);border-radius:50%;animation:pulse 1.2s infinite"></span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="liveTipsGrid">
+                <div style="background:var(--surface2);border-radius:10px;padding:10px 12px">
+                    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:4px">👁️ FAKE EYE CONTACT</div>
+                    <div style="font-size:0.82rem;line-height:1.4" id="eyeTip">Camera ko dekho, screen ko nahi. Camera ke theek upar ek dot lagao tape se — wahi dekho jabte baat karo.</div>
+                </div>
+                <div style="background:var(--surface2);border-radius:10px;padding:10px 12px">
+                    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:4px">🧍 POSTURE TIP</div>
+                    <div style="font-size:0.82rem;line-height:1.4" id="postureTip">Seedha baitho. Shoulders peeche. Chin slightly up rakho — yeh confident dikhata hai.</div>
+                </div>
+                <div style="background:var(--surface2);border-radius:10px;padding:10px 12px">
+                    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:4px">💡 REAL-TIME ADVICE</div>
+                    <div style="font-size:0.82rem;line-height:1.4" id="realtimeTip">Ab interview shuru karo. AI har jawaab ke baad live feedback dega...</div>
+                </div>
+                <div style="background:var(--surface2);border-radius:10px;padding:10px 12px">
+                    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:4px">🎤 SPEECH PACE</div>
+                    <div style="font-size:0.82rem;line-height:1.4" id="speechTip">Dheere bolo. Ek deep breath lo answer se pehle. 45 second kafi hain — jaldi mat karo.</div>
+                </div>
+            </div>
+        </div>
+
         <!-- QUESTION CARD -->
         <div class="question-card">
             <div class="q-header">
@@ -756,8 +787,8 @@
             <div class="pay-method" id="pm-card" onclick="selectPayMethod('card')">
                 <div class="pay-icon">💳</div>Card
             </div>
-            <div class="pay-method" id="pm-paypal" onclick="selectPayMethod('paypal')">
-                <div class="pay-icon">🅿️</div>PayPal
+            <div class="pay-method" id="pm-crypto" onclick="selectPayMethod('crypto')">
+                <div class="pay-icon">🪙</div>Crypto
             </div>
         </div>
 
@@ -766,7 +797,7 @@
             <p style="color:var(--muted);font-size:0.85rem;margin-bottom:6px">Send payment to:</p>
             <div class="upi-id" id="upiIdText">adityachauhan0604@oksbi</div><br>
             <button class="btn-copy" onclick="copyUPI()">📋 Copy UPI ID</button>
-            <p style="color:var(--muted);font-size:0.78rem;margin-top:10px">After paying, WhatsApp screenshot to get activated</p>
+            <p style="color:var(--muted);font-size:0.78rem;margin-top:10px">After paying, send screenshot on Telegram <strong style="color:var(--accent)">@adityachauhan0604</strong> to get activated</p>
         </div>
 
         <!-- Card Section -->
@@ -777,13 +808,12 @@
             </div>
         </div>
 
-        <!-- PayPal Section -->
-        <div id="paypalSection" style="display:none">
-            <p style="color:var(--muted);font-size:0.85rem;margin-bottom:10px">PayPal — add your PayPal.me link below</p>
-            <a href="https://paypal.me/YOURLINK" target="_blank"
-               style="display:block;text-align:center;padding:12px;background:rgba(0,112,243,0.15);border:1px solid rgba(0,112,243,0.3);border-radius:12px;color:#60a5fa;text-decoration:none;font-weight:600">
-               Pay via PayPal.me →
-            </a>
+        <!-- Crypto Section -->
+        <div id="cryptoSection" style="display:none">
+            <p style="color:var(--muted);font-size:0.85rem;margin-bottom:8px">Send USDT/TRX on <strong style="color:#22d3ee">TRON (TRC20)</strong> network:</p>
+            <div class="upi-id" id="cryptoAddr" style="font-size:0.72rem;word-break:break-all;letter-spacing:0.02em">TNWWxebAmvDVh8Qz8bTrKbAkiHfKCHffc7</div><br>
+            <button class="btn-copy" onclick="copyCrypto()">📋 Copy Wallet Address</button>
+            <p style="color:var(--muted);font-size:0.78rem;margin-top:10px">⚠️ TRC20 network only. After paying, send screenshot on Telegram <strong style="color:var(--accent)">@adityachauhan0604</strong></p>
         </div>
 
         <button class="btn-pay" onclick="confirmPayment()">✅ I've Paid – Activate Now</button>
@@ -1122,6 +1152,9 @@ async function startInterview() {
     await initAudio();
     nextQuestion();
     startMetricsLoop();
+    // Show AI live tips panel
+    document.getElementById('aiTipsPanel').style.display = 'block';
+    startLiveTipsRotation();
 }
 
 // ─── CAMERA ───────────────────────────────────────────────
@@ -1177,6 +1210,21 @@ function startMetricsLoop() {
         state.totalScore = avg;
         document.getElementById('sessScore').textContent = avg + '%';
 
+        // Update realtime AI tip based on scores
+        if (document.getElementById('aiTipsPanel').style.display !== 'none') {
+            let rtTip = '';
+            if (eye < 65) rtTip = '⚠️ Eye contact kam hai! Camera ki taraf dekho — screen pe mat dekho.';
+            else if (post < 65) rtTip = '⚠️ Posture sudharo! Seedha baitho, shoulders relax rakho.';
+            else if (speech < 60) rtTip = '⚠️ Aur zor se bolo. Mic ke paas jao ya volume badhao.';
+            else if (conf >= 85) rtTip = '✅ Zabardast! Confidence bahut achha hai — aise hi rakho!';
+            else rtTip = '👍 Achha chal raha hai. Camera dekho aur dheere clearly bolo.';
+            document.getElementById('realtimeTip').textContent = rtTip;
+            document.getElementById('speechTip').textContent = speech < 60
+                ? 'Thoda aur oonchi awaaz mein bolo. Deep breath lo phir bolo.'
+                : speech > 88
+                ? 'Bahut achha speech level! Isi pace pe rehna.'
+                : 'Dheere clearly bolo. Ek breath lo jawaab se pehle.';
+        }
         // AI speaking animation
         const isSpeaking = Math.random() > 0.6;
         document.getElementById('aiSpeaking').style.display = isSpeaking ? 'flex' : 'none';
@@ -1291,6 +1339,7 @@ function toggleMute() {
 // ─── END ──────────────────────────────────────────────────
 function endInterview() {
     clearInterval(state.metricsInterval);
+    stopLiveTips();
     clearInterval(state.timerInterval);
     clearInterval(state.qTimerInterval);
     if (state.localStream) state.localStream.getTracks().forEach(t => t.stop());
@@ -1310,6 +1359,31 @@ function updateSessionTime() {
     document.getElementById('sessTime').textContent = `${m}:${s.toString().padStart(2,'0')}`;
 }
 
+// ─── LIVE TIPS ROTATION ──────────────────────────────────
+const eyeTips = [
+    "Camera ko dekho, screen ko nahi. Camera ke upar ek tape ka dot lagao — wahi dekho.",
+    "Jab bolna band ho tab bhi camera ki taraf dekho. Blinking natural rehni chahiye.",
+    "Aankhon ka contact maintain karo — 70% time camera, 30% thoda side.",
+    "Ek trick: camera ke peeche koi photo chipkao jaise kisi dost ki — usse baat karo."
+];
+const postureTips = [
+    "Seedha baitho. Shoulders peeche. Chin slightly up — confident dikhta hai.",
+    "Kursi mein peeche mat dhaso — aage ki taraf thoda lean karo (engagement).",
+    "Haath table pe rakho — mute gesture mat karo har sentence mein.",
+    "Camera aankh ke level pe hona chahiye — neeche se na dikhe. Books rakh ke adjust karo."
+];
+let tipsRotationInterval = null;
+let tipIndex = 0;
+function startLiveTipsRotation() {
+    tipIndex = 0;
+    tipsRotationInterval = setInterval(() => {
+        tipIndex = (tipIndex + 1) % eyeTips.length;
+        document.getElementById('eyeTip').textContent = eyeTips[tipIndex];
+        document.getElementById('postureTip').textContent = postureTips[tipIndex];
+    }, 8000);
+}
+function stopLiveTips() { clearInterval(tipsRotationInterval); }
+
 // ─── PAYMENT ──────────────────────────────────────────────
 function openPayment() {
     document.getElementById('paymentModal').classList.add('open');
@@ -1326,7 +1400,7 @@ function selectPayMethod(m) {
     document.getElementById('pm-' + m).classList.add('selected');
     document.getElementById('upiSection').style.display = m === 'upi' ? 'block' : 'none';
     document.getElementById('cardSection').style.display = m === 'card' ? 'block' : 'none';
-    document.getElementById('paypalSection').style.display = m === 'paypal' ? 'block' : 'none';
+    document.getElementById('cryptoSection').style.display = m === 'crypto' ? 'block' : 'none';
 }
 function copyUPI() {
     navigator.clipboard.writeText('adityachauhan0604@oksbi');
@@ -1338,6 +1412,10 @@ function confirmPayment() {
     document.getElementById('creditsBadge').textContent = '💎 Premium';
     closePayment();
     showToast('🎉 Premium activated! Unlimited interviews unlocked!');
+}
+
+function copyCrypto() {
+    navigator.clipboard.writeText('TNWWxebAmvDVh8Qz8bTrKbAkiHfKCHffc7').then(() => showToast('✅ Crypto address copied!'));
 }
 
 // ─── TOAST ────────────────────────────────────────────────
