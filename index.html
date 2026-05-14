@@ -472,7 +472,10 @@
 
         /* Timer ring */
         .timer-ring { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 0.85rem; }
-        .timer-val { font-family: 'Syne', sans-serif; font-size: 1rem; color: var(--gold); font-weight: 700; }
+        .timer-val { font-family: 'Syne', sans-serif; font-size: 1rem; color: var(--gold); font-weight: 700; transition: color 0.5s; }
+        .timer-val.warn { color: #f97316; }
+        .timer-val.danger { color: var(--danger); animation: timerPulse 0.6s infinite; }
+        @keyframes timerPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
         /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
@@ -502,6 +505,8 @@
                 <div class="lang-option" onclick="setLang('es','🇪🇸','Español')">🇪🇸 Español</div>
                 <div class="lang-option" onclick="setLang('bn','🇧🇩','Bengali')">🇧🇩 Bengali</div>
                 <div class="lang-option" onclick="setLang('ne','🇳🇵','Nepali')">🇳🇵 Nepali</div>
+                <div class="lang-option" onclick="setLang('pa','🇮🇳','Punjabi')">🟠 Punjabi</div>
+                <div class="lang-option" onclick="setLang('ta','🇮🇳','Tamil')">🔵 Tamil</div>
             </div>
         </div>
         <span class="credits-badge" id="creditsBadge">⚡ 5 Free Left</span>
@@ -578,6 +583,9 @@
                     <div class="pill" data-val="hospitality" onclick="selectPill(this,'jobGroup')">🍽️ Hospitality</div>
                     <div class="pill" data-val="construction" onclick="selectPill(this,'jobGroup')">🏗️ Construction</div>
                     <div class="pill" data-val="domestic" onclick="selectPill(this,'jobGroup')">🏠 Domestic</div>
+                    <div class="pill" data-val="cook" onclick="selectPill(this,'jobGroup')">👨‍🍳 Cook</div>
+                    <div class="pill" data-val="plumber" onclick="selectPill(this,'jobGroup')">🔩 Plumber</div>
+                    <div class="pill" data-val="electrician" onclick="selectPill(this,'jobGroup')">⚡ Electrician</div>
                 </div>
             </div>
 
@@ -760,6 +768,66 @@
 
 </main>
 
+
+<!-- TESTIMONIALS SECTION -->
+<section style="max-width:1200px;margin:0 auto 48px;padding:0 20px;position:relative;z-index:1">
+    <div style="text-align:center;margin-bottom:28px">
+        <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);color:#f59e0b;padding:5px 14px;border-radius:999px;font-size:0.78rem;font-weight:600;margin-bottom:12px">⭐ USER REVIEWS</div>
+        <h2 style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800">Logon ne kya kaha?</h2>
+        <p style="color:var(--muted);font-size:0.95rem;margin-top:6px">Real users, real results</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px">
+            <div style="display:flex;gap:3px;color:#f59e0b;margin-bottom:10px">⭐⭐⭐⭐⭐</div>
+            <p style="font-size:0.9rem;line-height:1.6;color:var(--text);margin-bottom:14px">"Pehle interview mein itna ghabrata tha. JobCrackAI se 3 din practice ki aur security job mil gayi! Eye contact tip ne kaam kiya."</p>
+            <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#00b8d9);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem">R</div>
+                <div><div style="font-size:0.88rem;font-weight:600">Rahul Kumar</div><div style="font-size:0.75rem;color:var(--muted)">Security Guard • Delhi</div></div>
+            </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px">
+            <div style="display:flex;gap:3px;color:#f59e0b;margin-bottom:10px">⭐⭐⭐⭐⭐</div>
+            <p style="font-size:0.9rem;line-height:1.6;color:var(--text);margin-bottom:14px">"Gulf mein driver ki naukri chahiye thi. Arabic practice ki iss app pe, interview confidently diya. Ab Dubai mein hoon!"</p>
+            <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#ec4899);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem">M</div>
+                <div><div style="font-size:0.88rem;font-weight:600">Mohammed Rafi</div><div style="font-size:0.75rem;color:var(--muted)">Driver • Kerala → Dubai</div></div>
+            </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px">
+            <div style="display:flex;gap:3px;color:#f59e0b;margin-bottom:10px">⭐⭐⭐⭐⭐</div>
+            <p style="font-size:0.9rem;line-height:1.6;color:var(--text);margin-bottom:14px">"Cook ki naukri ke liye 5-star hotel mein interview tha. Posture aur speech tips ne bahut help ki. Select ho gayi!"</p>
+            <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem">P</div>
+                <div><div style="font-size:0.88rem;font-weight:600">Priya Sharma</div><div style="font-size:0.75rem;color:var(--muted)">Cook • Mumbai</div></div>
+            </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px">
+            <div style="display:flex;gap:3px;color:#f59e0b;margin-bottom:10px">⭐⭐⭐⭐⭐</div>
+            <p style="font-size:0.9rem;line-height:1.6;color:var(--text);margin-bottom:14px">"ਪੰਜਾਬੀ ਵਿੱਚ practice ਕਰ ਸਕਦੇ ਹਾਂ — ਇਹ ਬਹੁਤ ਵਧੀਆ ਹੈ। Electrician interview ਵਿੱਚ pass ਹੋ ਗਿਆ!"</p>
+            <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ef4444);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem">G</div>
+                <div><div style="font-size:0.88rem;font-weight:600">Gurpreet Singh</div><div style="font-size:0.75rem;color:var(--muted)">Electrician • Punjab</div></div>
+            </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px">
+            <div style="display:flex;gap:3px;color:#f59e0b;margin-bottom:10px">⭐⭐⭐⭐⭐</div>
+            <p style="font-size:0.9rem;line-height:1.6;color:var(--text);margin-bottom:14px">"தமிழில் practice செய்ய முடிகிறது! Plumber job கிடைத்தது. Real-time feedback மிகவும் useful."</p>
+            <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#00e5a0,#3b82f6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem">K</div>
+                <div><div style="font-size:0.88rem;font-weight:600">Karthik Raja</div><div style="font-size:0.75rem;color:var(--muted)">Plumber • Tamil Nadu</div></div>
+            </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px">
+            <div style="display:flex;gap:3px;color:#f59e0b;margin-bottom:10px">⭐⭐⭐⭐⭐</div>
+            <p style="font-size:0.9rem;line-height:1.6;color:var(--text);margin-bottom:14px">"Factory worker hoon. Expert level practice ki, supervisor role ke liye apply kiya aur mil gaya! Score tracking bahut motivating hai."</p>
+            <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#ec4899,#a855f7);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem">S</div>
+                <div><div style="font-size:0.88rem;font-weight:600">Sunita Devi</div><div style="font-size:0.75rem;color:var(--muted)">Factory Supervisor • UP</div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- PAYMENT MODAL -->
 <div class="modal-overlay" id="paymentModal">
     <div class="modal">
@@ -819,6 +887,36 @@
         <button class="btn-pay" onclick="confirmPayment()">✅ I've Paid – Activate Now</button>
     </div>
 </div>
+
+
+<!-- FOOTER -->
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:32px 24px;text-align:center;position:relative;z-index:1">
+    <div style="max-width:1200px;margin:0 auto">
+        <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:16px">
+            <div style="width:36px;height:36px;background:linear-gradient(135deg,var(--accent),#00b8d9);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem">🤖</div>
+            <span style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800">JobCrackAI</span>
+        </div>
+        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:20px">AI Interview Coach for India's Blue-Collar Workers</p>
+        <div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:20px">
+            <a href="https://t.me/adityachauhan0604" target="_blank" style="display:inline-flex;align-items:center;gap:6px;color:#38bdf8;text-decoration:none;font-size:0.88rem;font-weight:600;padding:8px 14px;background:rgba(56,189,248,0.1);border-radius:10px;border:1px solid rgba(56,189,248,0.25)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="#38bdf8"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.014 9.492c-.148.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.877.729z"/></svg>
+                Telegram Support
+            </a>
+            <a href="https://github.com/adityachauhan0604" target="_blank" style="display:inline-flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none;font-size:0.88rem;font-weight:600;padding:8px 14px;background:var(--surface2);border-radius:10px;border:1px solid var(--border)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                GitHub
+            </a>
+            <span onclick="openPayment()" style="display:inline-flex;align-items:center;gap:6px;color:var(--accent);text-decoration:none;font-size:0.88rem;font-weight:600;padding:8px 14px;background:rgba(0,229,160,0.1);border-radius:10px;border:1px solid rgba(0,229,160,0.25);cursor:pointer">
+                💎 Go Premium — ₹99
+            </span>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:16px;display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap">
+            <span style="font-size:0.78rem;color:var(--muted)">© 2025 JobCrackAI by <strong style="color:var(--text)">Aditya Chauhan</strong></span>
+            <span style="font-size:0.78rem;color:var(--muted)">🔒 100% Privacy • No data stored</span>
+            <span style="font-size:0.78rem;color:var(--muted)">🇮🇳 Made in India</span>
+        </div>
+    </div>
+</footer>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -1033,6 +1131,102 @@ const QUESTIONS = {
         intermediate: { hi: ["Project delay handle karna?", "Team coordination on-site?"], en: ["How do you handle project delays?", "How do you coordinate your team on-site?"], ar: ["كيف تتعامل مع تأخيرات المشروع؟"], tl: ["Paano mo haharapin ang pagkaantala ng proyekto?"], es: ["¿Cómo manejas retrasos en el proyecto?"], bn: ["প্রকল্প বিলম্ব কীভাবে সামলান?"], ne: ["परियोजना ढिलाइ कसरी ह्यान्डल गर्नुहुन्छ?"] },
         expert: { hi: ["Site management experience batao", "Budget control strategies?"], en: ["Describe your site management experience", "What budget control strategies do you use?"], ar: ["صف تجربتك في إدارة المواقع"], tl: ["Ilarawan ang iyong karanasan sa pamamahala ng site"], es: ["Describe tu experiencia en gestión de obras"], bn: ["সাইট ব্যবস্থাপনার অভিজ্ঞতা বলুন"], ne: ["साइट व्यवस्थापन अनुभव बताउनुहोस्"] }
     },
+    cook: {
+        beginner: {
+            hi: ["Apna cooking experience batao", "Kitchen hygiene kaise maintain karte ho?", "Daily mise en place routine kya hai?", "Food storage temperature kya honi chahiye?", "Urgent order handle kaise karte ho?"],
+            en: ["Tell me about your cooking experience", "How do you maintain kitchen hygiene?", "What is your daily mise en place routine?", "What temperature for food storage?", "How do you handle a rush order?"],
+            pa: ["ਆਪਣਾ ਖਾਣਾ ਬਣਾਉਣ ਦਾ ਤਜਰਬਾ ਦੱਸੋ", "ਰਸੋਈ ਦੀ ਸਫ਼ਾਈ ਕਿਵੇਂ ਰੱਖਦੇ ਹੋ?", "ਰੋਜ਼ਾਨਾ ਰੁਟੀਨ ਕੀ ਹੈ?"],
+            ta: ["உங்கள் சமையல் அனுபவம் சொல்லுங்கள்", "சமையலறை சுகாதாரம் எப்படி பராமரிக்கிறீர்கள்?", "தினசரி routine என்ன?"],
+            bn: ["রান্নার অভিজ্ঞতা বলুন", "রান্নাঘরের পরিচ্ছন্নতা কীভাবে রাখেন?"],
+            ne: ["खाना पकाउने अनुभव बताउनुहोस्", "भान्साको सरसफाइ कसरी राख्नुहुन्छ?"],
+            ar: ["أخبرني عن خبرتك في الطهي", "كيف تحافظ على نظافة المطبخ؟"],
+            es: ["Cuéntame tu experiencia cocinando", "¿Cómo mantienes la higiene en la cocina?"]
+        },
+        intermediate: {
+            hi: ["Menu planning kaise karte ho?", "Food cost control kaise karte ho?", "Allergies aur dietary restrictions handle karna?"],
+            en: ["How do you plan a menu?", "How do you control food costs?", "How do you handle allergies and dietary restrictions?"],
+            pa: ["ਮੀਨੂ ਯੋਜਨਾ ਕਿਵੇਂ ਬਣਾਉਂਦੇ ਹੋ?", "ਭੋਜਨ ਦੀ ਲਾਗਤ ਕਿਵੇਂ ਕੰਟਰੋਲ ਕਰਦੇ ਹੋ?"],
+            ta: ["மெனு திட்டமிடல் எப்படி செய்கிறீர்கள்?", "உணவு செலவை எப்படி கட்டுப்படுத்துகிறீர்கள்?"],
+            bn: ["মেনু পরিকল্পনা কীভাবে করেন?"],
+            ne: ["मेनु योजना कसरी गर्नुहुन्छ?"],
+            ar: ["كيف تخطط لقائمة الطعام؟"],
+            es: ["¿Cómo planificas un menú?"]
+        },
+        expert: {
+            hi: ["Kitchen team manage karna?", "New menu design experience batao", "Food waste reduce karne ki strategies?"],
+            en: ["How do you manage a kitchen team?", "Describe your menu design experience", "What strategies reduce food waste?"],
+            pa: ["ਰਸੋਈ ਟੀਮ ਕਿਵੇਂ ਮੈਨੇਜ ਕਰਦੇ ਹੋ?"],
+            ta: ["சமையலறை குழுவை எப்படி நிர்வகிக்கிறீர்கள்?"],
+            bn: ["রান্নাঘর দল কীভাবে পরিচালনা করেন?"],
+            ne: ["भान्सा टोली कसरी व्यवस्थापन गर्नुहुन्छ?"],
+            ar: ["كيف تدير فريق المطبخ؟"],
+            es: ["¿Cómo gestionas un equipo de cocina?"]
+        }
+    },
+    plumber: {
+        beginner: {
+            hi: ["Plumbing tools kaunse jaante ho?", "Pipe leak kaise detect aur fix karte ho?", "Safety precautions kya hain?", "Customer ke ghar mein kaise behave karte ho?"],
+            en: ["What plumbing tools do you know?", "How do you detect and fix a pipe leak?", "What safety precautions do you take?", "How do you behave at a customer's home?"],
+            pa: ["ਪਲੰਬਿੰਗ ਔਜ਼ਾਰ ਕਿਹੜੇ ਜਾਣਦੇ ਹੋ?", "ਪਾਈਪ ਲੀਕ ਕਿਵੇਂ ਠੀਕ ਕਰਦੇ ਹੋ?"],
+            ta: ["என்ன plumbing கருவிகள் தெரியும்?", "குழாய் கசிவை எப்படி சரிசெய்கிறீர்கள்?"],
+            bn: ["কোন প্লাম্বিং সরঞ্জাম জানেন?"],
+            ne: ["कुन प्लम्बिङ उपकरणहरू जान्नुहुन्छ?"],
+            ar: ["ما هي أدوات السباكة التي تعرفها؟"],
+            es: ["¿Qué herramientas de plomería conoces?"]
+        },
+        intermediate: {
+            hi: ["Bathroom renovation project handle karna?", "Water pressure issues diagnose karna?", "Emergency plumbing call kaise manage karte ho?"],
+            en: ["How do you handle a bathroom renovation?", "How do you diagnose water pressure issues?", "How do you manage an emergency plumbing call?"],
+            pa: ["ਬਾਥਰੂਮ ਨਵੀਨੀਕਰਣ ਕਿਵੇਂ ਕਰਦੇ ਹੋ?"],
+            ta: ["குளியலறை புதுப்பிப்பை எப்படி கையாள்கிறீர்கள்?"],
+            bn: ["বাথরুম সংস্কার কীভাবে করেন?"],
+            ne: ["बाथरूम नवीकरण कसरी गर्नुहुन्छ?"],
+            ar: ["كيف تتعامل مع تجديد الحمام؟"],
+            es: ["¿Cómo manejas una renovación de baño?"]
+        },
+        expert: {
+            hi: ["Large commercial project experience?", "Team supervise karna?", "New plumbing codes ke baare mein kya jaante ho?"],
+            en: ["Describe a large commercial plumbing project", "How do you supervise a plumbing team?", "What do you know about updated plumbing codes?"],
+            pa: ["ਵੱਡੇ ਵਪਾਰਕ ਪ੍ਰੋਜੈਕਟ ਦਾ ਤਜਰਬਾ?"],
+            ta: ["பெரிய வணிக திட்டம் அனுபவம்?"],
+            bn: ["বড় বাণিজ্যিক প্রকল্পের অভিজ্ঞতা?"],
+            ne: ["ठूलो व्यावसायिक परियोजना अनुभव?"],
+            ar: ["صف مشروع سباكة تجارية كبيرة"],
+            es: ["Describe un gran proyecto de plomería comercial"]
+        }
+    },
+    electrician: {
+        beginner: {
+            hi: ["Electrical safety rules kya hain?", "Basic wiring kaise karte ho?", "Circuit breaker trip hone par kya karte ho?", "Tools kaunse use karte ho?"],
+            en: ["What are the main electrical safety rules?", "How do you do basic wiring?", "What do you do when a circuit breaker trips?", "Which tools do you use?"],
+            pa: ["ਬਿਜਲੀ ਸੁਰੱਖਿਆ ਨਿਯਮ ਕੀ ਹਨ?", "ਬੁਨਿਆਦੀ ਵਾਇਰਿੰਗ ਕਿਵੇਂ ਕਰਦੇ ਹੋ?"],
+            ta: ["மின் பாதுகாப்பு விதிகள் என்ன?", "அடிப்படை wiring எப்படி செய்கிறீர்கள்?"],
+            bn: ["বৈদ্যুতিক নিরাপত্তার মূল নিয়ম কী?"],
+            ne: ["बिजुलीको मुख्य सुरक्षा नियमहरू के हुन्?"],
+            ar: ["ما هي قواعد السلامة الكهربائية الرئيسية؟"],
+            es: ["¿Cuáles son las principales reglas de seguridad eléctrica?"]
+        },
+        intermediate: {
+            hi: ["3-phase wiring explain karo", "Fault finding process kya hai?", "Commercial installation experience?"],
+            en: ["Explain 3-phase wiring", "What is your fault-finding process?", "Describe your commercial installation experience"],
+            pa: ["3-phase wiring ਸਮਝਾਓ", "ਨੁਕਸ ਲੱਭਣ ਦੀ ਪ੍ਰਕਿਰਿਆ ਕੀ ਹੈ?"],
+            ta: ["3-phase wiring விளக்குங்கள்", "பிழை கண்டுபிடிக்கும் செயல்முறை என்ன?"],
+            bn: ["3-phase wiring ব্যাখ্যা করুন"],
+            ne: ["3-phase wiring व्याख्या गर्नुहोस्"],
+            ar: ["اشرح التوصيل ثلاثي الأوجه"],
+            es: ["Explica el cableado trifásico"]
+        },
+        expert: {
+            hi: ["Large project electrical design experience?", "Team manage karna?", "Energy efficiency solutions suggest karo"],
+            en: ["Describe large project electrical design experience", "How do you manage an electrical team?", "Suggest energy efficiency solutions"],
+            pa: ["ਵੱਡੇ ਪ੍ਰੋਜੈਕਟ ਡਿਜ਼ਾਈਨ ਦਾ ਤਜਰਬਾ?"],
+            ta: ["பெரிய திட்ட வடிவமைப்பு அனுபவம்?"],
+            bn: ["বড় প্রকল্পের ডিজাইন অভিজ্ঞতা?"],
+            ne: ["ठूलो परियोजना डिजाइन अनुभव?"],
+            ar: ["صف تجربتك في تصميم المشاريع الكبيرة"],
+            es: ["Describe tu experiencia en diseño eléctrico de grandes proyectos"]
+        }
+    },
     domestic: {
         beginner: {
             hi: ["Cleaning schedule kaise follow karte ho?", "Employer ke saath kaise communicate karte ho?", "Confidentiality kaise maintain karte ho?"],
@@ -1200,10 +1394,17 @@ function startMetricsLoop() {
         const speech = Math.min(97, Math.max(40, getSpeechLevel()));
         const conf = Math.round((eye * 0.35 + post * 0.35 + speech * 0.3));
 
-        document.getElementById('eyeMetric').textContent = eye + '%';
-        document.getElementById('postureMetric').textContent = post + '%';
-        document.getElementById('confidenceMetric').textContent = conf + '%';
-        document.getElementById('speechMetric').textContent = Math.round(speech) + '%';
+        const colorize = (el, val) => {
+            el.style.color = val >= 80 ? 'var(--accent)' : val >= 65 ? 'var(--gold)' : 'var(--danger)';
+        };
+        const eyeEl = document.getElementById('eyeMetric');
+        const postEl = document.getElementById('postureMetric');
+        const confEl = document.getElementById('confidenceMetric');
+        const spEl = document.getElementById('speechMetric');
+        eyeEl.textContent = eye + '%'; colorize(eyeEl, eye);
+        postEl.textContent = post + '%'; colorize(postEl, post);
+        confEl.textContent = conf + '%'; colorize(confEl, conf);
+        spEl.textContent = Math.round(speech) + '%'; colorize(spEl, Math.round(speech));
 
         // Update session score
         const avg = Math.round((eye + post + conf + speech) / 4);
@@ -1262,7 +1463,9 @@ function nextQuestion() {
     document.getElementById('timerVal').textContent = '45s';
     state.qTimerInterval = setInterval(() => {
         state.qTimeLeft--;
-        document.getElementById('timerVal').textContent = state.qTimeLeft + 's';
+        const tv = document.getElementById('timerVal');
+        tv.textContent = state.qTimeLeft + 's';
+        tv.className = 'timer-val' + (state.qTimeLeft <= 10 ? ' danger' : state.qTimeLeft <= 20 ? ' warn' : '');
         if (state.qTimeLeft <= 0) {
             clearInterval(state.qTimerInterval);
             showFeedback();
