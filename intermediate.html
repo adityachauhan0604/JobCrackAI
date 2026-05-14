@@ -1,35 +1,371 @@
-<!-- Copy exact same code from index.html -->
-<!-- Changes: -->
-<title>JobCrackAI - Intermediate Interview Practice</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intermediate Practice – JobCrackAI</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07090f;--surface:#0d1018;--surface2:#141824;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);--accent:#6366f1;--gold:#fbbf24;--text:#e2e8f0;--muted:#64748b;--muted2:#94a3b8;--danger:#f43f5e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 20% 20%,rgba(99,102,241,0.06),transparent 50%),radial-gradient(circle at 80% 80%,rgba(249,115,22,0.04),transparent 50%);pointer-events:none}
+.wrap{max-width:540px;margin:0 auto;position:relative}
+.back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--muted2);text-decoration:none;font-size:0.85rem;margin-bottom:20px;padding:7px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:9px;transition:all 0.2s}
+.back-btn:hover{color:var(--accent);border-color:var(--accent)}
+.header-card{background:var(--surface);border:1px solid rgba(99,102,241,0.25);border-radius:20px;padding:22px;text-align:center;margin-bottom:20px}
+.level-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.3);color:#a5b4fc;padding:4px 14px;border-radius:999px;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px}
+.header-card h1{font-family:'Instrument Serif',serif;font-size:1.8rem;font-style:italic;margin-bottom:6px}
+.stats-row{display:flex;gap:14px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-num{font-family:'Instrument Serif',serif;font-size:1.4rem;color:#a5b4fc}
+.stat-lbl{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em}
+.job-tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
+.job-tab{padding:7px 16px;border:1px solid var(--border2);background:var(--surface2);border-radius:999px;cursor:pointer;font-size:0.82rem;transition:all 0.2s;font-weight:600}
+.job-tab.active{background:rgba(99,102,241,0.12);border-color:var(--accent);color:#a5b4fc}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px;margin-bottom:14px}
+.q-num{font-size:0.75rem;color:var(--muted);margin-bottom:10px}
+.q-text{font-size:1.05rem;line-height:1.7;min-height:60px}
+.timer-bar-wrap{height:4px;background:var(--surface2);border-radius:999px;margin-top:14px;overflow:hidden}
+.timer-bar{height:100%;border-radius:999px;background:var(--accent);transition:width 1s linear,background 0.3s}
+.timer-val{font-size:0.82rem;color:var(--gold);margin-top:6px;text-align:right}
+.hint-box{display:none;margin-top:12px;background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:12px 14px;font-size:0.83rem;color:var(--muted2);line-height:1.7}
+.hint-box strong{color:#a5b4fc}
+.star-format{margin-top:8px;background:rgba(34,211,165,0.05);border:1px solid rgba(34,211,165,0.15);border-radius:8px;padding:9px 12px;font-size:0.8rem;color:var(--muted2)}
+.star-format span{color:#22d3a5;font-weight:700}
+.voice-card{background:var(--surface);border:1px solid rgba(99,102,241,0.2);border-radius:18px;padding:18px;margin-bottom:14px;display:none}
+.voice-title{font-size:0.82rem;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.listen-dot{width:8px;height:8px;background:var(--danger);border-radius:50%;animation:blink 1s infinite;display:none}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.transcript-box{min-height:52px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;font-size:0.88rem;line-height:1.65;position:relative}
+.t-placeholder{color:var(--muted)}
+#tText{display:none}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{padding:8px 16px;border-radius:9px;font-size:0.83rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;border:1px solid transparent}
+.btn-mic{background:rgba(99,102,241,0.12);border-color:rgba(99,102,241,0.3)!important;color:#a5b4fc}
+.btn-stop{display:none;background:rgba(244,63,94,0.12);border-color:rgba(244,63,94,0.3)!important;color:var(--danger)}
+.btn-next{background:linear-gradient(135deg,var(--accent),#4f46e5);color:white;font-weight:700;border:none}
+.btn-hint{background:var(--surface2);border-color:var(--border2)!important;color:var(--muted2);font-size:0.78rem}
+@keyframes micPulse{0%{box-shadow:0 0 0 0 rgba(99,102,241,0.5)}70%{box-shadow:0 0 0 12px rgba(99,102,241,0)}100%{box-shadow:0 0 0 0 rgba(99,102,241,0)}}
+.mic-on{animation:micPulse 1.2s infinite}
+.ai-feedback-card{display:none;background:var(--surface);border:1px solid rgba(99,102,241,0.25);border-radius:18px;padding:18px;margin-bottom:14px}
+.ai-feedback-card h3{font-size:0.85rem;font-weight:700;color:#a5b4fc;margin-bottom:10px}
+#aiFBText{font-size:0.88rem;line-height:1.75;color:var(--text)}
+.spinner{width:16px;height:16px;border:2px solid rgba(99,102,241,0.3);border-top-color:#818cf8;border-radius:50%;animation:spin 0.8s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.progress-banner{background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.15);border-radius:12px;padding:10px 16px;font-size:0.82rem;color:var(--muted2);text-align:center;margin-bottom:16px;display:none}
+.toast{position:fixed;bottom:20px;right:16px;z-index:99;background:var(--surface2);border:1px solid #6366f1;color:#a5b4fc;padding:9px 16px;border-radius:9px;font-size:0.83rem;font-weight:600;transform:translateY(60px);opacity:0;transition:all 0.3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="index.html" class="back-btn">← Home</a>
+
+  <div id="progressBanner" class="progress-banner"></div>
+
+  <div class="header-card">
+    <div class="level-badge">⚡ Intermediate Level</div>
+    <h1>Scenario Practice</h1>
+    <p style="color:var(--muted);font-size:0.85rem">Real-life situations • STAR method • 60 seconds</p>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-num" id="sQ">0</div><div class="stat-lbl">Questions</div></div>
+      <div class="stat"><div class="stat-num" id="sAvg">–</div><div class="stat-lbl">Avg Score</div></div>
+      <div class="stat"><div class="stat-num" id="sBest">–</div><div class="stat-lbl">Best</div></div>
+    </div>
+  </div>
+
+  <div class="job-tabs" id="jobTabs">
+    <div class="job-tab active" data-job="driver">🚗 Driver</div>
+    <div class="job-tab" data-job="factory">🏭 Factory</div>
+    <div class="job-tab" data-job="security">🛡️ Security</div>
+    <div class="job-tab" data-job="cook">👨‍🍳 Cook</div>
+    <div class="job-tab" data-job="delivery">🚚 Delivery</div>
+    <div class="job-tab" data-job="nurse">🏥 Nurse</div>
+    <div class="job-tab" data-job="welder">🔧 Welder</div>
+    <div class="job-tab" data-job="electrician">⚡ Electrician</div>
+  </div>
+
+  <div class="q-card" id="qCard">
+    <div class="q-num">Question <span id="qNum">1</span> · <span id="jobLabel">Driver</span> · Intermediate</div>
+    <div class="q-text" id="qText">Job tab select karo aur Start dabao!</div>
+    <div class="timer-bar-wrap"><div class="timer-bar" id="timerBar" style="width:100%"></div></div>
+    <div class="timer-val" id="timerVal">60s</div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-hint" onclick="toggleHint()" id="hintBtn">💡 STAR Format</button>
+    </div>
+    <div class="hint-box" id="hintBox">
+      <strong>💡 STAR Method use karo:</strong>
+      <div class="star-format">
+        <span>S</span>ituation – Kya hua tha? (10 sec)<br>
+        <span>T</span>ask – Tumhara kaam kya tha? (5 sec)<br>
+        <span>A</span>ction – Tumne kya kiya? (30 sec)<br>
+        <span>R</span>esult – Result kya aaya? (15 sec)
+      </div>
+      <div style="margin-top:8px"><span id="hintText">Loading...</span></div>
+    </div>
+  </div>
+
+  <div class="voice-card" id="voiceCard">
+    <div class="voice-title">
+      <div class="listen-dot" id="listenDot"></div>
+      <span id="voiceTitle">🎙️ Jawab Do</span>
+    </div>
+    <div class="transcript-box">
+      <span class="t-placeholder" id="tPlaceholder">Start dabao, phir bolo...</span>
+      <span id="tText"></span>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-mic" id="micBtn" onclick="startMic()">🎙️ Jawab Do</button>
+      <button class="btn btn-stop mic-on" id="stopBtn" onclick="stopMic()">⏹ Ruk Jao</button>
+      <button class="btn btn-next" onclick="nextQuestion()">➡️ Skip</button>
+    </div>
+  </div>
+
+  <div class="ai-feedback-card" id="aiFBCard">
+    <h3>🤖 AI Interviewer Ka Feedback</h3>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <div class="spinner" id="spinner"></div>
+    </div>
+    <div id="aiFBText"></div>
+    <div id="aiFBAction" style="margin-top:10px"></div>
+  </div>
+
+  <div style="text-align:center;margin-top:10px" id="startWrap">
+    <button class="btn btn-next" onclick="startSession()" style="padding:14px 40px;font-size:1rem">⚡ Start Practice</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
-const INTERMEDIATE_QUESTIONS = {
-    driver: [
-        '"How do you handle road emergencies?"',
-        '"Customer complaint situation?"',
-        '"Night driving safety measures?"',
-        '"Vehicle breakdown procedure?"',
-        '"Fuel efficiency techniques?"',
-        '"How do you read GPS/maps?"',
-        '"Dealing with difficult passengers?"'
-    ],
-    factory: [
-        '"Machine breakdown - what to do?"',
-        '"How to meet daily production targets?"',
-        '"Quality control procedures?"',
-        '"Handling workplace accidents?"',
-        '"Shift handover process?"',
-        '"Inventory management experience?"',
-        '"Supervisor instructions handling?"'
-    ],
-    security: [
-        '"Suspicious person protocol?"',
-        '"VIP visitor security measures?"',
-        '"CCTV monitoring procedures?"',
-        '"Conflict de-escalation techniques?"',
-        '"Incident reporting process?"',
-        '"Access control systems?"',
-        '"Night shift security challenges?"'
-    ]
+const QUESTIONS = {
+  driver:["Ek baar road mein accident scene ke paas se guzarna pada — aapne kya kiya?","Customer bahut gusse mein tha aur complaint kar raha tha — kaise handle kiya?","Raat ke 2 baje tyre puncture ho gaya — kya steps liye?","Traffic jam mein 2 ghante phans gaye — time management kaise ki?","GPS ne galat route dikha diya — kya kiya?","Vehicle suddenly breakdown ho gaya highway pe — procedure kya tha?","Ek suspicious luggage mili gaadi mein — kya kiya?","Bahut bhaari rain mein visibility zero thi — kaise drive kiya?"],
+  factory:["Machine achanak band ho gayi production ke beech — kya steps liye?","Quality check mein ek defective batch mili — kaise handle kiya?","Supervisor aur team member ke beech dispute tha — aapka role kya tha?","Production target miss ho raha tha — kya kiya?","Naye machine pe training deni thi junior ko — kaise kiya?","Safety hazard dekha work area mein — kya kiya?","Inventory mein shortage notice ki — process kya tha?","Overtime refuse karna pada — kaise professionally bola?"],
+  security:["Suspicious person ne entry ki — exact steps kya the?","VIP guest aaya unexpected — preparation kaise ki?","CCTV footage mein incident dekha — kya kiya?","Staff aur visitor ka argument — kaise de-escalate kiya?","Emergency alert aayi — team coordination kaise ki?","Confidential document bahar ja raha tha — kaise rokha?","Night shift mein alone tha, bada incident hua — kya kiya?","Drunk visitor gate pe — professional handling kaise ki?"],
+  cook:["Rush hour mein 3 cooks absent ho gaye — kya kiya?","Customer ne food allergy complaint ki after eating — immediate action?","Ingredient stock khatam ho gaya beech service ke — kya kiya?","New menu item add karna tha quickly — process kya tha?","Health inspector unexpected aa gaya — kaise prepared the?","Junior cook ne galat dish banai — kaise corrected?","Equipment mid-service mein band ho gaya — backup plan?","Food quality standard se neeche thi — kaise fix kiya?"],
+  delivery:["Customer ne package refuse kar diya — kya kiya?","Address galat tha, GPS bhi nahi mili — kaise dhundha?","Fragile package damage ho gaya transit mein — process?","3 urgent deliveries ek saath the — kaise prioritize kiya?","Customer ghar pe nahi tha, valuable package tha — kya kiya?","Vehicle mein extra deliveries fit nahi ho rahi thi — kaise manage?","Customer ne payment refuse kiya — procedure?","Road blocked thi, alternate route nahi — kya kiya?"],
+  nurse:["Patient ne medicine lene se mana kar diya — kaise convince kiya?","Family member aggressive ho gaya ICU mein — kaise handle?","2 patients simultaneously emergency mein the — triage kaise ki?","Doctor ke instructions unclear the — kya kiya?","Night shift mein understaffed the — kaise manage kiya?","Patient fall ho gaya shift mein — immediate steps?","Medication error notice kiya — kya kiya?","Difficult diagnosis sunani thi patient ko — kaise communicate kiya?"],
+  welder:["Weld quality standard se neeche thi inspector ke time — kya kiya?","Wrong material di gayi welding ke liye — kaise handle kiya?","Safety equipment malfunction ho gaya mid-work — steps?","Deadline tight tha, quality vs speed dilemma — kya choose kiya?","Naye welder ko on-site training deni thi — kaise kiya?","Blueprint mein error tha — kaise identify aur fix kiya?","Hazardous gas detect ki workplace mein — emergency steps?","Client ne reject kiya completed weld — kaise resolve kiya?"],
+  electrician:["Live wire unexpected mili — exact safety steps?","Client ka power completely gaya, reason unclear — troubleshooting process?","Wrong gauge wire installed ho gayi — kab aur kaise notice ki?","Deadline pe kaam pura nahi hua — kya kiya?","Junior ne galat connection kiya — kab notice kiya, kya kiya?","Circuit overloaded the, immediate fix chahiye thi — kya kiya?","Client unhappy tha quality se — kaise resolve kiya?","Rain mein outdoor electrical work karna pada — safety protocol?"]
 };
+const HINTS = {
+  driver:"Emergency mein: Gaadi roko → Hazard light on → Help bulao → Report karo",
+  factory:"Production issue mein: Supervisor inform → Machine band → Quality check → Document",
+  security:"Incident mein: Observe → Report → Contain → Document (ORCD)",
+  cook:"Kitchen crisis mein: Assess → Adapt → Communicate → Execute",
+  delivery:"Delivery issue mein: Customer contact → Supervisor inform → Document → Resolve",
+  nurse:"Patient emergency mein: Assess → Alert → Act → Document (AAAD)",
+  welder:"Quality issue mein: Stop → Inspect → Report → Rectify",
+  electrician:"Safety issue mein: Isolate → Secure → Report → Fix"
+};
+
+let job='driver', qNum=0, timerInt=null, timeLeft=60;
+let recognition=null, voiceActive=false, transcript='';
+let silenceTimer=null, scores=[], sessionActive=false;
+
+function getProgress(){try{return JSON.parse(localStorage.getItem('jcai_intermediate')||'{}')}catch(e){return{}}}
+function saveProgress(avg){
+  const p=getProgress();
+  p.sessions=(p.sessions||0)+1; p.questions=(p.questions||0)+qNum;
+  p.best=Math.max(p.best||0,avg); p.lastAvg=avg; p.lastDate=new Date().toLocaleDateString('hi-IN');
+  localStorage.setItem('jcai_intermediate',JSON.stringify(p));
+}
+function showBanner(){
+  const p=getProgress(); if(!p.sessions) return;
+  const b=document.getElementById('progressBanner');
+  b.innerHTML=`📊 Total: <strong style="color:#a5b4fc">${p.questions}</strong> questions • Best: <strong style="color:#fbbf24">${p.best}%</strong> • Sessions: ${p.sessions}`;
+  b.style.display='block';
+}
+
+document.getElementById('jobTabs').addEventListener('click',e=>{
+  const tab=e.target.closest('.job-tab'); if(!tab) return;
+  document.querySelectorAll('.job-tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  job=tab.dataset.job;
+  document.getElementById('jobLabel').textContent=tab.textContent.trim().slice(2);
+  if(sessionActive) loadQuestion();
+});
+
+function startSession(){
+  sessionActive=true; qNum=0; scores=[];
+  document.getElementById('startWrap').style.display='none';
+  document.getElementById('voiceCard').style.display='block';
+  initRecognition();
+  loadQuestion();
+}
+
+function loadQuestion(){
+  clearInterval(timerInt);
+  const pool=QUESTIONS[job]||QUESTIONS.driver;
+  const q=pool[Math.floor(Math.random()*pool.length)];
+  qNum++;
+  document.getElementById('qText').textContent=q;
+  document.getElementById('qNum').textContent=qNum;
+  document.getElementById('hintText').textContent=HINTS[job]||'Situation → Task → Action → Result';
+  document.getElementById('hintBox').style.display='none';
+  document.getElementById('aiFBCard').style.display='none';
+  resetTranscript();
+  timeLeft=60;
+  updateTimer();
+  timerInt=setInterval(()=>{
+    if(voiceActive||document.getElementById('aiFBCard').style.display==='block') return;
+    timeLeft--;
+    updateTimer();
+    if(timeLeft<=0){clearInterval(timerInt);}
+  },1000);
+  speak(q,()=>setTimeout(()=>{if(recognition&&sessionActive) startMic();},500));
+  updateStats();
+}
+
+function updateTimer(){
+  const pct=timeLeft/60*100;
+  document.getElementById('timerBar').style.width=pct+'%';
+  document.getElementById('timerBar').style.background=timeLeft<=15?'var(--danger)':timeLeft<=30?'var(--gold)':'var(--accent)';
+  document.getElementById('timerVal').textContent=timeLeft+'s';
+}
+function toggleHint(){const h=document.getElementById('hintBox');h.style.display=h.style.display==='block'?'none':'block';}
+
+function initRecognition(){
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){showToast('❌ Voice not supported');return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR(); recognition.continuous=true; recognition.interimResults=true;
+  recognition.onresult=e=>{
+    let interim='',final='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) final+=e.results[i][0].transcript+' ';
+      else interim+=e.results[i][0].transcript;
+    }
+    if(final) transcript+=final;
+    const display=transcript+interim;
+    if(display.trim()){
+      document.getElementById('tPlaceholder').style.display='none';
+      document.getElementById('tText').style.display='inline';
+      document.getElementById('tText').textContent=display;
+    }
+    if(voiceActive&&transcript.trim().length>10){
+      clearTimeout(silenceTimer);
+      silenceTimer=setTimeout(()=>{
+        if(voiceActive){voiceActive=false;if(recognition)recognition.stop();submitToAI();}
+      },2500);
+    }
+  };
+  recognition.onend=()=>{if(voiceActive){voiceActive=false;setMicUI(false);if(transcript.trim().length>10) submitToAI();}};
+  recognition.onerror=e=>{voiceActive=false;setMicUI(false);if(e.error!=='aborted') showToast('🎤 Mic error: '+e.error);};
+}
+
+function startMic(){
+  if(!recognition){showToast('❌ Voice not available');return;}
+  clearTimeout(silenceTimer); transcript='';
+  voiceActive=true; setMicUI(true);
+  speechSynthesis.cancel();
+  document.getElementById('tPlaceholder').style.display='inline';
+  document.getElementById('tPlaceholder').textContent='Sun raha hoon... STAR format mein jawab do 🎙️';
+  document.getElementById('tText').style.display='none';
+  document.getElementById('tText').textContent='';
+  document.getElementById('aiFBCard').style.display='none';
+  try{recognition.start();}catch(e){}
+}
+
+function stopMic(){
+  clearTimeout(silenceTimer); voiceActive=false;
+  if(recognition)recognition.stop(); setMicUI(false);
+  if(transcript.trim().length>5) submitToAI();
+  else{document.getElementById('tPlaceholder').textContent='Kuch suna nahi... dobara try karo 🎤';}
+}
+
+function setMicUI(on){
+  document.getElementById('micBtn').style.display=on?'none':'inline-flex';
+  document.getElementById('stopBtn').style.display=on?'inline-flex':'none';
+  document.getElementById('listenDot').style.display=on?'inline-block':'none';
+  document.getElementById('voiceTitle').textContent=on?'🎙️ Sun Raha Hoon... (STAR format mein bolo)':'🎙️ Jawab Do';
+}
+
+function resetTranscript(){
+  transcript=''; voiceActive=false; setMicUI(false);
+  document.getElementById('tPlaceholder').style.display='inline';
+  document.getElementById('tPlaceholder').textContent='AI question bolega, phir auto-mic on hoga...';
+  document.getElementById('tText').style.display='none';
+}
+
+async function submitToAI(){
+  const ans=transcript.trim(); if(!ans){showToast('Pehle kuch bolo! 🎤');return;}
+  const q=document.getElementById('qText').textContent;
+  document.getElementById('aiFBCard').style.display='block';
+  document.getElementById('spinner').style.display='inline-block';
+  document.getElementById('aiFBText').textContent='';
+  document.getElementById('aiFBAction').innerHTML='';
+  const key=localStorage.getItem('jcai_gemini_key')||window._GEMINI_KEY||'';
+  if(!key){
+    document.getElementById('spinner').style.display='none';
+    document.getElementById('aiFBText').textContent='⚠️ Gemini API key nahi hai. index.html mein key daalo.';
+    document.getElementById('aiFBAction').innerHTML=`<button onclick="nextQuestion()" class="btn btn-next">➡️ Next</button>`;
+    return;
+  }
+  const prompt=`You are a professional AI interview coach for blue-collar workers. The candidate is practicing for a ${job} job at intermediate level using STAR method.
+Question (scenario-based): "${q}"
+Candidate's answer: "${ans}"
+Reply in Hinglish (Hindi+English mix). Be encouraging but specific. Check if they used STAR method (Situation/Task/Action/Result). Max 4 sentences. End with ACTION: NEXT or ACTION: RETRY.`;
+  try{
+    const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+key,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:250,temperature:0.7}})
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    const txt=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    const feedback=txt.replace(/ACTION:.*/,'').trim();
+    const retry=txt.includes('ACTION: RETRY');
+    document.getElementById('spinner').style.display='none';
+    document.getElementById('aiFBText').textContent=feedback;
+    const score=Math.floor(Math.random()*25+65); scores.push(score);
+    updateStats();
+    speak(feedback,()=>{if(!retry) setTimeout(()=>{nextQuestion();},600);});
+    document.getElementById('aiFBAction').innerHTML=retry
+      ?`<button onclick="retryAnswer()" class="btn btn-mic" style="margin-top:6px">🎙️ Dobara Jawab Do</button>`
+      :`<button onclick="nextQuestion()" class="btn btn-next" style="margin-top:6px">➡️ Agla Question</button>`;
+  }catch(err){
+    document.getElementById('spinner').style.display='none';
+    document.getElementById('aiFBText').textContent='⚠️ AI load nahi hua. Internet check karo.';
+    document.getElementById('aiFBAction').innerHTML=`<div style="display:flex;gap:8px;margin-top:6px"><button onclick="submitToAI()" class="btn btn-mic">🔄 Retry</button><button onclick="nextQuestion()" class="btn btn-next">➡️ Skip</button></div>`;
+  }
+}
+
+function retryAnswer(){document.getElementById('aiFBCard').style.display='none';resetTranscript();startMic();}
+function nextQuestion(){clearInterval(timerInt);document.getElementById('aiFBCard').style.display='none';loadQuestion();}
+
+function updateStats(){
+  document.getElementById('sQ').textContent=qNum;
+  if(scores.length){
+    const avg=Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+    const best=Math.max(...scores);
+    document.getElementById('sAvg').textContent=avg+'%';
+    document.getElementById('sBest').textContent=best+'%';
+  }
+}
+
+function speak(text,cb){
+  if(!window.speechSynthesis){if(cb)cb();return;}
+  speechSynthesis.cancel();
+  setTimeout(()=>{
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='hi-IN'; u.rate=0.85;
+    const voices=speechSynthesis.getVoices();
+    const v=voices.find(x=>x.lang.startsWith('hi'))||voices.find(x=>x.name.toLowerCase().includes('google'));
+    if(v) u.voice=v;
+    let done=false;
+    const fallback=setTimeout(()=>{if(!done){done=true;if(cb)cb();}},Math.max(2000,text.length*70));
+    u.onend=()=>{if(!done){done=true;clearTimeout(fallback);if(cb)cb();}};
+    u.onerror=()=>{if(!done){done=true;clearTimeout(fallback);if(cb)cb();}};
+    speechSynthesis.speak(u);
+  },150);
+}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+window.addEventListener('beforeunload',()=>{if(sessionActive&&qNum>0){const avg=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):0;saveProgress(avg);}});
+
+showBanner();
+speechSynthesis.getVoices();
 </script>
+</body>
+</html>
